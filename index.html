@@ -2637,15 +2637,33 @@ async function salvaArticoloDaCarico() {
 // Elimina articolo direttamente dalla lista (solo se stock totale = 0 in magazzini reali)
 async function delArtDirect(id) {
   const a = getArt(id);
-  const stockReale = totalArtReale(id);
-  if (stockReale > 0) { toast('Articolo presente in magazzini reali — spostalo prima nel Cestino', true); return; }
-  if (!confirm(`Eliminare definitivamente "${a?.nome}"?
-Questa operazione è irreversibile.`)) return;
+  const dove = D.stock.filter(s => s.art_id==id && s.qty>0).map(s => s.qty + ' in ' + (getMag(s.mag_id)?.nome || '?')).join(', ');
+  const msg = dove ? `Eliminare definitivamente "${a?.nome}"?
+
+È presente in: ${dove}.
+Verrà tolto da tutti i magazzini. Operazione irreversibile.`
+                   : `Eliminare definitivamente "${a?.nome}"?
+Questa operazione è irreversibile.`;
+  if (!confirm(msg)) return;
   try {
-    await apiFetch('DELETE',`/articoli/${id}`);
+    await apiFetch('DELETE', `/articoli/${id}`);
     await loadPartial('articoli'); renderArticoli();
     toast(`"${a?.nome}" eliminato ✓`);
-  } catch(e) { toast(e.message||'Errore imprevisto — riprova', true); }
+  } catch(e) {}
+}
+
+// toglie un articolo da un solo magazzino (scarica tutta la quantità): resta in Articoli > senza stock
+async function togliDaMagazzino(artId, magId) {
+  const a = getArt(artId), m = getMag(magId), q = getStock(artId, magId);
+  if (!q) return;
+  if (!confirm(`Togliere ${q} ${a?.um||'pz'} di "${a?.nome}" da "${m?.nome}"?
+
+L'articolo resta nel database: se non ha stock altrove lo trovi in Articoli > senza stock, dove puoi eliminarlo.`)) return;
+  try {
+    await apiFetch('POST', '/stock/scarica', { art_id: artId, mag_id: magId, qty: q, note: 'Rimosso dal magazzino' });
+    await loadPartial('stock'); renderMagDetailTable(); renderPage(curPage);
+    toast(`"${a?.nome}" tolto da "${m?.nome}" ✓`);
+  } catch(e) {}
 }
 
 // ─── TRASFERISCI TUTTO (Tour) ───
@@ -2836,8 +2854,7 @@ function renderMagDetailTable() {
       <td style="text-align:right"><span style="${qtyStyle}">${s.qty}</span></td>
       <td style="${monoStyle}">${h(a?.um)||'pz'}</td>
       <td>${catPill(cat)}</td>
-      <td></td>
-
+      <td style="text-align:right">${!isSpecial ? `<button class="btn btn-ghost btn-xs" title="Togli da questo magazzino" onclick="event.stopPropagation();togliDaMagazzino(${s.art_id},${magId})">✕</button>` : ''}</td>
     </tr>`;
     const expandRow = isBau
       ? `<tr class="mag-bau-expand" id="bau-exp-${s.art_id}" style="display:none">

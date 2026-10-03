@@ -213,8 +213,8 @@ app.put('/api/articoli/:id', (req, res) => {
 });
 app.delete('/api/articoli/:id', (req, res) => {
   touch();
-  if (db.prepare(`SELECT COUNT(*) as n FROM stock s JOIN magazzini m ON m.id=s.mag_id WHERE s.art_id=? AND s.qty>0 AND m.virtuale=0`).get(req.params.id).n > 0)
-    return res.status(400).json({ error: 'Articolo presente in magazzini reali' });
+  const inFlc = db.prepare('SELECT a.nome FROM flightcase_def f JOIN articoli a ON a.id=f.art_id WHERE f.art_id_contenuto=?').get(req.params.id);
+  if (inFlc) return res.status(400).json({ error: 'È il contenuto del flight case "' + inFlc.nome + '": elimina prima il flight case' });
   try {
     db.transaction(() => {
       const righeIds = db.prepare('SELECT id FROM lista_righe WHERE art_id=?').all(req.params.id).map(r => r.id);
