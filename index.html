@@ -935,6 +935,7 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
       <span id="userLabel">—</span>
       <button onclick="exportaDb()" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);border-radius:4px;padding:6px 8px;font-size:12px;cursor:pointer;font-family:'DM Mono',monospace;text-align:left">💾 Esporta database</button>
       <button onclick="document.getElementById('impFile').click()" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);border-radius:4px;padding:6px 8px;font-size:12px;cursor:pointer;font-family:'DM Mono',monospace;text-align:left">⤓ Importa database</button>
+      <button onclick="eliminaDb()" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);border-radius:4px;padding:6px 8px;font-size:12px;cursor:pointer;font-family:'DM Mono',monospace;text-align:left;color:#fca5a5;border-color:rgba(252,165,165,.35)">🗑 Elimina database</button>
       <input type="file" id="impFile" accept=".db,.sqlite,.sqlite3,application/octet-stream" style="display:none" onchange="importaDb(this)">
     </div>
     <div class="aside-foot" id="clock">--:--</div>
@@ -4732,7 +4733,7 @@ function renderBauli() {
       ? `<span class="baule-badge compilato">${b.n_voci} voci</span>`
       : `<span class="baule-badge vuoto">vuoto</span>`;
     const stockRealeB = totalArtReale(b.id);
-    const eliminabile = stockRealeB === 0;
+    const eliminabile = true;
     const adminFoot = currentUser?.ruolo === 'admin'
       ? `<div class="baule-foot">
            ${eliminabile
@@ -4880,19 +4881,17 @@ async function salvaBaule() {
 async function eliminaBaule(id) {
   const b = D.bauli.find(x => x.id === id) || D.flightcase.find(x => x.id === id);
   if (!b) { toast('Elemento non trovato', true); return; }
-  const stockRealeB = totalArtReale(id);
-  if (stockRealeB > 0) {
-    toast('Sposta prima nel cestino per poterlo eliminare', true);
-    return;
-  }
-  const tipo = isBauleArt(id) ? 'baule' : 'flight case';
-  if (!confirm(`Eliminare definitivamente "${b.nome}" (${tipo})?\nOperazione irreversibile.`)) return;
+  const isB = isBauleArt(id), tipo = isB ? 'baule' : 'flight case';
+  const dove = D.stock.filter(s => s.art_id==id && s.qty>0).map(s => getMag(s.mag_id)?.nome).filter(Boolean).join(', ');
+  let extra = isB ? '\nLe voci del baule verranno cancellate.' : '';
+  if (!isB) { const fc = getFlightcaseDef(id); if (fc && fc.qty_caricata > 0) extra = `\nI ${fc.qty_caricata} pz di "${fc.art_contenuto_nome||'articolo'}" contenuti tornano in stock${dove ? ` in "${dove}"` : ''}.`; }
+  if (!confirm(`Eliminare definitivamente "${b.nome}" (${tipo})${dove ? `, presente in: ${dove}` : ''}?${extra}\nOperazione irreversibile.`)) return;
   try {
     await apiFetch('DELETE', `/bauli/${id}`);
     await Promise.all([loadPartial('spostamenti'), _aggiornaBauliD()]);
     if (_bauliTab === 'flc') renderFlc(); else renderBauli();
     toast(`"${b.nome}" eliminato ✓`);
-  } catch(e) { toast(e.message || 'Errore', true); }
+  } catch(e) {}
 }
 
 // Ricarica bauli, articoli e stock in parallelo
@@ -4935,7 +4934,7 @@ function renderFlc() {
 
   grid.innerHTML = D.flightcase.map(fc => {
     const stockReale = totalArtReale(fc.id);
-    const eliminabile = stockReale === 0;
+    const eliminabile = true;
     const qtyInfo = fc.art_contenuto_nome
       ? `<div style="font-size:10px;color:var(--ink3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${h(fc.art_contenuto_nome)}</div>`
       : '';

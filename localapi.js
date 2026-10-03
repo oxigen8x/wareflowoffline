@@ -3,7 +3,7 @@
 'use strict';
 const DB_KEY = 'db';
 const USER = { id: 1, username: 'iPad', ruolo: 'admin' };
-let SQL, raw, db, timer = null;
+let SQL, raw, db, timer = null, resetting = false;
 
 // ── IndexedDB (persistenza del file .db) ──
 const idb = () => new Promise((ok, ko) => {
@@ -13,12 +13,14 @@ const idb = () => new Promise((ok, ko) => {
 });
 const idbGet = async k => { const d = await idb(); return new Promise((ok, ko) => {
   const q = d.transaction('kv').objectStore('kv').get(k); q.onsuccess = () => ok(q.result); q.onerror = () => ko(q.error); }); };
+const idbDel = async k => { const d = await idb(); return new Promise((ok, ko) => {
+  const t = d.transaction('kv', 'readwrite'); t.objectStore('kv').delete(k); t.oncomplete = ok; t.onerror = () => ko(t.error); }); };
 const idbSet = async (k, v) => { const d = await idb(); return new Promise((ok, ko) => {
   const t = d.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = ok; t.onerror = () => ko(t.error); }); };
 
 // export() di sql.js chiude e riapre il DB: i PRAGMA vanno reimpostati
 function snapshot() { const b = raw.export(); raw.exec('PRAGMA foreign_keys = ON'); return b; }
-const save = () => idbSet(DB_KEY, snapshot());
+const save = () => resetting ? Promise.resolve() : idbSet(DB_KEY, snapshot());
 const scheduleSave = () => { clearTimeout(timer); timer = setTimeout(save, 300); };
 addEventListener('pagehide', () => { if (timer) { clearTimeout(timer); timer = null; save(); } });
 document.addEventListener('visibilitychange', () => { if (document.hidden && timer) { clearTimeout(timer); timer = null; save(); } });
@@ -443,18 +445,22 @@ app.delete('/api/bauli/voci/:id', (req, res) => {
 // DELETE baule o flight case (solo admin)
 app.delete('/api/bauli/:id', (req, res) => {
   touch();
-  const stockReale = db.prepare(`
-    SELECT COUNT(*) as n FROM stock s
-    JOIN magazzini m ON m.id=s.mag_id
-    WHERE s.art_id=? AND s.qty>0 AND m.virtuale=0
-  `).get(req.params.id);
-  if (stockReale.n > 0)
-    return res.status(400).json({ error: 'Sposta prima nel cestino prima di eliminare' });
+  const fcDel = db.prepare('SELECT * FROM flightcase_def WHERE art_id=?').get(req.params.id);
+  const uidDel = req.session.user.id;
   try {
     db.transaction(() => {
       const righeIds = db.prepare('SELECT id FROM lista_righe WHERE art_id=?').all(req.params.id).map(r => r.id);
       for (const rigaId of righeIds) db.prepare('DELETE FROM lista_flag WHERE riga_id=?').run(rigaId);
       db.prepare('DELETE FROM lista_righe WHERE art_id=?').run(req.params.id);
+      if (fcDel && fcDel.qty_caricata > 0) {   // i pezzi contenuti tornano in stock dove si trova il case
+        const loc = db.prepare('SELECT mag_id FROM stock WHERE art_id=? AND qty>0 ORDER BY mag_id LIMIT 1').get(req.params.id);
+        if (loc) {
+          const nomeFc = db.prepare('SELECT nome FROM articoli WHERE id=?').get(req.params.id)?.nome || '';
+          db.prepare('INSERT INTO stock (art_id,mag_id,qty) VALUES (?,?,?) ON CONFLICT(art_id,mag_id) DO UPDATE SET qty=qty+excluded.qty').run(fcDel.art_id_contenuto, loc.mag_id, fcDel.qty_caricata);
+          db.prepare('INSERT INTO spostamenti (art_id,mag_from,mag_to,qty,tipo,note,data,user_id) VALUES (?,?,?,?,?,?,?,?)')
+            .run(fcDel.art_id_contenuto, null, loc.mag_id, fcDel.qty_caricata, 'carico', 'Scaricato da: ' + nomeFc + ' (eliminato)', new Date().toISOString(), uidDel);
+        }
+      }
       db.prepare('DELETE FROM baule_voci WHERE art_id=?').run(req.params.id);
       db.prepare('DELETE FROM flightcase_def WHERE art_id=?').run(req.params.id);
       db.prepare('DELETE FROM spostamenti WHERE art_id=?').run(req.params.id);
@@ -770,6 +776,17 @@ try {
   try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (_) {}
   await save();
 })();
+
+// ── Elimina il database corrente (ripartenza da zero) ──
+window.eliminaDb = async () => {
+  if (!confirm('Eliminare TUTTO il database di questo iPad?\n\nArticoli, magazzini, bauli e flight case verranno cancellati per sempre.\nSe non hai ancora esportato un backup, premi Annulla ed esporta prima.')) return;
+  const t = prompt('Per confermare scrivi ELIMINA');
+  if (t === null || t.trim().toUpperCase() !== 'ELIMINA') { alert('Annullato: il database non è stato toccato.'); return; }
+  resetting = true; clearTimeout(timer); timer = null;
+  try { await idbDel(DB_KEY); }
+  catch (e) { resetting = false; alert('Impossibile eliminare il database: ' + (e.message || e)); return; }
+  location.reload();
+};
 
 // ── Backup: esporta / importa il file .db ──
 window.exportaDb = async () => {
