@@ -1,0 +1,9 @@
+{
+  "name": "WareFlow Offline", "short_name": "WareFlow",
+  "start_url": "./", "scope": "./", "display": "standalone", "orientation": "any",
+  "background_color": "#0d1f1a", "theme_color": "#0d1f1a",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"}
+  ]
+}
