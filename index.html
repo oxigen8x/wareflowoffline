@@ -459,6 +459,12 @@ textarea.finput{resize:vertical;min-height:60px;}
 .flck-voce-az{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .flck-pz{display:flex;align-items:center;gap:8px;padding:7px 4px;border-bottom:0.5px solid var(--border);cursor:pointer;font-size:13px}
 
+.cv-tiles{display:flex;flex-wrap:wrap;gap:8px}
+.cv-tile{position:relative;min-width:92px;padding:10px 14px;border:2px solid var(--border);border-radius:10px;background:var(--bg,#fff);cursor:pointer;text-align:center;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.cv-tile.on{border-color:var(--green);background:var(--green-bg,#ecfdf5)}
+.cv-name{font-weight:700;font-size:15px}
+.cv-n{font-family:'Fraunces',serif;font-size:22px;font-weight:700;min-height:28px;color:var(--green)}
+.cv-minus{position:absolute;top:2px;right:2px;width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:var(--bg,#fff);cursor:pointer;font-size:16px;line-height:1;padding:0}
 .var-block{border:1px dashed var(--border);border-radius:8px;padding:10px 12px}
 .var-block label.var-toggle{display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;font-size:13px;margin:0}
 .var-block label.var-toggle input{width:20px;height:20px}
@@ -1144,13 +1150,18 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
             <div id="cMagList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px"></div>
             <input type="hidden" id="cMag">
             <div id="cMagSel" style="font-size:12px;font-family:'DM Mono',monospace;color:var(--green);min-height:18px;margin-bottom:12px"></div>
+            <div id="cVarPanel" style="display:none;margin-bottom:14px">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><label style="margin:0;font-weight:600">Quanti pezzi *</label><input class="finput" id="cVarTot" type="number" min="1" max="200" value="1" style="width:90px" oninput="cvSetTot(this.value)" autocomplete="off"></div>
+              <div id="cVarTiles" class="cv-tiles"></div>
+              <div id="cVarInfo" style="font-size:12px;margin-top:8px;min-height:18px"></div>
+            </div>
             <div class="form-grid form-row-2" style="margin-bottom:14px">
-              <div class="fgroup">
+              <div class="fgroup" id="cQtyWrap">
                 <label>Quantità *</label>
                 <input class="finput" id="cQty" type="number" min="1" step="1" placeholder="0" autocomplete="off">
               </div>
             </div>
-            <div class="fgroup" style="margin-bottom:16px">
+            <div class="fgroup" id="cNoteWrap" style="margin-bottom:16px">
               <label>Note articolo</label>
               <input class="finput" id="cNote" placeholder="Caratteristiche, modello, specifiche tecniche..." autocomplete="off">
             </div>
@@ -1207,9 +1218,8 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
 <div class="fgroup" id="naArtVarWrap"><div class="var-block">
 <label class="var-toggle"><input type="checkbox" id="naArtVarOn" onchange="onVarToggle('naArt')"> Articolo con varianti <span style="font-weight:400;font-size:11px;color:var(--ink3)">(pezzi univoci)</span></label>
 <div id="naArtVarBox" style="display:none;margin-top:10px">
-<div class="fgroup"><label>Quanti pezzi *</label><input class="finput" type="number" min="1" max="200" id="naArtVarN" placeholder="es. 6" style="width:110px" autocomplete="off"></div>
 <div class="fgroup"><label>Varianti * <span style="font-weight:400;font-size:11px;color:var(--ink3)">(separate da virgola)</span></label><input class="finput" id="naArtVarList" placeholder="es. cp60, cp61, cp62" autocomplete="off"></div>
-<div style="font-size:11px;color:var(--ink3);line-height:1.5">Crea tanti articoli distinti "Nome #1, #2…", ognuno con la propria variante (all'inizio la prima della lista) e codici progressivi. La variante di ogni pezzo si cambia poi dal magazzino.</div>
+<div style="font-size:11px;color:var(--ink3);line-height:1.5">Si crea l'articolo generico. I pezzi nascono al carico: scegli quanti e di quale variante, con codici LU3-1, LU3-2… (i numeri non si riusano).</div>
 </div></div></div>
               <div class="fgroup">
                 <label>Descrizione / Note <span style="font-weight:400;font-size:11px;color:var(--ink3)">(rimane sull'articolo)</span></label>
@@ -2044,9 +2054,8 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
       <div class="fgroup" id="artVarWrap"><div class="var-block">
 <label class="var-toggle"><input type="checkbox" id="artVarOn" onchange="onVarToggle('art')"> Articolo con varianti <span style="font-weight:400;font-size:11px;color:var(--ink3)">(pezzi univoci)</span></label>
 <div id="artVarBox" style="display:none;margin-top:10px">
-<div class="fgroup"><label>Quanti pezzi *</label><input class="finput" type="number" min="1" max="200" id="artVarN" placeholder="es. 6" style="width:110px" autocomplete="off"></div>
 <div class="fgroup"><label>Varianti * <span style="font-weight:400;font-size:11px;color:var(--ink3)">(separate da virgola)</span></label><input class="finput" id="artVarList" placeholder="es. cp60, cp61, cp62" autocomplete="off"></div>
-<div style="font-size:11px;color:var(--ink3);line-height:1.5">Crea tanti articoli distinti "Nome #1, #2…", ognuno con la propria variante (all'inizio la prima della lista) e codici progressivi. La variante di ogni pezzo si cambia poi dal magazzino.</div>
+<div style="font-size:11px;color:var(--ink3);line-height:1.5">Si crea l'articolo generico. I pezzi nascono al carico: scegli quanti e di quale variante, con codici LU3-1, LU3-2… (i numeri non si riusano).</div>
 </div></div></div>
 <div class="fgroup"><label>Descrizione / Note <span style="font-weight:400;font-size:11px;color:var(--ink3)">(rimane sull'articolo)</span></label><textarea class="finput" id="artNote" rows="2" placeholder="Caratteristiche, modello, specifiche tecniche..." autocomplete="off"></textarea></div>
     </div>
@@ -2639,12 +2648,20 @@ function renderCaricoNoStock() {
   const listNoStock = D.articoli.filter(a =>
     totalArtAny(a.id) === 0
   );
+  const mv = modelliSenzaPezzi();
   const wrap = document.getElementById('caricoNoStockWrap');
-  if (wrap) wrap.style.display = listNoStock.length ? '' : 'none';
+  if (wrap) wrap.style.display = (listNoStock.length || mv.length) ? '' : 'none';
   const tbody = document.getElementById('tbCaricoNoStock');
   if (!tbody) return;
-  tbody.innerHTML = listNoStock.length
-    ? listNoStock.map(a => {
+  tbody.innerHTML = (listNoStock.length || mv.length)
+    ? mv.map(m => { const cat = getCat(m.cat_id);
+        return `<tr onclick="caricaModello(${m.id})" title="Clicca per caricare">
+          <td>${codiceBadge(m.codice || '—', cat?.colore)}</td>
+          <td><strong>${h(m.nome)}</strong> <span class="var-chip">${m.varianti.length} varianti</span></td>
+          <td>${catPill(cat)}</td>
+          <td style="font-family:'DM Mono',monospace;font-size:12px">pz</td>
+          <td class="wrap" style="font-size:12px;color:var(--ink3)">${h(m.note)||'—'}</td>
+        </tr>`; }).join('') + listNoStock.map(a => {
         const cat = getCat(a.cat_id);
         return `<tr onclick="selArtDaNoStock(${a.id})" title="Clicca per selezionare">
           <td>${codiceBadge(a.codice, cat?.colore)}</td>
@@ -2660,7 +2677,7 @@ function renderCaricoNoStock() {
 function selArtDaNoStock(artId) {
   const sel = document.getElementById('cArticolo');
   if (!sel) return;
-  sel.value = artId;
+  sel.value = artId; cvRender();
   document.querySelectorAll('#tbCaricoNoStock tr').forEach(tr => {
     tr.classList.toggle('selected', tr.getAttribute('onclick') === `selArtDaNoStock(${artId})`);
   });
@@ -2678,10 +2695,19 @@ function renderCrea() {
   document.getElementById('naArtCodiceHint').textContent = 'Seleziona prima la categoria';
   // Tabella articoli senza stock
   const noMag = D.articoli.filter(a=>totalArtAny(a.id)===0);
+  const noMagMod = modelliSenzaPezzi();
   const badge = document.getElementById('stockNoMagBadge');
-  if(badge){ badge.textContent=noMag.length; badge.style.display=noMag.length?'':'none'; }
+  if(badge){ { const nt=noMag.length+modelliSenzaPezzi().length; badge.textContent=nt; badge.style.display=nt?'':'none'; } }
   const tbNoMag = document.getElementById('tbStockNoMag');
-  if(tbNoMag) tbNoMag.innerHTML = noMag.length ? noMag.map(a=>{
+  if(tbNoMag) tbNoMag.innerHTML = (noMag.length||noMagMod.length) ? noMagMod.map(m=>{ const cat=getCat(m.cat_id);
+    return `<tr>
+      <td>${codiceBadge(m.codice||'—', cat?.colore)}</td>
+      <td><strong>${h(m.nome)}</strong> <span class="var-chip">${m.varianti.map(h).join(' · ')}</span></td>
+      <td>${catPill(cat)}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">pz</td>
+      <td style="font-size:12px;color:var(--ink3)">${h(m.note)||'—'}</td>
+      <td style="white-space:nowrap">${modelloVuotoBtns(m)}</td>
+    </tr>`; }).join('') + noMag.map(a=>{
     const cat = getCat(a.cat_id);
     return `<tr>
       <td>${codiceBadge(a.codice, cat?.colore)}</td>
@@ -2726,7 +2752,9 @@ function filterCaricoArticoli() {
   const catId = document.getElementById('cCategoria').value;
   const prevArt = document.getElementById('cArticolo').value;
   const lista = (catId ? D.articoli.filter(a=>a.cat_id==catId) : D.articoli).filter(a => !isSpecialArt(a.id));
+  const mods = (D.modelli || []).filter(m => !catId || m.cat_id == catId);
   document.getElementById('cArticolo').innerHTML =
+    mods.map(m=>`<option value="m${m.id}"${'m'+m.id===prevArt?' selected':''}>${m.codice?'['+h(m.codice)+'] ':''}${h(m.nome)} (con varianti)</option>`).join('') +
     lista.map(a=>`<option value="${a.id}"${a.id==prevArt?' selected':''}>[${h(a.codice)}] ${h(a.nome)}${a.variante?' · '+h(a.variante):''}</option>`).join('');
 }
 function onCaricoChange() {
@@ -2735,15 +2763,19 @@ function onCaricoChange() {
   const a = getArt(+artId);
   document.getElementById('cNote').value = a?.note || '';
   if (a?.modello_id) document.getElementById('cQty').value = 1;
+  if (cvModello()?.id !== _cv.mid) { _cv = { tot: 1, q: {}, mid: cvModello()?.id }; }
+  cvRender();
 }
 function renderCaricoMagList() {
   // Per il carico mostra tutti i magazzini reali con il totale pezzi già presenti
-  const artId = document.getElementById('cArticolo').value;
+  const artIdRaw = document.getElementById('cArticolo').value;
+  const mod = cvModello();
+  const artId = mod ? '' : artIdRaw;
   const selMagId = +document.getElementById('cMag').value;
   const list = document.getElementById('cMagList');
   list.innerHTML = D.magazzini.map(m=>{
     const tot    = totalMag(m.id);
-    const artQty = artId ? getStock(artId, m.id) : null;
+    const artQty = mod ? D.articoli.filter(x => x.modello_id == mod.id).reduce((n, x) => n + getStock(x.id, m.id), 0) : (artId ? getStock(artId, m.id) : null);
     const isSel  = selMagId && m.id==selMagId;
     const isVirt = !!m.virtuale;
     const colDot = m.colore&&!isVirt ? `<span style="width:8px;height:8px;border-radius:50%;background:${m.colore};display:inline-block;margin-right:5px"></span>` : '';
@@ -2752,7 +2784,7 @@ function renderCaricoMagList() {
     return `<div class="${cls}" onclick="selCaricoMag(${m.id})">
       <div>
         <div style="font-weight:600;display:flex;align-items:center">${colDot}${h(m.nome)} ${virtBadge}</div>
-        <div style="font-size:11px;color:var(--ink3);margin-top:1px">${h(m.citta)||''} · ${tot} pz totali${artId&&artQty!==null?` · <strong style="color:var(--ink)">${artQty} di questo art.</strong>`:''}</div>
+        <div style="font-size:11px;color:var(--ink3);margin-top:1px">${h(m.citta)||''} · ${tot} pz totali${(artId||mod)&&artQty!==null?` · <strong style="color:var(--ink)">${artQty} di questo art.</strong>`:''}</div>
       </div>
       ${isSel?`<span class="stock-map-badge" class="stock-badge-a" style="font-size:11px">✓ selezionato</span>`:''}
     </div>`;
@@ -2764,7 +2796,24 @@ function selCaricoMag(magId) {
   document.getElementById('cMagSel').textContent = `Destinazione: ${h(m.nome)}`;
   renderCaricoMagList();
 }
+async function salvaCaricoModello(m) {
+  const mag_id = +document.getElementById('cMag').value;
+  if (!mag_id) { toast('Seleziona il magazzino destinazione', true); return; }
+  const righe = m.varianti.filter(v => _cv.q[v] > 0).map(v => ({ variante: v, qty: _cv.q[v] }));
+  if (cvSum() !== _cv.tot || !righe.length) { toast('Assegna tutti i pezzi a una variante', true); return; }
+  try {
+    const r = await apiFetch('POST', `/modelli/${m.id}/carica`, { mag_id, righe, note: '' });
+    document.getElementById('cMag').value = ''; document.getElementById('cMagSel').textContent = '';
+    _cv = { tot: 1, q: {}, mid: m.id };
+    await loadPartial('articoli');
+    filterCaricoArticoli(); document.getElementById('cArticolo').value = 'm' + m.id;
+    onCaricoChange(); renderCaricoNoStock();
+    toast(`${r.pezzi.length} ${r.pezzi.length === 1 ? 'pezzo caricato' : 'pezzi caricati'} ✓`);
+  } catch (e) { toast(e.message || 'Errore imprevisto — riprova', true); }
+}
 async function salvaCarico() {
+  const mCar = cvModello();
+  if (mCar) return salvaCaricoModello(mCar);
   const art_id = +document.getElementById('cArticolo').value;
   const mag_id = +document.getElementById('cMag').value;
   const qty    = +document.getElementById('cQty').value;
@@ -2807,7 +2856,7 @@ async function salvaArticoloDaCarico() {
       resetVar('naArt');
       await loadPartial('articoli'); renderCaricaScarica();
       if(curPage==='crea') renderCrea();
-      toast('Articolo con varianti creato ✓');
+      toast('Articolo con varianti creato ✓ — i pezzi si creano al carico');
     } catch(e) {}
     return;
   }
@@ -3105,7 +3154,7 @@ function artGruppoRows(g) {
       <td class="wrap" style="font-size:12px;color:var(--ink3)">${h(m.note) || '—'}</td>
       <td class="col-depositi wrap"><div class="stock-inline">${(pills + virt) || '<span style="font-size:11px;color:var(--ink3)">—</span>'}</div></td>
       <td>${catPill(cat)}</td>
-      <td style="text-align:right;white-space:nowrap">${isAdmin ? `<button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();modificaVarianti(${m.id})">Varianti</button> <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();aggiungiPezzi(${m.id})">+ pezzi</button>` : ''}</td>
+      <td style="text-align:right;white-space:nowrap">${isAdmin ? `<button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();modificaVarianti(${m.id})">Varianti</button> <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();caricaModello(${m.id})">↓ Carica</button>` : ''}</td>
     </tr>
     <tr class="art-expand-row${open ? ' open' : ''}"><td colspan="8" class="art-expand-cell"><table class="pezzi-tab"><tbody>${pezzi}</tbody></table></td></tr>`;
 }
@@ -3186,15 +3235,72 @@ async function cambiaVariante(id, sel) {
     toast('Variante aggiornata ✓');
   } catch (e) { sel.value = old; }
 }
-async function aggiungiPezzi(mid) {
+function caricaModello(mid) {
+  goTo('caricoscarico');
+  document.getElementById('cCategoria').value = '';
+  filterCaricoArticoli();
+  document.getElementById('cArticolo').value = 'm' + mid;
+  onCaricoChange();
+}
+async function eliminaModello(mid) {
   const m = getModello(mid); if (!m) return;
-  const n = parseInt(prompt(`Quanti pezzi di "${m.nome}" vuoi aggiungere?`, '1'));
-  if (!n || n < 1) return;
+  if (!confirm(`Eliminare l'articolo "${m.nome}"?\nNon ha ancora pezzi creati.`)) return;
   try {
-    await apiFetch('POST', `/modelli/${mid}/pezzi`, { n });
+    await apiFetch('DELETE', `/modelli/${mid}`);
     await loadPartial('articoli'); rerenderVarianti();
-    toast(n + (n === 1 ? ' pezzo aggiunto ✓' : ' pezzi aggiunti ✓'));
+    try { renderCaricaScarica(); } catch (e) {}
+    try { if (curPage === 'crea') renderCrea(); } catch (e) {}
+    toast('Articolo eliminato ✓');
   } catch (e) {}
+}
+const modelliSenzaPezzi = () => (D.modelli || []).filter(m => !D.articoli.some(a => a.modello_id == m.id));
+const _nascosto = a => isFlightcaseArt(a.id) || isFlckArt(a.id);   // gruppi di articoli: non compaiono nelle liste articoli
+function modelloVuotoBtns(m, cls) {
+  if (currentUser?.ruolo !== 'admin') return '';
+  return `<button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();caricaModello(${m.id})">↓ Carica</button> <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();modificaVarianti(${m.id})">Varianti</button> <button class="btn btn-danger btn-xs" onclick="event.stopPropagation();eliminaModello(${m.id})">Elimina</button>`;
+}
+// Pannello varianti nel carico: quantità + tessere cliccabili con ripartizione
+let _cv = { tot: 1, q: {} };
+const cvSum = () => Object.values(_cv.q).reduce((x, y) => x + y, 0);
+function cvModello() { const v = document.getElementById('cArticolo')?.value || ''; return /^m\d+$/.test(v) ? getModello(+v.slice(1)) : null; }
+function cvReset() { _cv = { tot: 1, q: {} }; cvRender(); }
+function cvSetTot(v) {
+  let n = Math.max(1, Math.min(200, parseInt(v) || 1)); const was = _cv.tot, ks = Object.keys(_cv.q).filter(k => _cv.q[k] > 0);
+  if (n > was && cvSum() === was && ks.length === 1) _cv.q[ks[0]] = n;       // una sola variante: segue il totale
+  _cv.tot = n;
+  while (cvSum() > n) { const k = Object.keys(_cv.q).sort((x, y) => _cv.q[y] - _cv.q[x])[0]; _cv.q[k]--; if (!_cv.q[k]) delete _cv.q[k]; }
+  cvRender();
+}
+function cvTap(i) {
+  const m = cvModello(); if (!m) return; const v = m.varianti[i]; if (v === undefined) return;
+  const ks = Object.keys(_cv.q).filter(k => _cv.q[k] > 0);
+  if (!ks.length) _cv.q[v] = _cv.tot;                                    // primo tocco: tutti i pezzi a questa variante
+  else if (cvSum() < _cv.tot) _cv.q[v] = (_cv.q[v] || 0) + 1;            // ci sono pezzi da assegnare
+  else {                                                                  // tutti assegnati: ne sposto 1 dalla variante più numerosa
+    const don = ks.filter(k => k !== v).sort((x, y) => _cv.q[y] - _cv.q[x])[0];
+    if (!don) return; _cv.q[don]--; if (!_cv.q[don]) delete _cv.q[don]; _cv.q[v] = (_cv.q[v] || 0) + 1;
+  }
+  cvRender();
+}
+function cvMinus(i, ev) {
+  ev?.stopPropagation(); const m = cvModello(); if (!m) return; const v = m.varianti[i];
+  if (_cv.q[v] > 0) { _cv.q[v]--; if (!_cv.q[v]) delete _cv.q[v]; } cvRender();
+}
+function cvRender() {
+  const box = document.getElementById('cVarPanel'); if (!box) return;
+  const m = cvModello();
+  box.style.display = m ? '' : 'none';
+  const qw = document.getElementById('cQtyWrap'), nw = document.getElementById('cNoteWrap');
+  if (qw) qw.style.display = m ? 'none' : ''; if (nw) nw.style.display = m ? 'none' : '';
+  if (!m) return;
+  const rest = _cv.tot - cvSum();
+  document.getElementById('cVarTot').value = _cv.tot;
+  document.getElementById('cVarTiles').innerHTML = m.varianti.map((v, i) => {
+    const n = _cv.q[v] || 0;
+    return `<div class="cv-tile${n ? ' on' : ''}" onclick="cvTap(${i})"><div class="cv-name">${h(v)}</div><div class="cv-n">${n || ''}</div>${n ? `<button type="button" class="cv-minus" onclick="cvMinus(${i}, event)" title="Togli uno">−</button>` : ''}</div>`;
+  }).join('');
+  document.getElementById('cVarInfo').innerHTML = rest > 0 ? `Da assegnare: <strong>${rest}</strong> — tocca una variante` : `✓ ${_cv.tot} ${_cv.tot === 1 ? 'pezzo' : 'pezzi'} assegnati`;
+  document.getElementById('cVarInfo').style.color = rest > 0 ? 'var(--orange,#c2410c)' : 'var(--green)';
 }
 async function modificaVarianti(mid) {
   const m = getModello(mid); if (!m) return;
@@ -3213,19 +3319,17 @@ function onVarToggle(p) {
 }
 function resetVar(p) {
   const c = document.getElementById(p + 'VarOn'); if (!c) return;
-  c.checked = false; document.getElementById(p + 'VarN').value = ''; document.getElementById(p + 'VarList').value = '';
+  c.checked = false; document.getElementById(p + 'VarList').value = '';
   onVarToggle(p);
 }
 async function creaModelloDa(p) {      // true se creato; false se mancano dati (toast già mostrato)
   const g = f => document.getElementById(p + f);
   const cat_id = +g('Cat').value || null, nome = g('Nome').value.trim(), note = g('Note').value.trim();
-  const n_pezzi = parseInt(g('VarN').value);
   const varianti = g('VarList').value.split(/[,;\n]/).map(x => x.trim()).filter(Boolean);
   if (!cat_id) { toast('Categoria obbligatoria', true); return false; }
   if (!nome) { toast('Nome obbligatorio', true); return false; }
-  if (!(n_pezzi >= 1)) { toast('Indica quanti pezzi creare', true); return false; }
   if (!varianti.length) { toast('Indica almeno una variante', true); return false; }
-  await apiFetch('POST', '/modelli', { nome, cat_id, note, varianti, n_pezzi });
+  await apiFetch('POST', '/modelli', { nome, cat_id, note, varianti });
   return true;
 }
 
@@ -3446,7 +3550,7 @@ function renderArticoli() {
   const fc=document.getElementById('filterCatArt');
   const cv=fc.value;
   fc.innerHTML='<option value="">Tutte le categorie</option>'+
-    D.categorie.map(c=>`<option value="${c.id}"${cv==c.id?' selected':''}>[${h(c.prefisso)}] ${h(c.nome)}</option>`).join('');
+    D.categorie.filter(c=>!['FLC','FLCK'].includes(c.prefisso)).map(c=>`<option value="${c.id}"${cv==c.id?' selected':''}>[${h(c.prefisso)}] ${h(c.nome)}</option>`).join('');
   const fm=document.getElementById('filterMagArt');
   const cmv=fm.value;
   fm.innerHTML='<option value="">Tutti i magazzini</option>'+
@@ -3457,7 +3561,7 @@ function renderArticoli() {
   const magVirt=getMagVirt();
 
   // Tab 1: con stock reale
-  let listStock=D.articoli.filter(a=>totalArtReale(a.id)>0);
+  let listStock=D.articoli.filter(a=>totalArtReale(a.id)>0&&!_nascosto(a));
   if(s)  listStock=listStock.filter(a=>a.nome.toLowerCase().includes(s)||a.codice.toLowerCase().includes(s));
   if(cf) listStock=listStock.filter(a=>a.cat_id==cf);
   if(mf) listStock=listStock.filter(a=>getTot(a.id,+mf)>0);
@@ -3528,10 +3632,19 @@ function renderArticoli() {
   // Tab 2: senza stock (nessuno stock in nessun magazzino, nemmeno virtuale)
   const listNoStock=D.articoli.filter(a=>{
     const totAll=totalArtAny(a.id);
-    return totAll===0;
+    return totAll===0&&!_nascosto(a);
   });
   const listNoStockSorted = sortBauliFirst(listNoStock);
-  document.getElementById('tbArtNoStock').innerHTML = listNoStockSorted.length ? listNoStockSorted.map(a=>{
+  const modVuoti = modelliSenzaPezzi();
+  document.getElementById('tbArtNoStock').innerHTML = (listNoStockSorted.length||modVuoti.length) ? modVuoti.map(m=>{ const cat=getCat(m.cat_id);
+    return `<tr>
+      <td>${codiceBadge(m.codice||'—', cat?.colore)}</td>
+      <td><strong>${h(m.nome)}</strong> <span class="var-chip">${m.varianti.map(h).join(' · ')}</span></td>
+      <td class="wrap" style="font-size:12px;color:var(--ink3)">${h(m.note)||'—'}</td>
+      <td>${catPill(cat)}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">pz</td>
+      <td style="text-align:right;white-space:nowrap">${modelloVuotoBtns(m)}</td>
+    </tr>`; }).join('') + listNoStockSorted.map(a=>{
     const cat=getCat(a.cat_id);
     return `<tr>
       <td>${codiceBadge(a.codice, getCat(a.cat_id)?.colore)}</td>
@@ -3549,7 +3662,7 @@ function renderArticoli() {
 
   // Aggiorna badge tabs
   document.getElementById('badgeConStock').textContent = listStock.length;
-  const nNoStock = listNoStock.length;
+  const nNoStock = listNoStock.length + modVuoti.length;
   document.getElementById('badgeSenzaStock').textContent = nNoStock;
   document.getElementById('badgeSenzaStock').className = 'art-tab-badge' + (nNoStock>0?' warn':'');
 }
@@ -3701,7 +3814,7 @@ async function salvaArt() {
       if (!(await creaModelloDa('art'))) return;
       closeModal('modalArt'); await loadPartial('articoli'); renderArticoli();
       if(curPage==='crea') renderCrea();
-      toast('Articolo con varianti creato ✓');
+      toast('Articolo con varianti creato ✓ — i pezzi si creano al carico');
     } catch(e) {}
     return;
   }
@@ -4142,9 +4255,18 @@ function renderStock() {
 
   const noMag=D.articoli.filter(a=>totalArtAny(a.id)===0);
   const badge=document.getElementById('stockNoMagBadge');
-  if(badge){ badge.textContent=noMag.length; badge.style.display=noMag.length?'':'none'; }
+  if(badge){ { const nt=noMag.length+modelliSenzaPezzi().length; badge.textContent=nt; badge.style.display=nt?'':'none'; } }
   const tbNoMag=document.getElementById('tbStockNoMag');
-  if(tbNoMag) tbNoMag.innerHTML=noMag.length?noMag.map(a=>{
+  const noMagMod2=modelliSenzaPezzi();
+  if(tbNoMag) tbNoMag.innerHTML=(noMag.length||noMagMod2.length)?noMagMod2.map(m=>{ const cat=getCat(m.cat_id);
+    return `<tr>
+      <td>${codiceBadge(m.codice||'—', cat?.colore)}</td>
+      <td><strong>${h(m.nome)}</strong> <span class="var-chip">${m.varianti.map(h).join(' · ')}</span></td>
+      <td>${catPill(cat)}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">pz</td>
+      <td style="font-size:12px;color:var(--ink3)">${h(m.note)||'—'}</td>
+      <td style="white-space:nowrap">${modelloVuotoBtns(m)}</td>
+    </tr>`; }).join('')+noMag.map(a=>{
     const cat=getCat(a.cat_id);
     return `<tr>
       <td>${codiceBadge(a.codice, cat?.colore)}</td>
@@ -4816,7 +4938,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 4;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 5;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);

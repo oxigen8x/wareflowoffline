@@ -75,7 +75,7 @@ async function localFetch(method, url, body) {
   return out;
 }
 window.localFetch = localFetch;
-window.LOCALAPI_BUILD = 4;   // deve coincidere con APP_BUILD in index.html
+window.LOCALAPI_BUILD = 5;   // deve coincidere con APP_BUILD in index.html
 
 function isValidColore(c) {
   return !c || /^#[0-9a-fA-F]{3,6}$/.test(c);
@@ -90,11 +90,9 @@ function safeErr(e, context) {
 }
 
 function prossimoNumero(prefisso) {
-  const row = db.prepare(`
-    SELECT MAX(CAST(SUBSTR(codice, ?) AS INTEGER)) as max
-    FROM articoli WHERE codice LIKE ?
-  `).get(prefisso.length + 1, prefisso + '%');
-  return (row?.max || 0) + 1;
+  const mx = t => db.prepare(`SELECT MAX(CAST(SUBSTR(codice, ?) AS INTEGER)) as max FROM ${t} WHERE codice LIKE ?`)
+    .get(prefisso.length + 1, prefisso + '%')?.max || 0;
+  return Math.max(mx('articoli'), mx('modelli')) + 1;   // anche i codici degli articoli con varianti contano
 }
 
 function stockDecrement(artId, magId, amount) {
@@ -234,9 +232,7 @@ app.delete('/api/articoli/:id', (req, res) => {
       db.prepare('DELETE FROM flightcase_def WHERE art_id=? OR art_id_contenuto=?').run(req.params.id, req.params.id);
       db.prepare('DELETE FROM spostamenti WHERE art_id=?').run(req.params.id);
       db.prepare('DELETE FROM stock WHERE art_id=?').run(req.params.id);
-      const mid = db.prepare('SELECT modello_id FROM articoli WHERE id=?').get(req.params.id)?.modello_id;
       db.prepare('DELETE FROM articoli WHERE id=?').run(req.params.id);
-      if (mid && !db.prepare('SELECT 1 FROM articoli WHERE modello_id=?').get(mid)) db.prepare('DELETE FROM modelli WHERE id=?').run(mid);
     })(); res.json({ ok:true });
   } catch(e) {
     console.error('Errore eliminazione articolo:', e.message);
@@ -407,43 +403,67 @@ function pulisciVarianti(v) {
   return out.slice(0, 30);
 }
 const varDi = m => { try { return JSON.parse(m.varianti || '[]'); } catch { return []; } };
-function creaPezzi(modello, n, variante, uid) {
-  const cat = db.prepare('SELECT prefisso FROM categorie WHERE id=?').get(modello.cat_id);
-  const esistenti = db.prepare('SELECT nome FROM articoli WHERE modello_id=?').all(modello.id);
-  let k = 0;
-  for (const e of esistenti) { const mm = /#(\d+)$/.exec(e.nome); if (mm) k = Math.max(k, parseInt(mm[1])); }
-  let num = prossimoNumero(cat.prefisso);
-  const nomi = [];
-  for (let i = 1; i <= n; i++) nomi.push(`${modello.nome} #${k + i}`);
-  for (const nm of nomi) if (db.prepare('SELECT 1 FROM articoli WHERE nome=?').get(nm)) throw new Error('UNIQUE: nome ' + nm);
+// Crea n pezzi univoci "Nome #k" con codice "CODICE-k". Il contatore k non riparte mai (i numeri tolti non si riusano).
+function creaPezzi(modelloId, n, variante) {
+  const m = db.prepare('SELECT * FROM modelli WHERE id=?').get(modelloId);
+  const pfx = db.prepare('SELECT prefisso FROM categorie WHERE id=?').get(m.cat_id).prefisso;
+  let codice = m.codice;
+  if (!codice) { codice = pfx + prossimoNumero(pfx); db.prepare('UPDATE modelli SET codice=? WHERE id=?').run(codice, m.id); }
+  let k = m.prossimo || 1;
   const ins = db.prepare('INSERT INTO articoli (codice,nome,cat_id,um,note,modello_id,variante) VALUES (?,?,?,?,?,?,?)');
-  return nomi.map(nm => { const r = ins.run(cat.prefisso + (num++), nm, modello.cat_id, 'pz', modello.note || '', modello.id, variante); return Number(r.lastInsertRowid); });
+  const ids = [];
+  for (let i = 0; i < n; i++, k++) {
+    const nome = `${m.nome} #${k}`;
+    if (db.prepare('SELECT 1 FROM articoli WHERE nome=? OR codice=?').get(nome, `${codice}-${k}`)) throw new Error('UNIQUE: ' + nome);
+    ids.push(Number(ins.run(`${codice}-${k}`, nome, m.cat_id, 'pz', m.note || '', m.id, variante).lastInsertRowid));
+  }
+  db.prepare('UPDATE modelli SET prossimo=? WHERE id=?').run(k, m.id);
+  return ids;
 }
 app.get('/api/modelli', (_, res) =>
   res.json(db.prepare('SELECT * FROM modelli ORDER BY nome').all().map(m => ({ ...m, varianti: varDi(m) }))));
+// Crea l'articolo generico: nome, categoria, elenco varianti. I pezzi nascono al carico.
 app.post('/api/modelli', (req, res) => {
   touch();
-  const { nome, cat_id, note = '', n_pezzi, variante_iniziale } = req.body;
+  const { nome, cat_id, note = '' } = req.body;
   const varianti = pulisciVarianti(req.body.varianti);
   if (!nome?.trim()) return res.status(400).json({ error: 'Nome obbligatorio' });
   if (!cat_id) return res.status(400).json({ error: 'Categoria obbligatoria' });
-  const n = parseInt(n_pezzi);
-  if (isNaN(n) || n < 1 || n > 200) return res.status(400).json({ error: 'Numero di pezzi non valido (1–200)' });
   if (!varianti.length) return res.status(400).json({ error: 'Indica almeno una variante' });
   const cat = db.prepare('SELECT prefisso FROM categorie WHERE id=?').get(cat_id);
   if (!cat) return res.status(400).json({ error: 'Categoria non trovata' });
   if (['BAU', 'FLC', 'FLCK'].includes(cat.prefisso)) return res.status(400).json({ error: 'Categoria non consentita per i pezzi con varianti' });
   if (!cat.prefisso) return res.status(400).json({ error: 'La categoria scelta non ha un prefisso codice' });
-  const iniz = varianti.includes(variante_iniziale) ? variante_iniziale : varianti[0];
   try {
-    let modelloId, ids;
-    db.transaction(() => {
-      const r = db.prepare('INSERT INTO modelli (nome,cat_id,um,note,varianti) VALUES (?,?,?,?,?)').run(nome.trim(), cat_id, 'pz', note, JSON.stringify(varianti));
-      modelloId = Number(r.lastInsertRowid);
-      ids = creaPezzi({ id: modelloId, nome: nome.trim(), cat_id, note }, n, iniz, req.session.user.id);
-    })();
-    res.json({ ok: true, id: modelloId, pezzi: ids });
+    const codice = cat.prefisso + prossimoNumero(cat.prefisso);
+    const r = db.prepare('INSERT INTO modelli (nome,cat_id,um,note,varianti,codice,prossimo) VALUES (?,?,?,?,?,?,1)').run(nome.trim(), cat_id, 'pz', note, JSON.stringify(varianti), codice);
+    res.json({ ok: true, id: Number(r.lastInsertRowid), codice });
   } catch (e) { res.status(400).json({ error: safeErr(e, 'POST modelli') }); }
+});
+// Carico: crea i pezzi (con la variante scelta per ciascun gruppo) e li mette nel magazzino
+app.post('/api/modelli/:id/carica', (req, res) => {
+  touch();
+  const m = db.prepare('SELECT * FROM modelli WHERE id=?').get(req.params.id);
+  if (!m) return res.status(404).json({ error: 'Articolo non trovato' });
+  const { mag_id, note = '' } = req.body;
+  if (!mag_id || !db.prepare('SELECT 1 FROM magazzini WHERE id=?').get(mag_id)) return res.status(400).json({ error: 'Magazzino non valido' });
+  const vs = varDi(m);
+  const righe = (Array.isArray(req.body.righe) ? req.body.righe : []).map(r => ({ variante: String(r.variante ?? '').trim(), qty: parseInt(r.qty) }));
+  if (!righe.length || righe.some(r => !(r.qty >= 1) || !vs.includes(r.variante))) return res.status(400).json({ error: 'Scegli la variante e la quantità' });
+  const tot = righe.reduce((n, r) => n + r.qty, 0);
+  if (tot > 200) return res.status(400).json({ error: 'Al massimo 200 pezzi per volta' });
+  const uid = req.session.user.id, data = new Date().toISOString();
+  try {
+    let ids = [];
+    db.transaction(() => {
+      for (const r of righe) ids = ids.concat(creaPezzi(m.id, r.qty, r.variante));
+      for (const id of ids) {
+        db.prepare('INSERT INTO stock (art_id,mag_id,qty) VALUES (?,?,1)').run(id, mag_id);
+        db.prepare('INSERT INTO spostamenti (art_id,mag_from,mag_to,qty,tipo,note,data,user_id) VALUES (?,NULL,?,1,?,?,?,?)').run(id, mag_id, 'carico', note, data, uid);
+      }
+    })();
+    res.json({ ok: true, pezzi: ids });
+  } catch (e) { res.status(400).json({ error: safeErr(e, 'POST modelli carica') }); }
 });
 app.post('/api/modelli/:id/pezzi', (req, res) => {
   touch();
@@ -455,7 +475,7 @@ app.post('/api/modelli/:id/pezzi', (req, res) => {
   const iniz = vs.includes(req.body.variante) ? req.body.variante : (vs[0] || '');
   try {
     let ids;
-    db.transaction(() => { ids = creaPezzi(m, n, iniz, req.session.user.id); })();
+    db.transaction(() => { ids = creaPezzi(m.id, n, iniz); })();
     res.json({ ok: true, pezzi: ids });
   } catch (e) { res.status(400).json({ error: safeErr(e, 'POST modelli pezzi') }); }
 });
@@ -469,6 +489,12 @@ app.put('/api/modelli/:id', (req, res) => {
   const mancanti = usate.filter(u => !varianti.includes(u));
   if (mancanti.length) return res.status(400).json({ error: 'Variante in uso su alcuni pezzi: ' + mancanti.join(', ') });
   db.prepare('UPDATE modelli SET varianti=? WHERE id=?').run(JSON.stringify(varianti), m.id);
+  res.json({ ok: true });
+});
+app.delete('/api/modelli/:id', (req, res) => {
+  touch();
+  if (db.prepare('SELECT 1 FROM articoli WHERE modello_id=?').get(req.params.id)) return res.status(400).json({ error: 'Ci sono ancora pezzi di questo articolo: eliminali prima' });
+  db.prepare('DELETE FROM modelli WHERE id=?').run(req.params.id);
   res.json({ ok: true });
 });
 app.put('/api/articoli/:id/variante', (req, res) => {
@@ -998,6 +1024,15 @@ migrate(`CREATE TABLE IF NOT EXISTS modelli (
   cat_id INTEGER NOT NULL REFERENCES categorie(id),
   um TEXT DEFAULT 'pz', note TEXT DEFAULT '', varianti TEXT NOT NULL DEFAULT '[]'
 )`, 'modelli');
+migrate(`ALTER TABLE modelli ADD COLUMN codice TEXT`, 'modelli.codice');
+migrate(`ALTER TABLE modelli ADD COLUMN prossimo INTEGER NOT NULL DEFAULT 1`, 'modelli.prossimo');
+try {   // il contatore dei pezzi riparte da dopo l'ultimo numero già usato
+  for (const m of db.prepare('SELECT id FROM modelli').all()) {
+    let k = 0;
+    for (const e of db.prepare('SELECT nome FROM articoli WHERE modello_id=?').all(m.id)) { const mm = /#(\d+)$/.exec(e.nome); if (mm) k = Math.max(k, parseInt(mm[1])); }
+    db.prepare('UPDATE modelli SET prossimo=MAX(prossimo,?) WHERE id=?').run(k + 1, m.id);
+  }
+} catch (e) { console.warn('Migrazione modelli:', e.message); }
 try { db.exec(`UPDATE liste_carico SET tipo='veloce' WHERE tipo='provvisoria'`); } catch(e) { console.warn('Migrazione tipo lista:', e.message); }
 
 // Migration: ensure ON DELETE CASCADE on critical FK relationships
