@@ -2170,15 +2170,27 @@ function _rebuildMaps() {
   D._artMap = Object.fromEntries(D.articoli.map(a => [a.id, a]));
   D._magMap = Object.fromEntries(D.magazzini.map(m => [m.id, m]));
   D._catMap = Object.fromEntries(D.categorie.map(c => [c.id, c]));
+  D._spCat = new Set(D.categorie.filter(c => ['BAU','FLC','FLCK'].includes(c.prefisso)).map(c => c.id));
+  // contenuto dei case: _contMap[artId][magId] = { tot, case:[{id,nome,codice,qty,tipo}] }
+  D._contMap = {};
+  const addC = (artId, k, tipo, each) => {
+    for (const [mid, cq] of Object.entries(D._stockMap[k.id] || {})) {
+      if (!(cq > 0)) continue;
+      const e = ((D._contMap[artId] ??= {})[mid] ??= { tot: 0, case: [] });
+      e.tot += each * cq; e.case.push({ id: k.id, nome: k.nome, codice: k.codice, qty: each * cq, tipo });
+    }
+  };
+  for (const fc of D.flightcase || []) if (fc.art_id_contenuto && fc.qty_caricata > 0) addC(fc.art_id_contenuto, fc, 'FLC', fc.qty_caricata);
+  for (const k of D.flck || []) for (const v of k.voci) if (v.qty_caricata > 0) addC(v.art_id, k, 'FLCK', v.qty_caricata);
 }
 
 // Ricarica solo i dati che cambiano con l'operazione specificata
 async function loadPartial(tipo) {
   const reload = {
-    stock:        ['/stock'],
-    spostamenti:  ['/stock', '/spostamenti'],
-    articoli:     ['/articoli', '/stock', '/modelli'],
-    magazzini:    ['/magazzini', '/stock', '/articoli', '/modelli'],
+    stock:        ['/stock', '/flightcase', '/flck'],
+    spostamenti:  ['/stock', '/spostamenti', '/flightcase', '/flck'],
+    articoli:     ['/articoli', '/stock', '/modelli', '/flightcase', '/flck'],
+    magazzini:    ['/magazzini', '/stock', '/articoli', '/modelli', '/flightcase', '/flck'],
     categorie:    ['/categorie', '/articoli'],
     all:          null
   }[tipo] || null;
@@ -2200,8 +2212,50 @@ const getCat     = id => D._catMap?.[id] ?? D.categorie.find(c => c.id == id);
 const getArt     = id => D._artMap?.[id] ?? D.articoli.find(a => a.id == id);
 const getMagVirt = ()  => D.magazzini.find(m => m.virtuale == 1);
 const getStock   = (artId, magId) => D._stockMap?.[artId]?.[magId] || 0;
-const totalMag   = magId  => { const map=D._stockMap; if(map){let t=0;for(const mm of Object.values(map))t+=mm[magId]||0;return t;} return D.stock.filter(s=>s.mag_id==magId).reduce((n,s)=>n+s.qty,0); };
-const totalArtReale = artId => D.stock.filter(s => s.art_id==artId && !getMag(s.mag_id)?.virtuale).reduce((n,s)=>n+s.qty,0);
+// Totali: contano gli articoli liberi + quelli dentro i case (FLC/FLCK) che si trovano nel magazzino.
+// Bauli, flight case e flightcase K sono contenitori e non contano come pezzi.
+const totalMag   = magId  => {
+  let t = 0; const sp = D._spCat;
+  for (const [aid, mm] of Object.entries(D._stockMap || {})) { if (sp && sp.has(D._artMap?.[aid]?.cat_id)) continue; t += mm[magId] || 0; }
+  for (const mm of Object.values(D._contMap || {})) t += mm[magId]?.tot || 0;
+  return t;
+};
+const getTot = (artId, magId) => getStock(artId, magId) + (D._contMap?.[artId]?.[magId]?.tot || 0);
+const totalArtReale = artId => {
+  let t = D.stock.filter(s => s.art_id==artId && !getMag(s.mag_id)?.virtuale).reduce((n,s)=>n+s.qty,0);
+  for (const [mid, c] of Object.entries(D._contMap?.[artId] || {})) if (!getMag(+mid)?.virtuale) t += c.tot;
+  return t;
+};
+const totalArtAny = artId => D.stock.filter(s => s.art_id==artId).reduce((n,s)=>n+s.qty,0)
+  + Object.values(D._contMap?.[artId] || {}).reduce((n,c)=>n+c.tot,0);
+function righeMagConContenuti(magId) {        // righe stock del magazzino, con il contenuto dei case sommato
+  const out = [], seen = new Set();
+  for (const s of D.stock) if (s.mag_id == magId && s.qty > 0) {
+    seen.add(s.art_id);
+    const c = D._contMap?.[s.art_id]?.[magId];
+    out.push(c ? { ...s, qty: s.qty + c.tot, _lib: s.qty, _case: c.case } : s);
+  }
+  for (const [aid, mm] of Object.entries(D._contMap || {})) {
+    const c = mm[magId];
+    if (c && !seen.has(+aid)) out.push({ art_id: +aid, mag_id: magId, qty: c.tot, _lib: 0, _case: c.case });
+  }
+  return out;
+}
+const caseTot = cs => cs.reduce((n, e) => n + e.qty, 0);
+function caseChips(lib, cs) {
+  return (lib > 0 ? ` <span class="var-chip">${lib} liberi</span>` : '') + ` <span class="var-chip">${caseTot(cs)} nei case</span>`;
+}
+function caseBreakdown(lib, cs) {
+  const righe = (lib > 0 ? [`<div>${lib} liberi nel magazzino</div>`] : [])
+    .concat(cs.map(e => `<div>${e.qty} in <strong>${h(e.nome)}</strong> <span style="color:var(--ink3);font-family:'DM Mono',monospace;font-size:11px">${h(e.codice)}</span></div>`));
+  return `<div style="font-size:12px;line-height:1.7;padding:2px 4px">${righe.join('')}</div>`;
+}
+function caseLines(artId) {                   // pagina Articoli: dove sono i pezzi nei case
+  const rows = [];
+  for (const [mid, c] of Object.entries(D._contMap?.[artId] || {}))
+    for (const e of c.case) rows.push(`<span class="var-chip">${e.qty} in ${h(e.nome)} (${h(getMag(+mid)?.nome || '—')})</span>`);
+  return rows.length ? `<div style="margin-top:6px;font-size:11px;color:var(--ink3)">Nei case: ${rows.join(' ')}</div>` : '';
+}
 
 // ─── UTILS ───
 // Helper getElementById shorthand
@@ -2506,7 +2560,7 @@ function onSposArticoloChange() {
         <div style="font-weight:600;display:flex;align-items:center">${colDot}${h(m.nome)}</div>
         <div class="stock-map-badges">${virtBadge}${daBadge}${aBadge}</div>
       </div>
-      <span class="stock-map-qty" style="color:${qty===0?'var(--ink3)':'var(--ink)'}">${qty}<span style="font-size:11px;font-weight:400;font-family:'DM Sans',sans-serif;margin-left:3px">${h(a?.um)||'pz'}</span></span>
+      <span class="stock-map-qty" style="color:${qty===0?'var(--ink3)':'var(--ink)'}">${qty}<span style="font-size:11px;font-weight:400;font-family:'DM Sans',sans-serif;margin-left:3px">${h(a?.um)||'pz'}</span>${D._contMap?.[artId]?.[m.id]?.tot?`<span style="font-size:10px;font-weight:400;color:var(--ink3);margin-left:6px">+${D._contMap[artId][m.id].tot} nei case</span>`:''}</span>
     </div>`;
   }).join('');
   updateSposDisp();
@@ -2544,7 +2598,8 @@ function updateSposDisp() {
   const el      = document.getElementById('sDisponibile');
   if (artId && magDaId) {
     const disp = getStock(artId, magDaId);
-    el.textContent = `Disponibile in "${getMag(magDaId)?.nome}": ${disp} ${getArt(artId)?.um||'pz'}`;
+    const inC = D._contMap?.[artId]?.[magDaId]?.tot || 0;
+    el.textContent = `Disponibile in "${getMag(magDaId)?.nome}": ${disp} ${getArt(artId)?.um||'pz'}` + (inC ? ` (altri ${inC} sono nei case e viaggiano con il case)` : '');
     el.style.color = disp===0 ? 'var(--red)' : 'var(--green)';
   } else { el.textContent=''; }
 }
@@ -2582,7 +2637,7 @@ async function salvaSpostamento() {
 // ─── CARICO / SCARICO ───
 function renderCaricoNoStock() {
   const listNoStock = D.articoli.filter(a =>
-    D.stock.filter(s => s.art_id == a.id).reduce((n,s) => n+s.qty, 0) === 0
+    totalArtAny(a.id) === 0
   );
   const wrap = document.getElementById('caricoNoStockWrap');
   if (wrap) wrap.style.display = listNoStock.length ? '' : 'none';
@@ -2622,7 +2677,7 @@ function renderCrea() {
   document.getElementById('naArtNote').value   = '';
   document.getElementById('naArtCodiceHint').textContent = 'Seleziona prima la categoria';
   // Tabella articoli senza stock
-  const noMag = D.articoli.filter(a=>D.stock.filter(s=>s.art_id==a.id).reduce((n,s)=>n+s.qty,0)===0);
+  const noMag = D.articoli.filter(a=>totalArtAny(a.id)===0);
   const badge = document.getElementById('stockNoMagBadge');
   if(badge){ badge.textContent=noMag.length; badge.style.display=noMag.length?'':'none'; }
   const tbNoMag = document.getElementById('tbStockNoMag');
@@ -3011,7 +3066,7 @@ function raggruppaPezziMag(righe) {        // righe stock di un magazzino → gr
   return out;
 }
 function dovePezzo(a) {
-  const dove = D.magazzini.filter(m => getStock(a.id, m.id) > 0).map(m => h(m.nome) + (m.virtuale ? ' 🗑' : ''));
+  const dove = D.magazzini.filter(m => getTot(a.id, m.id) > 0).map(m => { const c = D._contMap?.[a.id]?.[m.id]; return h(m.nome) + (m.virtuale ? ' 🗑' : '') + (c ? ` (in ${h(c.case[0].nome)})` : ''); });
   return dove.length ? dove.join(', ') : '<span style="color:var(--ink3)">senza magazzino</span>';
 }
 function toggleGrp(el, key) {
@@ -3028,11 +3083,11 @@ function artGruppoRows(g) {
   const m = g.modello, cat = getCat(m.cat_id), isAdmin = currentUser?.ruolo === 'admin';
   const key = 'art:' + m.id, open = _openGrp.has(key);
   const pills = D.magazzini.filter(x => !x.virtuale).map(x => {
-    const n = g.pezzi.reduce((s, a) => s + getStock(a.id, x.id), 0);
+    const n = g.pezzi.reduce((s, a) => s + getTot(a.id, x.id), 0);
     return n ? `<span class="stock-pill"><strong>${n}</strong> ${h(x.nome)}</span>` : '';
   }).join('');
   const mv = getMagVirt();
-  const nv = mv ? g.pezzi.reduce((s, a) => s + getStock(a.id, mv.id), 0) : 0;
+  const nv = mv ? g.pezzi.reduce((s, a) => s + getTot(a.id, mv.id), 0) : 0;
   const virt = isAdmin && nv > 0 ? `<span class="stock-pill" style="background:var(--teal-bg);border-color:var(--teal-border);color:var(--virt-text)"><strong>${nv}</strong> cestino</span>` : '';
   const tot = g.pezzi.reduce((s, a) => s + totalArtReale(a.id), 0);
   const pezzi = g.pezzi.map(a => `<tr>
@@ -3059,7 +3114,7 @@ function stockGruppoRow(r) {
   const pezzi = r.pezzi.map(a => `<tr><td style="width:70px">${codiceBadge(a.codice, getCat(a.cat_id)?.colore)}</td><td><strong>${h(a.nome)}</strong></td><td>${varSelect(a)}</td></tr>`).join('');
   return `<tr${r.m.virtuale ? ' class="stock-virt-row"' : ''} onclick="toggleGrp(this,'${key}')" style="cursor:pointer">
       <td>${codiceBadge(r.pezzi[0].codice, cat?.colore)}</td>
-      <td><strong>${h(m.nome)}</strong> <span class="var-chip var-chip-n">×${r.pezzi.length}</span> ${varSummary(r.pezzi)}</td>
+      <td><strong>${h(m.nome)}</strong> <span class="var-chip var-chip-n">×${r.pezzi.length}</span> ${varSummary(r.pezzi)}${r.pezzi.some(a => getStock(a.id, r.m.id) === 0) ? ` <span class="var-chip">${r.pezzi.filter(a => getStock(a.id, r.m.id) === 0).length} nei case</span>` : ''}</td>
       <td>${catPill(cat)}</td>
       <td>${h(r.m.nome)}</td>
       <td><span style="font-family:'Fraunces',serif;font-size:22px;font-weight:700">${r.qty}</span></td>
@@ -3071,15 +3126,15 @@ function magGruppoRows(g) {
   const m = g.modello, cat = getCat(m.cat_id), key = 'mag:' + m.id, open = _openGrp.has(key);
   const dests = (currentUser?.ruolo === 'admin' ? D.magazzini : getMagReali()).filter(x => x.id != _detailMagId);
   const pezzi = g.pezzi.map(a => `<tr>
-      <td style="width:40px;padding-left:6px;padding-right:2px"><input type="checkbox" class="pz-chk" ${_selPezzi.has(a.id) ? 'checked' : ''} onclick="event.stopPropagation()" onchange="selPezzo(${a.id}, this.checked)"></td>
+      <td style="width:40px;padding-left:6px;padding-right:2px"><input type="checkbox" class="pz-chk" ${getStock(a.id, _detailMagId) > 0 ? '' : 'disabled'} ${_selPezzi.has(a.id) ? 'checked' : ''} onclick="event.stopPropagation()" onchange="selPezzo(${a.id}, this.checked)"></td>
       <td style="width:70px">${codiceBadge(a.codice, getCat(a.cat_id)?.colore)}</td>
-      <td><strong>${h(a.nome)}</strong></td>
+      <td><strong>${h(a.nome)}</strong>${getStock(a.id, _detailMagId) > 0 ? '' : ` <span class="var-chip">in ${h(D._contMap?.[a.id]?.[_detailMagId]?.case[0]?.nome || 'case')}</span>`}</td>
       <td>${varSelect(a)}</td>
-      <td style="width:34px;text-align:right">${typeof togliDaMagazzino === 'function' ? `<button class="btn btn-danger btn-xs" onclick="event.stopPropagation();togliDaMagazzino(${a.id})" title="Togli dal magazzino">✕</button>` : ''}</td>
+      <td style="width:34px;text-align:right">${typeof togliDaMagazzino === 'function' && getStock(a.id, _detailMagId) > 0 ? `<button class="btn btn-danger btn-xs" onclick="event.stopPropagation();togliDaMagazzino(${a.id})" title="Togli dal magazzino">✕</button>` : ''}</td>
     </tr>`).join('');
   return `<tr class="mag-bau-row" onclick="toggleGrp(this,'${key}')">
       <td>${codiceBadge(g.pezzi[0].codice, cat?.colore)}</td>
-      <td><strong><span class="mag-bau-arrow" style="${open ? 'transform:rotate(90deg)' : ''}">▶</span>${h(m.nome)} <span class="var-chip var-chip-n">×${g.pezzi.length}</span> ${varSummary(g.pezzi)}</strong>${noteBtn(g.pezzi[0].id)}</td>
+      <td><strong><span class="mag-bau-arrow" style="${open ? 'transform:rotate(90deg)' : ''}">▶</span>${h(m.nome)} <span class="var-chip var-chip-n">×${g.pezzi.length}</span> ${varSummary(g.pezzi)}${g.pezzi.some(a => getStock(a.id, _detailMagId) === 0) ? ` <span class="var-chip">${g.pezzi.filter(a => getStock(a.id, _detailMagId) === 0).length} nei case</span>` : ''}</strong>${noteBtn(g.pezzi[0].id)}</td>
       <td style="text-align:right"><span style="font-family:'Fraunces',serif;font-size:20px;font-weight:700">${g.qty}</span></td>
       <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--ink3)">pz</td>
       <td>${catPill(cat)}</td>
@@ -3193,7 +3248,7 @@ function renderMagDetailTable() {
   // Popola filtro categoria con solo le categorie presenti nel magazzino
   const selCat = document.getElementById('filterCatDetail');
   const prevCat = selCat.value;
-  const righeAll = D.stock.filter(s=>s.mag_id==magId&&s.qty>0);
+  const righeAll = righeMagConContenuti(magId);
   const catPresenti = [...new Map(righeAll.map(s=>{ const a=getArt(s.art_id); const c=getCat(a?.cat_id); return c?[c.id,c]:null; }).filter(Boolean)).entries()].map(([,c])=>c);
   selCat.innerHTML = '<option value="">Tutte le categorie</option>' +
     catPresenti.map(c=>`<option value="${c.id}"${c.id==prevCat?' selected':''}>${h(c.nome)}</option>`).join('');
@@ -3208,14 +3263,17 @@ function renderMagDetailTable() {
     const isBau = isBauleArt(s.art_id);
     const isFLC = isFlightcaseArt(s.art_id);
     const isFLCK = isFlckArt(s.art_id), kDef = isFLCK ? getFlck(s.art_id) : null;
-    const isSpecial = isBau || isFLC || isFLCK;
+    const hasCase = !isBau && !isFLC && !isFLCK && !!(s._case && s._case.length);
+    const isSpecial = isBau || isFLC || isFLCK || hasCase;
     const fcDef = isFLC ? getFlightcaseDef(s.art_id) : null;
     const specialPill = isFLCK ? flckPillMag(kDef) : isBau
       ? `<span class="mag-bau-pill"><svg width="10" height="10" viewBox="0 0 48 48" fill="none" style="vertical-align:middle;margin-right:2px"><rect x="6" y="12" width="36" height="26" rx="2" stroke="#92400e" stroke-width="3.5" fill="none"/><path d="M6 12l3-3h30l3 3" stroke="#92400e" stroke-width="3" fill="none"/><rect x="6" y="12" width="4" height="4" rx="0.5" fill="#92400e" opacity=".5"/><rect x="38" y="12" width="4" height="4" rx="0.5" fill="#92400e" opacity=".5"/><rect x="6" y="34" width="4" height="4" rx="0.5" fill="#92400e" opacity=".5"/><rect x="38" y="34" width="4" height="4" rx="0.5" fill="#92400e" opacity=".5"/><line x1="6" y1="25" x2="42" y2="25" stroke="#92400e" stroke-width="2" opacity=".5"/><circle cx="16" cy="25" r="2" fill="#92400e" opacity=".5"/><circle cx="32" cy="25" r="2" fill="#92400e" opacity=".5"/></svg> baule</span>`
       : isFLC
       ? `<span class="mag-bau-pill" style="background:#6b4c6e22;color:#6b4c6e;border-color:#6b4c6e44"><svg width="10" height="10" viewBox="0 0 48 48" fill="none" style="vertical-align:middle;margin-right:2px"><rect x="6" y="12" width="36" height="26" rx="2" stroke="#6b4c6e" stroke-width="3.5" fill="none"/><path d="M6 12l3-3h30l3 3" stroke="#6b4c6e" stroke-width="3" fill="none"/><rect x="6" y="12" width="4" height="4" rx="0.5" fill="#6b4c6e" opacity=".5"/><rect x="38" y="12" width="4" height="4" rx="0.5" fill="#6b4c6e" opacity=".5"/><rect x="6" y="34" width="4" height="4" rx="0.5" fill="#6b4c6e" opacity=".5"/><rect x="38" y="34" width="4" height="4" rx="0.5" fill="#6b4c6e" opacity=".5"/><line x1="6" y1="25" x2="42" y2="25" stroke="#6b4c6e" stroke-width="2" opacity=".5"/><circle cx="16" cy="25" r="2" fill="#6b4c6e" opacity=".5"/><circle cx="32" cy="25" r="2" fill="#6b4c6e" opacity=".5"/></svg> case${fcDef?` · ${h(fcDef.art_contenuto_nome)} ×${fcDef.qty_max}`:''}</span>`
       : '';
-    const nomeCell = isSpecial
+    const nomeCell = hasCase
+      ? `<strong><span class="mag-bau-arrow" id="bau-arr-${s.art_id}">▶</span>${a?h(a.nome):'—'}${caseChips(s._lib, s._case)}</strong>${noteBtn(s.art_id)}`
+      : isSpecial
       ? `<strong><span class="mag-bau-arrow" id="bau-arr-${s.art_id}">▶</span>${h(a?.nome)||'—'}${specialPill}</strong>`
       : `<strong>${a?h(a.nome):'—'}</strong>${noteBtn(s.art_id)}`;
     const mainRow = `<tr class="${isSpecial?'mag-bau-row':''}" ${isSpecial?`onclick="toggleBauleInMag(${s.art_id})"`:''}>
@@ -3226,7 +3284,9 @@ function renderMagDetailTable() {
       <td>${catPill(cat)}</td>
       <td style="text-align:right">${!isSpecial ? `<button class="btn btn-ghost btn-xs" title="Togli da questo magazzino" onclick="event.stopPropagation();togliDaMagazzino(${s.art_id},${magId})">✕</button>` : ''}</td>
     </tr>`;
-    const expandRow = isFLCK
+    const expandRow = hasCase
+      ? `<tr class="mag-bau-expand" id="bau-exp-${s.art_id}" style="display:none"><td colspan="6"><div class="mag-bau-expand-inner" style="padding:6px 12px">${caseBreakdown(s._lib, s._case)}</div></td></tr>`
+      : isFLCK
       ? `<tr class="mag-bau-expand" id="bau-exp-${s.art_id}" style="display:none"><td colspan="6"><div class="mag-bau-expand-inner" style="padding:8px 12px">${flckContenutoBox(kDef)}</div></td></tr>`
       : isBau
       ? `<tr class="mag-bau-expand" id="bau-exp-${s.art_id}" style="display:none">
@@ -3260,7 +3320,7 @@ async function toggleBauleInMag(artId) {
   expRow.style.display = isOpen ? 'none' : '';
   if (arrow) arrow.style.transform = isOpen ? '' : 'rotate(90deg)';
   // FLC: expand row is static, no async load needed
-  if (isFlightcaseArt(artId) || isFlckArt(artId)) return;
+  if (!isBauleArt(artId)) return;
   // BAU: load voci from API
   const vociDiv = document.getElementById(`bau-voci-${artId}`);
   if (!isOpen && vociDiv) {
@@ -3400,16 +3460,16 @@ function renderArticoli() {
   let listStock=D.articoli.filter(a=>totalArtReale(a.id)>0);
   if(s)  listStock=listStock.filter(a=>a.nome.toLowerCase().includes(s)||a.codice.toLowerCase().includes(s));
   if(cf) listStock=listStock.filter(a=>a.cat_id==cf);
-  if(mf) listStock=listStock.filter(a=>getStock(a.id,+mf)>0);
+  if(mf) listStock=listStock.filter(a=>getTot(a.id,+mf)>0);
   listStock=raggruppaPezzi(sortBauliFirst(listStock));
 
   document.getElementById('tbArt').innerHTML = listStock.length ? listStock.map(a=>{
     if (a.g) return artGruppoRows(a);
     const cat=getCat(a.cat_id);
     const totReale=totalArtReale(a.id);
-    const totVirt=magVirt?getStock(a.id,magVirt.id):0;
-    const pills=D.magazzini.filter(m=>!m.virtuale&&getStock(a.id,m.id)>0)
-      .map(m=>`<span class="stock-pill"><strong>${getStock(a.id,m.id)}</strong> ${h(m.nome)}</span>`).join('');
+    const totVirt=magVirt?getTot(a.id,magVirt.id):0;
+    const pills=D.magazzini.filter(m=>!m.virtuale&&getTot(a.id,m.id)>0)
+      .map(m=>`<span class="stock-pill"><strong>${getTot(a.id,m.id)}</strong> ${h(m.nome)}</span>`).join('');
     const isAdmin = currentUser?.ruolo==='admin';
     const virtPill = isAdmin && totVirt>0 ? `<span class="stock-pill" style="background:var(--teal-bg);border-color:var(--teal-border);color:var(--virt-text)"><strong>${totVirt}</strong> cestino</span>` : '';
     const allPills = pills + virtPill;
@@ -3459,6 +3519,7 @@ function renderArticoli() {
       <td colspan="8" class="art-expand-cell">
         <div style="font-size:10px;color:var(--ink3);margin-bottom:4px;font-family:'DM Mono',monospace;letter-spacing:.5px">${cat?.nome||''}</div>
         <div class="stock-inline">${expandPills||'<span style="font-size:11px;color:var(--ink3)">—</span>'}</div>
+        ${caseLines(a.id)}
         ${specialExpand}
       </td>
     </tr>`;
@@ -3466,7 +3527,7 @@ function renderArticoli() {
 
   // Tab 2: senza stock (nessuno stock in nessun magazzino, nemmeno virtuale)
   const listNoStock=D.articoli.filter(a=>{
-    const totAll=D.stock.filter(s=>s.art_id==a.id).reduce((n,s)=>n+s.qty,0);
+    const totAll=totalArtAny(a.id);
     return totAll===0;
   });
   const listNoStockSorted = sortBauliFirst(listNoStock);
@@ -3540,14 +3601,14 @@ function renderNonAssegnati() {
   tbody.innerHTML = righe.map(s=>{
     const a=getArt(s.art_id), cat=getCat(a?.cat_id);
     const stockReale=totalArtReale(s.art_id);
-    const pillsReali=D.magazzini.filter(m=>!m.virtuale&&getStock(s.art_id,m.id)>0)
-      .map(m=>`<span class="stock-pill"><strong>${getStock(s.art_id,m.id)}</strong> ${h(m.nome)}</span>`).join('');
+    const pillsReali=D.magazzini.filter(m=>!m.virtuale&&getTot(s.art_id,m.id)>0)
+      .map(m=>`<span class="stock-pill"><strong>${getTot(s.art_id,m.id)}</strong> ${h(m.nome)}</span>`).join('');
     return `<tr class="nonass-row">
       <td>${codiceBadge(a?.codice, a ? getCat(a.cat_id)?.colore : null)}</td>
       <td><strong>${a?h(a.nome):'—'}</strong>${varChip(a)}</td>
       <td>${catPill(cat)}</td>
       <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--ink3)">${h(a?.um)||'pz'}</td>
-      <td><span style="font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--virt-text)">${s.qty}</span></td>
+      <td><span style="font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--virt-text)">${getTot(s.art_id,s.mag_id)}</span></td>
       <td>${stockReale>0?`<div class="stock-inline">${pillsReali}</div>`:'<span style="font-size:12px;color:var(--ink3)">Nessuno stock altrove</span>'}</td>
       <td style="text-align:right">
         ${stockReale===0
@@ -4030,17 +4091,19 @@ function renderStock() {
   D.articoli.forEach(a=>{
     if(s&&!a.nome.toLowerCase().includes(s)&&!a.codice.toLowerCase().includes(s)) return;
     if(sc.value&&a.cat_id!=sc.value) return;
+    if(isSpecialArt(a.id)) return;   // nello stock solo gli articoli, non i contenitori
     D.magazzini.forEach(m=>{
       if(m.virtuale) return;
       if(sm.value&&m.id!=sm.value) return;
-      const qty=getStock(a.id,m.id);
-      if(qty>0) rows.push({a,m,qty});
+      const lib=getStock(a.id,m.id), cs=D._contMap?.[a.id]?.[m.id];
+      const qty=lib+(cs?cs.tot:0);
+      if(qty>0) rows.push({a,m,qty,lib,cs:cs?cs.case:[]});
     });
   });
   const rowsSorted = raggruppaPezziStock(sortBauliFirst(rows, r => r.a.id));
   document.getElementById('tbStock').innerHTML=rowsSorted.length?rowsSorted.map(r=>{
     if (r.g) return stockGruppoRow(r);
-    const {a,m,qty}=r;
+    const {a,m,qty}=r, cs=r.cs||[], hasCase=cs.length>0;
     const cat=getCat(a.cat_id);
     const isBau = isBauleArt(a.id);
     const isFLC = isFlightcaseArt(a.id);
@@ -4051,7 +4114,7 @@ function renderStock() {
       : isFLC && fcDef
       ? ` <span style="font-size:9px;background:#6b4c6e15;color:#6b4c6e;border:1px solid #6b4c6e33;padding:1px 5px;border-radius:3px;font-family:'DM Mono',monospace">case · ${h(fcDef.art_contenuto_nome)} ${fcDef.qty_caricata}/${fcDef.qty_max}</span>`
       : '';
-    const isSpecial = isBau || isFLC || isFLCK;
+    const isSpecial = isBau || isFLC || isFLCK || hasCase;
     const rowClick = isSpecial ? ` onclick="toggleStockExpand(this)" style="cursor:pointer"` : '';
     let expandRow = '';
     if (isBau) {
@@ -4065,9 +4128,10 @@ function renderStock() {
       </div></td></tr>`;
     }
     if (isFLCK) expandRow = `<tr class="art-expand-row"><td colspan="7" class="art-expand-cell">${flckContenutoBox(kDef)}</td></tr>`;
+    if (hasCase) expandRow = `<tr class="art-expand-row"><td colspan="7" class="art-expand-cell">${caseBreakdown(r.lib, cs)}</td></tr>`;
     return `<tr${m.virtuale?' class="stock-virt-row"':''}${rowClick}>
       <td>${codiceBadge(a.codice, getCat(a.cat_id)?.colore)}</td>
-      <td><strong>${h(a.nome)}</strong>${varChip(a)}${specialTag}</td>
+      <td><strong>${h(a.nome)}</strong>${varChip(a)}${specialTag}${hasCase?caseChips(r.lib,cs):''}</td>
       <td>${catPill(cat)}</td>
       <td>${h(m.nome)}${m.virtuale?' <span class="badge badge-orange" style="font-size:10px">virtuale</span>':''}</td>
       <td><span style="font-family:'Fraunces',serif;font-size:22px;font-weight:700">${qty}</span></td>
@@ -4076,7 +4140,7 @@ function renderStock() {
     </tr>${expandRow}`;
   }).join(''):'<tr><td colspan="7" class="empty">Nessuno stock trovato</td></tr>';
 
-  const noMag=D.articoli.filter(a=>D.stock.filter(s=>s.art_id==a.id).reduce((n,s)=>n+s.qty,0)===0);
+  const noMag=D.articoli.filter(a=>totalArtAny(a.id)===0);
   const badge=document.getElementById('stockNoMagBadge');
   if(badge){ badge.textContent=noMag.length; badge.style.display=noMag.length?'':'none'; }
   const tbNoMag=document.getElementById('tbStockNoMag');
@@ -4941,10 +5005,10 @@ function stampaTesto(zoneId) {
 
 async function stampaMagDetail() {
   const m = getMag(_detailMagId);
-  const righe = D.stock.filter(s => s.mag_id == _detailMagId && s.qty > 0);
+  const righe = righeMagConContenuti(_detailMagId);
   const cf = document.getElementById('filterCatDetail').value;
   const righeFiltered = cf ? righe.filter(s => getArt(s.art_id)?.cat_id == cf) : righe;
-  const totale = righeFiltered.reduce((n, s) => n + s.qty, 0);
+  const totale = righeFiltered.reduce((n, s) => n + (isSpecialArt(s.art_id) ? 0 : s.qty), 0);
   // Carica le voci di tutti i bauli prima di stampare
   const catBAU = D.categorie.find(c => c.prefisso === 'BAU');
   const bauliInMag = righeFiltered.filter(s => catBAU && getArt(s.art_id)?.cat_id === catBAU.id);
