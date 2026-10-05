@@ -32,6 +32,7 @@
   --teal:#1D9E75;--teal-dark:#0F6E56;--teal-darker:#085041;
   --teal-light:#5DCAA5;--teal-xlight:#9FE1CB;
   --teal-bg:rgba(29,158,117,.08);--teal-border:rgba(29,158,117,.2);
+  --on-teal:#fff;
   /* ── Cestino / virtuale ── */
   --virt-bg:#fff7ed;--virt-border:#fed7aa;--virt-text:#c2410c;
 }
@@ -180,6 +181,136 @@ body.dark[data-theme="red"]{background:linear-gradient(160deg,#141414 0%,#0f0f0f
   --teal-bg:rgba(200,20,20,.12);--teal-border:rgba(200,20,20,.3);
   --aside-bg:#0f0f0f;--virt-bg:#1e1e1e;--virt-border:#3a1010;--virt-text:#FF3333;
 }
+/* ── Dashboard (stile Tabellone) ── */
+.ds-counters .lk-count{flex:1;min-width:0;}
+.ds-cta{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.ds-cta-btn{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:0 18px;height:68px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:border-color .15s;}
+.ds-cta-btn:hover{border-color:var(--border2);}
+.ds-cta-ico{width:42px;height:42px;border-radius:10px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
+.ds-cta-txt{flex:1;min-width:0;}
+.ds-cta-txt b{display:block;font-size:16px;font-weight:700;color:var(--ink);}
+.ds-cta-txt span{display:block;font-size:12px;color:var(--ink3);margin-top:1px;}
+.ds-cta-btn i{font-style:normal;font-size:18px;color:var(--ink3);}
+.ds-board{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:14px;align-items:start;}
+.ds-board>.lk-col{min-width:0;}
+.ds-stack{display:flex;flex-direction:column;gap:10px;}
+.ds-stack-tight{gap:6px;}
+.ds-all{cursor:pointer;font-size:10px;letter-spacing:0;text-transform:none;}
+.lk-card.ds-row{flex-direction:row;align-items:center;gap:12px;padding:12px 14px;}
+.ds-tile{width:40px;height:40px;border-radius:10px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.ds-num{text-align:right;}
+.ds-num b{display:block;font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:var(--ink);}
+.ds-num span{display:block;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);}
+.lk-card.ds-mov{gap:4px;padding:8px 12px;border-radius:10px;}
+.ds-mov-t{display:flex;align-items:center;gap:10px;}
+.ds-mov-t b{margin-left:auto;}
+.ds-ora{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3);white-space:nowrap;}
+.ds-rotta{min-width:0;font-size:12px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ds-mov b{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;color:var(--ink);}
+@media (max-width:1100px){.ds-board{grid-template-columns:1fr 1fr;}.ds-board>.lk-col:last-child{grid-column:1/-1;}}
+@media (max-width:760px){
+  .ds-board{grid-template-columns:1fr;}
+  .ds-cta{grid-template-columns:1fr;}
+  .ds-counters{display:grid;grid-template-columns:1fr 1fr;}
+}
+/* ── Magazzini (stile Tabellone) ── */
+.mg-board{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;}
+.lk-card.mg-card{box-shadow:inset 4px 0 0 var(--mc);gap:12px;}
+.mg-top{display:flex;gap:12px;align-items:center;padding-left:4px;}
+.mg-name{font-size:19px;font-weight:700;letter-spacing:-.3px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mg-pz b{font-size:18px;color:var(--ink2);}
+.mg-foot{display:flex;gap:6px;align-items:center;justify-content:flex-end;}
+.mg-open{height:30px;padding:0 12px;border-radius:8px;border:1px solid var(--border2);color:var(--ink2);font-size:12px;font-weight:600;display:inline-flex;align-items:center;margin-right:auto;}
+.lk-card.mg-card:hover .mg-open{border-color:var(--ink3);color:var(--ink);}
+.mg-ico{min-width:30px;height:30px;padding:0 8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--ink3);font-size:13px;cursor:pointer;font-family:inherit;}
+.mg-ico:hover{border-color:var(--border2);color:var(--ink);}
+.mg-svuota{font-size:11px;color:var(--amber);border-color:var(--amber);}
+.mg-del{color:var(--red);border-color:rgba(220,38,38,.3);font-size:12px;}
+@media (max-width:760px){.mg-board{grid-template-columns:1fr;}}
+/* ── Bauli / Flight Case / Flightcase K: riquadri e lista compatta ── */
+.bt-bar{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.bt-tabs{display:flex;gap:6px;flex-wrap:wrap;}
+.bt-tab{min-height:44px;padding:0 18px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--ink2);font-family:inherit;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;cursor:pointer;}
+.bt-tab span{font-family:'DM Mono',monospace;font-size:10px;padding:1px 7px;border-radius:10px;background:var(--bg);border:1px solid var(--border);color:var(--ink3);}
+.bt-tab.active{border-color:var(--amber);background:var(--surface2);color:var(--ink);}
+.bt-tab.active span{background:var(--amber);border-color:var(--amber);color:#241a05;}
+.bt-view{margin-left:auto;display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--surface);}
+.bt-view button{width:44px;height:42px;border:0;background:transparent;color:var(--ink3);font-size:16px;cursor:pointer;}
+.bt-view button+button{border-left:1px solid var(--border);}
+.bt-view button.on{background:var(--surface2);color:var(--amber);}
+.bt-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start;}
+.bt-card{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:border-color .15s;}
+.bt-card:hover{border-color:var(--border2);}
+.bt-band{height:92px;display:flex;align-items:center;justify-content:center;background:var(--surface2);background:color-mix(in srgb,var(--bc) 18%,var(--surface));border-bottom:3px solid var(--bc);color:var(--ink2);color:color-mix(in srgb,var(--bc) 70%,var(--ink));}
+.bt-foot{padding:12px 16px 14px;display:flex;align-items:center;gap:10px;}
+.bt-txt{flex:1;min-width:0;}
+.bt-nome{font-size:17px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bt-cod{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bt-chip{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;padding:3px 9px;border-radius:5px;white-space:nowrap;flex-shrink:0;}
+.bt-chip.ok{background:var(--surface2);border:1px solid var(--teal);color:var(--ink);}
+.bt-chip.no{border:1px dashed var(--amber);color:var(--amber);}
+.bt-del{width:28px;height:28px;padding:0;border-radius:8px;border:1px solid rgba(220,38,38,.3);background:var(--bg);color:var(--red);font-size:12px;cursor:pointer;flex-shrink:0;}
+.bt-card .bt-del{position:absolute;top:10px;right:10px;}
+.bt-del.off{opacity:.3;cursor:default;}
+.bt-list{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.bt-row{display:flex;align-items:center;gap:12px;padding:0 14px;height:46px;border-top:1px solid var(--border);cursor:pointer;box-sizing:border-box;}
+.bt-row:first-child{border-top:0;}
+.bt-row:hover{background:var(--bg2);}
+.bt-dot{width:8px;height:8px;border-radius:50%;background:var(--bc);flex-shrink:0;}
+.bt-rn{font-size:15px;font-weight:700;color:var(--ink);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bt-rc{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);max-width:34%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+@media (max-width:1000px){.bt-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media (max-width:640px){
+  .bt-grid{grid-template-columns:1fr;}
+  .bt-rc{display:none;}
+  .bt-tab{padding:0 12px;flex:1;justify-content:center;}
+  .bt-tabs{flex:1 1 100%;}
+}
+/* tasto ⚡ lista veloce (contenuto magazzino) */
+.vl-btn{min-width:38px;height:34px;padding:0 8px;box-sizing:border-box;border-radius:9px;border:1px solid var(--border2);background:transparent;color:var(--ink2);font-size:13px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:3px;font-family:inherit;transition:border-color .15s;}
+.vl-btn:hover{border-color:var(--ink3);}
+.vl-btn.on{border-color:var(--teal);background:var(--surface2);color:var(--ink);font-family:'DM Mono',monospace;font-size:12px;font-weight:500;}
+.vl-btn span{color:var(--teal);font-weight:700;}
+/* T11: Cemento — grigio neutro desaturato (accento monocromo, colore solo per gli stati) */
+[data-theme="cemento"]{
+  --bg:#b3b3b2;--bg2:#a9a9a8;
+  --surface:#bfbfbe;--surface2:#acacab;
+  --border:#979796;--border2:#858584;
+  --ink:#1a1a1a;--ink2:#3a3a3a;--ink3:#505050;
+  --green:#2b2b2a;--red:#8f3a3a;--amber:#a08647;--aside-bg:#2a2a2a;
+  --teal:#2b2b2a;--teal-dark:#1a1a1a;--teal-darker:#111111;
+  --teal-light:#6a6a69;--teal-xlight:#8a8a89;
+  --teal-bg:rgba(43,43,42,.08);--teal-border:rgba(43,43,42,.35);
+  --on-teal:#eeeeed;
+  --virt-bg:#b9b9b8;--virt-border:#979796;--virt-text:#3a3a3a;
+}
+body[data-theme="cemento"]{background:linear-gradient(160deg,#b3b3b2 0%,#aaaaa9 60%,#a3a3a2 100%) fixed;}
+body.dark[data-theme="cemento"]{background:linear-gradient(160deg,#161616 0%,#101010 60%,#0a0a0a 100%) fixed;}
+[data-theme="cemento"] aside{background:linear-gradient(180deg,#2e2e2e 0%,#222222 100%)!important;}
+body.dark[data-theme="cemento"] aside{background:linear-gradient(180deg,#171717 0%,#0c0c0c 100%)!important;}
+[data-theme="cemento"] .mobile-topbar{background:linear-gradient(90deg,#2e2e2e 0%,#222222 100%)!important;}
+body.dark[data-theme="cemento"] .mobile-topbar{background:linear-gradient(90deg,#171717 0%,#0c0c0c 100%)!important;}
+[data-theme="cemento"] .nav-btn.active{background:rgba(255,255,255,.14)!important;color:#ececeb!important;}
+[data-theme="cemento"] .beta-badge{background:rgba(255,255,255,.1)!important;color:#d0d0cf!important;border-color:rgba(255,255,255,.2)!important;}
+[data-theme="cemento"] .aside-logo{border-bottom-color:rgba(255,255,255,.12)!important;}
+[data-theme="cemento"].dark,[data-theme="cemento"] body.dark{
+  --bg:#161616;--bg2:#1e1e1e;--surface:#1f1f1f;--surface2:#292929;
+  --border:#363636;--border2:#4a4a4a;--ink:#e4e4e3;--ink2:#b0b0af;--ink3:#868685;
+  --green:#d4d4d2;--red:#cf7d7d;--amber:#c9b073;--aside-bg:#0f0f0f;
+  --teal:#d4d4d2;--teal-dark:#ececea;--teal-darker:#bdbdbb;
+  --teal-light:#9a9a99;--teal-xlight:#6e6e6d;
+  --teal-bg:rgba(212,212,210,.1);--teal-border:rgba(212,212,210,.3);
+  --on-teal:#161616;
+  --virt-bg:#1f1f1f;--virt-border:#363636;--virt-text:#c9b073;
+}
+[data-theme="cemento"] .btn-teal{color:var(--on-teal);}
+[data-theme="cemento"] .lista-stato.inattiva{background:var(--bg2);color:var(--ink2);border-color:var(--border2);}
+[data-theme="cemento"] .lista-stato.in-preparazione{background:var(--amber);color:#1a1407;border-color:var(--amber);}
+[data-theme="cemento"] .lista-stato.completa{background:var(--teal);color:var(--on-teal);border-color:var(--teal);}
+body.dark[data-theme="cemento"] .btn-teal{color:var(--on-teal);}
+[data-theme="cemento"] .lista-stato.inattiva{background:var(--bg2);color:var(--ink2);border-color:var(--border2);}
+[data-theme="cemento"] .lista-stato.in-preparazione{background:var(--amber);color:#1a1407;border-color:var(--amber);}
+[data-theme="cemento"] .lista-stato.completa{background:var(--teal);color:var(--on-teal);border-color:var(--teal);}
 .text-meta{font-size:12px;color:var(--ink3);}
 .text-mono-sm{font-size:11px;font-family:'DM Mono',monospace;color:var(--ink3);}
 .text-mono-xs{font-size:9px;font-family:'DM Mono',monospace;}
@@ -858,8 +989,8 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
   .lista-det-header{flex-direction:column;align-items:stretch;gap:10px;}
     .lista-det-top{flex-wrap:nowrap;}
     .lista-det-nome{font-size:18px;}
-    .lista-det-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;width:100%;}
-    .lista-det-actions .btn{width:100%;justify-content:center;font-size:12px;padding:8px 4px;}
+    .lista-det-actions{display:flex;justify-content:flex-end;gap:6px;width:100%;}
+    .lista-det-actions .btn{width:auto;justify-content:center;font-size:12px;padding:8px 14px;}
   .au-hide{display:none!important;}
     .au-sub-row{display:table-row!important;}
     #adminUserCard{max-width:100%!important;}
@@ -882,6 +1013,265 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
 .lista-det-actions{display:flex;gap:8px;flex-wrap:nowrap;align-items:center;flex-shrink:0;}
 .lista-group-label{font-size:9px;font-family:'DM Mono',monospace;font-weight:600;color:var(--ink3);letter-spacing:1px;text-transform:uppercase;padding:4px 0 6px;margin-top:10px;}
 .lista-group-label:first-child{margin-top:0;}
+/* ── Tabellone liste ── */
+.lk-wrap{container-type:inline-size;}
+.lk-counters{display:flex;gap:10px;margin-bottom:14px;}
+.lk-count{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 16px;min-width:88px;}
+.lk-count b{display:block;font-size:24px;font-weight:700;line-height:1;color:var(--ink);}
+.lk-count span{display:block;margin-top:4px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);}
+.lk-board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start;}
+.lk-col{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px;min-height:120px;}
+.lk-col-h{display:flex;align-items:center;gap:9px;padding:2px 4px 4px;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink2);}
+.lk-col-h i,.lk-tab i{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0;}
+.lk-col-h span{margin-left:auto;color:var(--ink3);}
+.lk-empty{border:1px dashed var(--border2);border-radius:12px;padding:16px;text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);}
+.lk-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:12px;cursor:pointer;transition:border-color .15s;}
+.lk-card:hover{border-color:var(--border2);}
+.lk-card.pronta{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-bg);}
+.lk-card-top{display:flex;gap:12px;align-items:flex-start;}
+.lk-ring{width:54px;height:54px;border-radius:50%;flex-shrink:0;background:conic-gradient(var(--c) calc(var(--p)*1%),var(--border) 0);display:flex;align-items:center;justify-content:center;}
+.lk-ring span{width:43px;height:43px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:var(--ink);}
+.lk-info{min-width:0;flex:1;}
+.lk-nome{font-size:15px;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lk-rotta{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink2);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lk-meta{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);margin-top:2px;}
+.lk-foot{display:flex;gap:6px;align-items:stretch;}
+.lk-foot .lk-btn{flex:1;min-width:0;}
+.lk-tools{display:flex;gap:6px;flex-shrink:0;}
+.lk-ico{width:42px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--ink2);font-size:15px;cursor:pointer;padding:0;}
+.lk-ico:hover{border-color:var(--border2);background:var(--bg2);}
+.lk-del{color:var(--red);border-color:rgba(220,38,38,.3);}
+.lk-tab.on i{background:#fff!important;}
+.lk-btn{width:100%;border:0;border-radius:9px;padding:11px 10px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;}
+.lk-go{background:var(--teal);color:var(--on-teal);}
+.lk-go:hover{background:var(--teal-dark);}
+.lk-ask{background:transparent;border:1px dashed var(--amber);color:var(--ink);}
+.lk-prep{background:var(--amber);color:#241a05;}
+.lk-prep:hover{filter:brightness(.94);}
+.lk-idle{background:transparent;border:1px solid var(--border);color:var(--ink3);font-weight:600;}
+.lk-chip{display:inline-block;border:1px solid var(--border2);background:var(--surface);border-radius:6px;padding:3px 9px;font-size:12px;color:var(--ink);margin:0 2px;}
+.lk-tabs{display:none;gap:6px;margin-bottom:12px;}
+.lk-tab{flex:1;min-height:44px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--ink2);font-family:inherit;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;}
+.lk-tab span{font-family:'DM Mono',monospace;font-size:11px;opacity:.7;}
+.lk-tab.on{background:var(--teal);border-color:var(--teal);color:var(--on-teal);}
+@container (max-width:760px){
+  .lk-tabs{display:flex;}
+  .lk-board{display:block;}
+  .lk-col{display:none;background:none;border:0;padding:0;min-height:0;}
+  .lk-col.active{display:flex;}
+  .lk-col-h{display:none;}
+  .lk-counters .lk-count{flex:1;min-width:0;}
+}
+/* ── Giro di prelievo (dettaglio lista) ── */
+#listaDetRighe{container-type:inline-size;}
+.gr-sum{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px 16px;margin-bottom:14px;}
+.gr-sum-t{font-size:18px;font-weight:700;color:var(--ink);}
+.gr-sum-s{font-family:'DM Mono',monospace;font-size:12px;color:var(--ink3);margin-top:3px;}
+.gr-body{display:flex;gap:18px;align-items:flex-start;}
+.gr-route{width:290px;flex-shrink:0;display:flex;flex-direction:column;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:12px;box-sizing:border-box;}
+.gr-stop{display:flex;align-items:center;gap:12px;text-align:left;width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 12px;cursor:pointer;font-family:inherit;color:var(--ink);box-sizing:border-box;}
+.gr-stop.on{border-color:var(--amber);box-shadow:0 0 0 3px rgba(230,168,48,.18);}
+.gr-stop-end{border-style:dashed;}
+.gr-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;color:var(--ink2);box-sizing:border-box;}
+.gr-stop.done .gr-dot{background:var(--teal);border-color:var(--teal);color:var(--on-teal);}
+.gr-stop.on .gr-dot{background:var(--amber);border-color:var(--amber);color:#241a05;}
+.gr-stop-b{min-width:0;display:flex;flex-direction:column;gap:2px;}
+.gr-stop-n{font-size:14px;font-weight:600;display:flex;align-items:center;gap:7px;}
+.gr-stop-n i,.gr-group-h i{width:9px;height:9px;border-radius:50%;flex-shrink:0;display:inline-block;}
+.gr-stop-m{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);}
+.gr-panel{flex:1;min-width:0;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box;}
+.gr-h{font-size:22px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:10px;}
+.gr-big-dot{width:12px;height:12px;border-radius:50%;display:inline-block;}
+.gr-sub{font-size:13px;color:var(--ink3);}
+.gr-rows{display:flex;flex-direction:column;gap:9px;}
+.gr-row{border:1px solid var(--border);border-radius:14px;padding:10px 12px;background:var(--surface);}
+.gr-row.taken{border-color:var(--teal-border);background:var(--teal-bg);}
+.gr-row.cmpl{opacity:.55;}
+.gr-row.editing{border:2px solid var(--amber);}
+.gr-row-top{display:flex;align-items:center;gap:12px;}
+.gr-chk{width:40px;height:40px;border-radius:10px;border:3px solid var(--border2);background:transparent;color:var(--on-teal);font-size:20px;font-weight:700;cursor:pointer;flex-shrink:0;padding:0;box-sizing:border-box;}
+.gr-chk.on{background:var(--teal);border-color:var(--teal);}
+.gr-chk:disabled{cursor:default;}
+.gr-rinfo{flex:1;min-width:0;cursor:pointer;}
+.gr-rn{font-size:15px;font-weight:600;color:var(--ink);}
+.gr-rs{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);margin-top:2px;}
+.gr-rq{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;flex-shrink:0;}
+.gr-ico{width:36px;height:36px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--ink2);cursor:pointer;flex-shrink:0;padding:0;font-size:14px;}
+.gr-del{color:var(--red);}
+.gr-edit{margin-top:12px;display:flex;flex-direction:column;gap:10px;}
+.gr-edit-l{font-size:13px;color:var(--ink2);}
+.gr-step{display:flex;align-items:center;gap:8px;}
+.gr-step button{width:48px;height:48px;border-radius:12px;border:1px solid var(--border2);background:var(--surface);font-size:22px;color:var(--ink);cursor:pointer;}
+.gr-step span{min-width:48px;text-align:center;font-family:'DM Mono',monospace;font-size:26px;font-weight:500;color:var(--ink);}
+.gr-altrove{border:1px dashed var(--border2);border-radius:12px;padding:10px 14px;font-size:12px;color:var(--ink3);}
+.gr-foot{display:flex;gap:10px;align-items:center;justify-content:space-between;padding-top:6px;flex-wrap:wrap;}
+.gr-setup{display:flex;flex-direction:column;gap:9px;}
+.gr-setup-card{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:14px;padding:10px 12px;opacity:.75;}
+.gr-setup-card.on{border-color:var(--amber);background:rgba(230,168,48,.08);opacity:1;}
+.gr-badge{width:26px;height:26px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;box-sizing:border-box;}
+.gr-setup-card.on .gr-badge{background:var(--amber);border-color:var(--amber);color:#241a05;}
+.gr-setup-b{flex:1;min-width:0;cursor:pointer;}
+.gr-dest{display:flex;flex-direction:column;gap:4px;max-width:360px;}
+.gr-dest label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);}
+.gr-warn{border:1px solid rgba(230,168,48,.5);background:rgba(230,168,48,.1);border-radius:12px;padding:10px 14px;font-size:13px;color:var(--ink);}
+.gr-groups{display:flex;flex-direction:column;gap:9px;}
+.gr-group{border:1px solid var(--border);border-radius:14px;padding:11px 14px;}
+.gr-group-h{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:var(--ink);}
+.gr-group-h span{margin-left:auto;font-family:'DM Mono',monospace;font-size:12px;color:var(--ink3);font-weight:400;}
+.gr-group-r{display:flex;justify-content:space-between;font-size:14px;color:var(--ink2);margin-top:5px;}
+.gr-slide{position:relative;flex:1;max-width:520px;height:64px;border-radius:32px;background:var(--teal-bg);border:1px solid var(--teal);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:var(--teal-dark);box-sizing:border-box;user-select:none;}
+.gr-slide span{padding-left:40px;text-align:center;}
+.gr-slide.off{border-color:var(--border2);background:var(--bg2);color:var(--ink3);}
+.gr-knob{position:absolute;left:6px;top:6px;width:50px;height:50px;border-radius:50%;border:0;background:var(--teal);color:var(--on-teal);font-size:22px;font-weight:700;cursor:grab;touch-action:none;padding:0;}
+.gr-slide.off .gr-knob{background:var(--border2);cursor:not-allowed;}
+@container (max-width:760px){
+  .gr-body{flex-direction:column;gap:12px;}
+  .gr-route{width:100%;flex-direction:row;overflow-x:auto;padding:8px;border-radius:12px;}
+  .gr-stop{width:auto;flex-shrink:0;border-radius:22px;padding:6px 14px 6px 6px;min-height:44px;}
+  .gr-stop-m{display:none;}
+  .gr-panel{width:100%;padding:14px;}
+  .gr-h{font-size:20px;}
+  .gr-foot .btn,.gr-foot .lk-btn{flex:1;}
+}
+/* ── Dettaglio lista a fasi ── */
+.ph-wrap{display:flex;flex-direction:column;gap:14px;}
+.ph-steps{display:flex;gap:8px;}
+.ph-step{flex:1;min-width:0;min-height:48px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--ink3);display:flex;align-items:center;gap:10px;padding:0 14px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;text-align:left;}
+.ph-step.on{border-color:var(--amber);background:rgba(230,168,48,.12);color:var(--ink);}
+.ph-step.done{border-color:var(--teal-border);background:var(--teal-bg);color:var(--teal-dark);}
+.ph-step.lock{opacity:.5;cursor:not-allowed;}
+.ph-step.on.done{border-color:var(--amber);background:rgba(230,168,48,.12);color:var(--ink);}
+.ph-step.on.done .ph-dot{background:var(--teal);border-color:var(--teal);color:var(--on-teal);}
+.ph-dot{width:26px;height:26px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;box-sizing:border-box;}
+.ph-step.on .ph-dot{background:var(--amber);border-color:var(--amber);color:#241a05;}
+.ph-step.done .ph-dot{background:var(--teal);border-color:var(--teal);color:var(--on-teal);}
+.ph-sl{display:flex;flex-direction:column;min-width:0;}
+.ph-sl em{font-style:normal;font-family:'DM Mono',monospace;font-size:10px;font-weight:400;opacity:.7;}
+.ph-add{display:flex;}
+.ph-addb{max-width:none;width:100%;min-height:48px;border-style:solid;border-color:var(--amber);}
+.ph-hint{font-size:14px;color:var(--ink2);}
+.ph-rows{display:flex;flex-direction:column;gap:9px;}
+.ph-row{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 16px;display:flex;align-items:center;gap:14px;min-height:72px;box-sizing:border-box;}
+.ph-row.new{border:2px solid var(--amber);}
+.ph-r-main{flex:1;min-width:0;}
+.ph-r-n{font-size:16px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.ph-r-s{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);margin-top:3px;}
+.ph-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;padding:1px 6px;border-radius:3px;background:var(--amber);color:#241a05;font-weight:500;}
+.ph-q{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.ph-q button{width:44px;height:44px;border-radius:10px;border:1px solid var(--border2);background:var(--surface);font-size:20px;color:var(--ink);cursor:pointer;padding:0;font-family:inherit;}
+.ph-q .ph-qn{width:56px;border:0;background:transparent;font-family:'DM Mono',monospace;font-size:22px;font-weight:500;}
+.ph-q span{min-width:34px;text-align:center;font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:var(--ink);}
+.ph-q.sm button{width:36px;height:36px;font-size:17px;}
+.ph-q.sm span{min-width:26px;font-size:17px;}
+.ph-del{width:44px;height:44px;}
+.ph-row2{flex-direction:column;align-items:stretch;gap:10px;}
+.ph-row2.ok{border-color:var(--border);}
+.ph-row2.miss{border-color:var(--amber);background:rgba(230,168,48,.06);}
+.ph-r-top{display:flex;align-items:center;gap:12px;}
+.ph-badge{width:28px;height:28px;border-radius:50%;border:2px solid var(--amber);color:var(--amber);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;box-sizing:border-box;}
+.ph-badge.ok{background:var(--teal);border-color:var(--teal);color:var(--on-teal);}
+.ph-srcs{display:flex;flex-wrap:wrap;gap:8px;}
+.ph-src{min-width:290px;flex:0 1 320px;border:1px dashed var(--border2);border-radius:12px;padding:6px 8px 6px 4px;display:flex;align-items:center;gap:8px;box-sizing:border-box;}
+.ph-src.on{border:1px solid var(--teal);background:var(--teal-bg);}
+.ph-src-b{flex:1;min-width:0;display:flex;align-items:center;gap:9px;background:none;border:0;padding:6px 6px 6px 8px;font-family:inherit;color:var(--ink);cursor:pointer;text-align:left;min-height:40px;}
+.ph-src-b i{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.ph-src-n{font-size:14px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ph-src-d{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3);flex-shrink:0;}
+.ph-src-hint{font-size:13px;font-weight:600;color:var(--amber);padding-right:8px;}
+.ph-riepilogo,.ph-pills{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 16px;}
+.ph-riep-t{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;color:var(--ink3);}
+.ph-riep{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--ink2);}
+.ph-riep i,.ph-pill i,.ph-grp-h i{width:9px;height:9px;border-radius:50%;flex-shrink:0;display:inline-block;}
+.ph-stop{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:14px;}
+.ph-stop-end{border-style:dashed;}
+.ph-stop-n{width:34px;height:34px;border-radius:50%;background:var(--amber);color:#241a05;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex-shrink:0;}
+.ph-stop-end .ph-stop-n{background:none;border:2px dashed var(--border2);color:var(--ink3);border-radius:9px;}
+.ph-stop-b{flex:1;min-width:0;}
+.ph-stop-t{margin-left:8px;font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);font-weight:400;}
+.ph-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.ph-chip{font-size:12px;color:var(--ink2);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 9px;}
+.ph-mv{display:flex;flex-direction:column;gap:6px;}
+.ph-mv .gr-ico{width:44px;height:36px;}
+.ph-pill{display:inline-flex;align-items:center;gap:8px;min-height:34px;padding:0 14px;border-radius:17px;border:1px solid var(--border);background:var(--surface);color:var(--ink2);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;}
+.ph-pill span{font-family:'DM Mono',monospace;font-size:11px;font-weight:400;color:var(--ink3);}
+.ph-pill.on{border-color:var(--amber);background:rgba(230,168,48,.12);color:var(--ink);}
+.ph-pill.done{border-color:var(--teal-border);}
+.ph-grp{border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--surface);scroll-margin-top:12px;}
+.ph-grp.cur{border-color:var(--amber);}
+.ph-grp-h{display:flex;align-items:center;gap:10px;padding:9px 16px;background:var(--bg2);font-size:14px;color:var(--ink);}
+.ph-grp.cur .ph-grp-h{background:rgba(230,168,48,.12);}
+.ph-grp-p{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);}
+.ph-grp-tag{margin-left:auto;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--amber);}
+.ph-v{display:flex;align-items:center;gap:14px;padding:6px 16px;min-height:60px;border-top:1px solid var(--border);box-sizing:border-box;}
+.ph-v.done .ph-r-n{color:var(--teal-dark);}
+.ph-vq{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:var(--ink);flex-shrink:0;}
+.ph-v.done .ph-vq{color:var(--teal);}
+.ph-foot{position:sticky;bottom:0;z-index:5;display:flex;align-items:center;gap:14px;background:var(--bg);border-top:1px solid var(--border);padding:12px 0;margin-top:4px;}
+.ph-foot-t{flex:1;min-width:0;}
+.ph-foot-a{font-size:15px;font-weight:600;color:var(--ink);}
+.ph-foot-b{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);margin-top:3px;}
+.ph-next{width:auto;min-height:48px;padding:0 22px;flex-shrink:0;}
+.ph-next:disabled{cursor:not-allowed;opacity:.7;}
+.ph-back{min-height:48px;flex-shrink:0;}
+.ph-dest{margin-top:4px;max-width:300px;}
+.ph-cons .gr-slide{flex:0 1 420px;height:56px;border-radius:28px;}
+.ph-cons .gr-knob{width:44px;height:44px;top:5px;left:5px;font-size:18px;}
+/* ── righe compatte (liste lunghe) ── */
+.ph-wrap{gap:10px;}
+.ph-rows{gap:5px;}
+.ph-step{min-height:44px;}
+.ph-dot{width:24px;height:24px;font-size:12px;}
+.ph-row:not(.ph-row2){min-height:44px;height:44px;padding:0 10px 0 14px;gap:12px;border-radius:10px;}
+.ph-row:not(.ph-row2) .ph-r-main{display:flex;align-items:center;gap:12px;}
+.ph-row:not(.ph-row2) .ph-r-n{display:block;flex:1;min-width:0;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ph-row:not(.ph-row2) .ph-r-s{margin:0;white-space:nowrap;flex-shrink:0;}
+.ph-q{gap:2px;}
+.ph-q button{width:32px;height:32px;border-radius:8px;font-size:17px;}
+.ph-q .ph-qn{width:40px;font-size:17px;}
+.ph-q span{font-size:17px;}
+.ph-q.sm button{width:30px;height:30px;font-size:16px;}
+.ph-del{width:32px;height:32px;}
+.ph-row2{padding:8px 14px;gap:6px;}
+.ph-row2 .ph-r-n{font-size:15px;}
+.ph-badge{width:24px;height:24px;font-size:12px;}
+.ph-src{padding:2px 6px 2px 2px;}
+.ph-src-b{min-height:34px;}
+.ph-stop{padding:8px 14px;}
+.ph-pill{min-height:30px;font-size:12px;}
+.ph-grp-h{height:32px;padding:0 14px;font-size:13px;}
+.ph-v{min-height:40px;height:40px;padding:0 14px;gap:12px;}
+.ph-v .gr-chk{width:26px;height:26px;border-width:2.5px;border-radius:7px;font-size:15px;}
+.ph-v .ph-r-main{display:flex;align-items:center;gap:12px;}
+.ph-v .ph-r-n{display:block;flex:1;min-width:0;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ph-v .ph-r-s{margin:0;white-space:nowrap;flex-shrink:0;max-width:55%;overflow:hidden;text-overflow:ellipsis;}
+.ph-vq{font-size:16px;}
+.ph-foot{padding:10px 0;}
+.ph-next,.ph-back{min-height:44px;}
+@container (max-width:760px){
+  .ph-step{flex-direction:column;justify-content:center;gap:3px;padding:6px 4px;min-height:52px;font-size:11px;text-align:center;}
+  .ph-sl{align-items:center;}
+  .ph-row:not(.ph-row2){height:52px;padding:0 6px 0 12px;gap:6px;}
+  .ph-row:not(.ph-row2) .ph-r-main{display:block;min-width:0;}
+  .ph-row:not(.ph-row2) .ph-r-n{font-size:14px;}
+  .ph-row:not(.ph-row2) .ph-r-s{margin-top:1px;font-size:10px;overflow:hidden;text-overflow:ellipsis;}
+  .ph-q button{width:34px;height:34px;}
+  .ph-q{gap:0;}
+  .ph-q .ph-qn{width:32px;}
+  .ph-del{width:34px;height:34px;}
+  .ph-row2{padding:8px 12px;flex-wrap:nowrap;}
+  .ph-grp-h{height:30px;padding:0 12px;}
+  .ph-v{height:42px;min-height:42px;padding:0 12px;gap:10px;}
+  .ph-v .ph-r-s{display:none;}
+  .ph-src{flex:1 1 100%;min-width:0;}
+  .ph-stop{padding:10px 12px;gap:10px;}
+  .ph-foot{flex-wrap:wrap;gap:10px;}
+  .ph-foot-t{flex:1 1 100%;order:-1;}
+  .ph-next{flex:1;}
+  .ph-back-l{display:none;}
+  .ph-cons .gr-slide{flex:1 1 100%;}
+  .ph-cons .ph-back{order:5;}
+  .ph-dest{max-width:none;width:100%;}
+}
 .lista-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:14px;transition:border-color .15s;cursor:pointer;overflow:hidden;}
 .lista-card:hover{border-color:var(--border2);}
 .lista-card.stato-inattiva{border-left:4px solid #d1d5db;}
@@ -1036,6 +1426,9 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
         <button class="theme-option" data-theme="red" onclick="setTheme('red')">
           <span class="theme-option-swatch" style="background:linear-gradient(135deg,#2c2c2c 50%,#f6f6f6 50%)"></span>Pure Red
         </button>
+        <button class="theme-option" data-theme="cemento" onclick="setTheme('cemento')">
+          <span class="theme-option-swatch" style="background:linear-gradient(135deg,#2a2a2a 50%,#b3b3b2 50%)"></span>Cemento
+        </button>
       </div>
     </div>
     <button class="dark-toggle" onclick="toggleDark()" id="darkToggleBtn" title="Modalità scura">
@@ -1059,22 +1452,21 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
       <div class="page-head">
         <div><div class="page-title">Dashboard</div><div class="page-sub">Panoramica magazzini</div></div>
       </div>
-      <!-- CTA Buttons -->
-      <div style="display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:20px" id="dashCta">
-        <div class="dash-cta-btn" onclick="goTo('magazzini')" style="cursor:pointer">
-          <div class="dash-cta-icon"><span style="font-size:20px">⬡</span></div>
-          <div><div class="dash-cta-label">Magazzini</div><div class="dash-cta-sub">Visualizza contenuto e stock</div></div>
-        </div>
-
-      </div>
-      <!-- Sezioni operative -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
-        <div class="card"><div class="card-head"><span class="card-title">Tour attivi</span></div><div class="card-body" id="dashTour"></div></div>
-        <div class="card" style="display:none"><div class="card-head"><span class="card-title">Liste in preparazione</span></div><div class="card-body" id="dashListe"></div></div>
-        <div class="card" style="display:none"><div class="card-head"><span class="card-title">Ultimi movimenti</span></div><div class="tbl-wrap"><table><thead><tr><th>Ora</th><th>Codice</th><th>Qtà</th><th>Da → A</th></tr></thead><tbody id="dashStorico"></tbody></table></div></div>
-      </div>
       <!-- Panoramica -->
-      <div class="stats-row" id="dashStats"></div>
+      <div class="lk-counters ds-counters" id="dashStats"></div>
+      <!-- Scorciatoie (offline: solo Magazzini) -->
+      <div class="ds-cta" id="dashCta" style="grid-template-columns:1fr">
+        <div class="ds-cta-btn" onclick="goTo('magazzini')">
+          <div class="ds-cta-ico" style="color:var(--teal)">⬡</div>
+          <div class="ds-cta-txt"><b>Magazzini</b><span>Visualizza contenuto e stock</span></div><i>→</i>
+        </div>
+      </div>
+      <!-- Sezioni operative (offline: solo Tour; Liste e Movimenti non ci sono) -->
+      <div class="ds-board" style="grid-template-columns:minmax(0,560px)">
+        <div class="lk-col"><div class="lk-col-h"><i style="background:var(--teal)"></i>Tour attivi<span id="dashTourN"></span></div><div id="dashTour" class="ds-stack"></div></div>
+        <div class="lk-col" style="display:none"><div id="dashListe"></div><span id="dashListeN"></span></div>
+        <div class="lk-col" style="display:none"><div id="dashStorico"></div></div>
+      </div>
     </div>
 
     <!-- SPOSTAMENTO -->
@@ -1323,7 +1715,8 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
         <div><div class="page-title">Magazzini</div><div class="page-sub">Gestisci i tuoi depositi</div></div>
         <button class="btn btn-dark admin-only" style="display:none" onclick="openModalMagNew()">+ Nuovo magazzino</button>
       </div>
-      <div class="mag-grid" id="magGrid"></div>
+      <div class="lk-counters ds-counters" id="magCounters"></div>
+      <div class="mg-board" id="magGrid"></div>
     </div>
 
     <!-- BAULI & FLIGHT CASE -->
@@ -1333,16 +1726,18 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
           <div class="page-title">Bauli & Flight Case</div>
           <div class="page-sub">Contenitori per il trasporto</div>
         </div>
-        <div style="display:flex;gap:6px">
-          <button class="btn btn-dark" onclick="openModalBauleNew()">+ Baule</button>
-          <button class="btn btn-dark" onclick="openModalFlcNew()">+ Flight Case</button>
-          <button class="btn btn-dark" onclick="openModalFlckNew()">+ Flightcase K</button>
-        </div>
+        <button class="btn btn-dark" id="bauliNewBtn" onclick="nuovoBauliCorrente()">+ Baule</button>
       </div>
-      <div class="art-tabs">
-        <button class="art-tab active" id="tabBauli" onclick="switchBauliTab('bauli')">Bauli</button>
-        <button class="art-tab" id="tabFlc" onclick="switchBauliTab('flc')">Flight Case</button>
-        <button class="art-tab" id="tabFlck" onclick="switchBauliTab('flck')">Flightcase K</button>
+      <div class="bt-bar">
+        <div class="bt-tabs">
+          <button class="bt-tab active" id="tabBauli" onclick="switchBauliTab('bauli')">Bauli <span id="tabBauliN">0</span></button>
+          <button class="bt-tab" id="tabFlc" onclick="switchBauliTab('flc')">Flight Case <span id="tabFlcN">0</span></button>
+          <button class="bt-tab" id="tabFlck" onclick="switchBauliTab('flck')">Flightcase K <span id="tabFlckN">0</span></button>
+        </div>
+        <div class="bt-view" id="btView">
+          <button id="btvTile" title="Riquadri" aria-label="Vista a riquadri" onclick="setBauliView('tile')">▦</button>
+          <button id="btvList" title="Lista compatta" aria-label="Vista a lista compatta" onclick="setBauliView('list')">☰</button>
+        </div>
       </div>
       <div id="bauliTabContent">
         <div id="bauliGrid" class="mag-grid"></div>
@@ -1576,7 +1971,7 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
           <div class="card-body" style="font-size:14px;line-height:1.7;color:var(--ink2);display:flex;flex-direction:column;gap:8px">
             <p style="margin:0">Visualizza tutti i magazzini con le loro giacenze. Clicca su una card per aprire il contenuto dettagliato del magazzino.</p>
             <p style="margin:0">I magazzini hanno due tipi: <strong>Stabile</strong> (deposito fisso) e <strong>Tour</strong> (mezzo mobile). Per i magazzini di tipo Tour è disponibile una card dedicata nella sezione <strong>Spostamento</strong> che permette di trasferire tutto il contenuto in un'unica operazione.</p>
-            <p style="margin:0">Dal contenuto di un magazzino puoi usare il tasto <strong>☰+</strong> per aggiungere un articolo a una lista veloce.</p>
+            <p style="margin:0">Dal contenuto di un magazzino puoi usare il tasto <strong>⚡</strong> per aggiungere un articolo a una lista veloce.</p>
           </div>
         </div>
 
@@ -1732,9 +2127,7 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
           </div>
           <span id="listaDetStatoMobile" class="lista-stato inattiva lista-stato-mobile" style="display:none">inattiva</span>
           <div class="lista-det-actions">
-            <button class="btn btn-sm btn-amber lista-btn-articolo" onclick="aggiungiArticoloLista()">+ articolo</button>
             <button class="btn btn-sm btn-gray lista-btn-stampa" onclick="stampaTesto('listaStampaZone')">🖨 stampa</button>
-            <button class="btn btn-sm btn-teal lista-btn-esegui" onclick="eseguiLista()">⇄ Esegui</button>
           </div>
         </div>
         <div id="listaDetMeta" style="font-size:13px;color:var(--ink3);margin-bottom:16px;font-family:'DM Mono',monospace"></div>
@@ -1749,6 +2142,23 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
 
 <!-- iframe stampa nascosto -->
 <iframe id="printFrame" style="display:none" title="Stampa"></iframe>
+
+<!-- MODAL: DESTINAZIONE LISTA VELOCE -->
+<div class="overlay" id="modalDestVeloce" style="z-index:400">
+  <div class="modal modal-sm">
+    <button class="modal-close" onclick="closeModal('modalDestVeloce')">✕</button>
+    <div class="modal-title">Destinazione dello spostamento</div>
+    <div class="form-grid">
+      <div class="fgroup"><label>Magazzino di destinazione *</label>
+        <select class="finput" id="destVeloceSel" autocomplete="off"></select>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('modalDestVeloce')">Annulla</button>
+      <button class="btn btn-dark" onclick="confermaDestVeloce()">Conferma</button>
+    </div>
+  </div>
+</div>
 
 <!-- MODAL: NUOVA/MODIFICA LISTA -->
 <div class="overlay" id="modalLista">
@@ -1787,6 +2197,9 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
     <div class="modal-title">Aggiungi articolo</div>
     <input type="hidden" id="aggArtListaId">
     <div class="form-grid">
+      <div class="fgroup"><label>Cerca</label>
+        <input class="finput" id="aggArtSearch" type="search" placeholder="Nome o codice…" oninput="filterAggArtArticoli()" autocomplete="off">
+      </div>
       <div class="fgroup"><label>Categoria</label>
         <select class="finput" id="aggArtCat" onchange="filterAggArtArticoli()" autocomplete="off"><option value="">Tutte</option></select>
       </div>
@@ -1893,6 +2306,7 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
     <div class="form-grid">
       <div class="fgroup"><label>Lista veloce *</label>
         <select class="finput" id="addToListaId" autocomplete="off"></select>
+        <button type="button" class="btn btn-outline btn-xs" id="addToListaNewBtn" onclick="creaNuovaListaVeloce()" style="margin-top:8px">＋ Nuova lista veloce</button>
       </div>
       <div class="fgroup"><label>Quantità *</label>
         <div style="display:flex;align-items:center;gap:8px">
@@ -2483,45 +2897,64 @@ document.addEventListener('click', async e => {
 function renderDash() {
   const magReali = getMagReali().length;
 
-  // Panoramica
+  // Contatori
   document.getElementById('dashStats').innerHTML = `
-    <div class="stat"><div class="stat-label">Magazzini</div><div class="stat-val">${magReali}</div></div>
-    <div class="stat"><div class="stat-label">Articoli</div><div class="stat-val">${D.articoli.length}</div></div>
-    <div class="stat"><div class="stat-label">Movimenti</div><div class="stat-val">${(D._spostamentiTotal||D.spostamenti.length).toLocaleString('it-IT')}</div></div>
-    <div class="stat"><div class="stat-label">Categorie</div><div class="stat-val">${D.categorie.length}</div></div>`;
+    <div class="lk-count"><b>${magReali}</b><span>magazzini</span></div>
+    <div class="lk-count"><b>${D.articoli.length}</b><span>articoli</span></div>
+    <div class="lk-count"><b>${(D._spostamentiTotal||D.spostamenti.length).toLocaleString('it-IT')}</b><span>movimenti</span></div>
+    <div class="lk-count"><b>${D.categorie.length}</b><span>categorie</span></div>`;
 
   // Tour attivi
   const tourMags = D.magazzini.filter(m=>m.classe==='tour'&&!m.virtuale);
+  document.getElementById('dashTourN').textContent = tourMags.length;
   document.getElementById('dashTour').innerHTML = tourMags.length
     ? tourMags.map(m=>{
-        const tot=totalMag(m.id);
-        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px">
-          <span style="color:var(--ink)">${m.icona||'🚛'} ${h(m.nome)}</span>
-          <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--ink2)">${tot} pz</span>
+        const tot = totalMag(m.id);
+        const nTipi = Object.values(D._stockMap||{}).filter(mm=>(mm[m.id]||0)>0).length;
+        return `<div class="lk-card ds-row" onclick="openMagDetail(${m.id})">
+          <div class="ds-tile">${m.icona||'🚛'}</div>
+          <div class="lk-info"><div class="lk-nome">${h(m.nome)}</div><div class="lk-meta">${nTipi} tipi</div></div>
+          <div class="ds-num"><b>${tot.toLocaleString('it-IT')}</b><span>pezzi</span></div>
         </div>`;
       }).join('')
-    : '<div class="empty" style="font-size:13px;padding:8px 0">Nessun magazzino tour</div>';
+    : '<div class="lk-empty">nessun magazzino tour</div>';
 
   // Liste in preparazione
   const listePrep = (D.liste||[]).filter(l=>l.stato_display==='in-preparazione');
+  document.getElementById('dashListeN').textContent = listePrep.length;
   document.getElementById('dashListe').innerHTML = listePrep.length
-    ? listePrep.slice(0,5).map(l=>`
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;cursor:pointer" onclick="goTo('liste')">
-          <span style="color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${h(l.nome)}</span>
-          <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--amber);margin-left:8px;flex-shrink:0">${l.n_righe} art.</span>
-        </div>`).join('')
-    : '<div class="empty" style="font-size:13px;padding:8px 0">Nessuna lista in preparazione</div>';
+    ? listePrep.slice(0,5).map(l=>{
+        const tot = l.tot_richiesta || 0, pr = l.tot_pronti || 0;
+        const pct = tot ? Math.min(100, Math.round(pr / tot * 100)) : 0;
+        const src = (l.mag_src_nomi || '').split('|').filter(Boolean).join(' + ');
+        const rotta = src ? `${src} → ${l.mag_dest_nome || '—'}` : (l.mag_dest_nome ? '→ ' + l.mag_dest_nome : 'Nessuna destinazione');
+        return `<div class="lk-card" onclick="apriListaDaDash(${l.id})">
+          <div class="lk-card-top">
+            <div class="lk-ring" style="--p:${pct};--c:var(--amber)"><span>${pct}%</span></div>
+            <div class="lk-info">
+              <div class="lk-nome">${h(l.nome)}${l.tipo==='veloce'?' <span class="tipo-badge-prov">veloce</span>':''}</div>
+              <div class="lk-rotta">${h(rotta)}</div>
+              <div class="lk-meta">${l.n_righe} ${l.n_righe===1?'articolo':'articoli'} · ${pr} / ${tot} pz</div>
+            </div>
+          </div>
+          <button class="lk-btn lk-prep" onclick="event.stopPropagation();apriListaDaDash(${l.id})">Continua</button>
+        </div>`;
+      }).join('')
+    : '<div class="lk-empty">nessuna lista in preparazione</div>';
 
   // Ultimi movimenti
   document.getElementById('dashStorico').innerHTML = D.spostamenti.slice(0,6).map(s=>{
     const a=getArt(s.art_id), da=getMag(s.mag_from), a2=getMag(s.mag_to);
-    return `<tr>
-      <td style="font-size:11px;color:var(--ink3);font-family:'DM Mono',monospace;white-space:nowrap">${fmtDt(s.data)}</td>
-      <td>${codiceBadge(a?.codice, a ? getCat(a.cat_id)?.colore : null)}</td>
-      <td style="font-size:12px">${s.qty}</td>
-      <td style="font-size:12px;color:var(--ink2)">${da?h(da.nome):'—'} → ${a2?h(a2.nome):'—'}</td>
-    </tr>`;
-  }).join('') || '<tr><td colspan="4" class="empty">Nessun movimento</td></tr>';
+    return `<div class="lk-card ds-mov" style="cursor:default">
+      <div class="ds-mov-t">${codiceBadge(a?.codice, a ? getCat(a.cat_id)?.colore : null)}<span class="ds-ora">${fmtDt(s.data)}</span><b>×${s.qty}</b></div>
+      <div class="ds-rotta">${da?h(da.nome):'—'} → ${a2?h(a2.nome):'—'}</div>
+    </div>`;
+  }).join('') || '<div class="lk-empty">nessun movimento</div>';
+}
+// Dashboard → apre direttamente la lista (apre prima il dettaglio, poi cambia pagina)
+async function apriListaDaDash(id) {
+  await apriLista(id);
+  goTo('liste');
 }
 
 // ─── SPOSTAMENTO ───
@@ -3102,47 +3535,38 @@ async function undoLast() {
 
 function renderMag() {
   const grid = document.getElementById('magGrid');
-  if (!D.magazzini.length) { grid.innerHTML='<div class="empty">Nessun magazzino</div>'; return; }
+  const cnt = document.getElementById('magCounters');
+  if (!D.magazzini.length) { if (cnt) cnt.innerHTML = ''; grid.innerHTML='<div class="lk-empty">Nessun magazzino</div>'; return; }
   const magReali = getMagReali();
   const stabili  = magReali.filter(m => m.classe !== 'tour');
   const tour     = magReali.filter(m => m.classe === 'tour');
+  const isAdmin  = currentUser?.ruolo === 'admin';
+  const totPezzi = magReali.reduce((n, m) => n + totalMag(m.id), 0);
+  if (cnt) cnt.innerHTML = `
+    <div class="lk-count"><b>${magReali.length}</b><span>magazzini</span></div>
+    <div class="lk-count"><b>${stabili.length}</b><span>stabili</span></div>
+    <div class="lk-count"><b>${tour.length}</b><span>tour</span></div>
+    <div class="lk-count"><b>${totPezzi.toLocaleString('it-IT')}</b><span>pezzi</span></div>`;
 
   const cardHtml = m => {
     const tot   = totalMag(m.id);
     const nTipi = Object.values(D._stockMap||{}).filter(mm=>(mm[m.id]||0)>0).length;
-    const colore = m.colore || null;
-    const topBorder = colore ? `border-top:4px solid ${colore}` : 'border-top:4px solid var(--border2)';
-    const tipoBadge = `<span style="font-size:9px;font-family:'DM Mono',monospace;font-weight:700;padding:1px 5px;border-radius:3px;background:${m.classe==='tour'?'#0e4f3a':'#374151'};color:${m.classe==='tour'?'#6ee7b7':'#e5e7eb'};border:1px solid ${m.classe==='tour'?'#10b981':'#6b7280'};white-space:nowrap">${(m.classe||'stabile').toUpperCase()}</span>`;
-    const adminFoot = (currentUser?.ruolo==='admin') ? `
-      <div class="mag-foot">
-        ${m.classe==='tour'?`<span class="mag-foot-btn orange" onclick="event.stopPropagation();svuotaMag(${m.id})">svuota</span>`:''}
-        <span class="mag-foot-btn ghost" onclick="event.stopPropagation();editMag(${m.id})">modifica</span>
-        <span class="mag-foot-btn danger" onclick="event.stopPropagation();delMag(${m.id})">elimina</span>
-      </div>` : '';
-    return `<div class="mag-card" style="${topBorder}" onclick="openMagDetail(${m.id})">
-      <div class="mag-card-body">
-        <div class="mag-card-left">
-          ${tipoBadge}
-          <div class="mag-icon-wrap">${m.icona||'🏭'}</div>
-        </div>
-        <div>
-          <div class="mag-name">${h(m.nome)}</div>
-          <div class="mag-luogo">${h(m.citta)||'—'}</div>
-          <div class="mag-nums">
-            <div><div class="mag-num-v">${tot.toLocaleString('it-IT')}</div><div class="mag-num-l">pezzi</div></div>
-            <div><div class="mag-num-v">${nTipi}</div><div class="mag-num-l">tipi</div></div>
-          </div>
-        </div>
+    const colore = m.colore || 'var(--border2)';
+    const adminFoot = isAdmin ? `
+        ${m.classe==='tour'?`<button class="mg-ico mg-svuota" title="Svuota" onclick="event.stopPropagation();svuotaMag(${m.id})">svuota</button>`:''}
+        <button class="mg-ico" title="Modifica" aria-label="Modifica magazzino" onclick="event.stopPropagation();editMag(${m.id})">✎</button>
+        <button class="mg-ico mg-del" title="Elimina" aria-label="Elimina magazzino" onclick="event.stopPropagation();delMag(${m.id})">✕</button>` : '';
+    return `<div class="lk-card mg-card" style="--mc:${colore}" onclick="openMagDetail(${m.id})">
+      <div class="mg-top">
+        <div class="ds-tile">${m.icona||'🏭'}</div>
+        <div class="lk-info"><div class="mg-name">${h(m.nome)}</div><div class="lk-meta">${h(m.citta)||'—'} · ${nTipi} tipi</div></div>
+        <div class="ds-num mg-pz"><b>${tot.toLocaleString('it-IT')}</b><span>pezzi</span></div>
       </div>
-      ${adminFoot}
+      <div class="mg-foot"><span class="mg-open">Apri ›</span>${adminFoot}</div>
     </div>`;
   };
-
-  let html = '';
-  if (stabili.length) html += '<div class="mag-group-label" style="grid-column:1/-1">Stabili</div>' + stabili.map(cardHtml).join('');
-  if (tour.length)    html += '<div class="mag-group-label" style="grid-column:1/-1">Tour</div>'    + tour.map(cardHtml).join('');
-  if (!html) html = '<div class="empty" style="grid-column:1/-1">Nessun magazzino</div>';
-  grid.innerHTML = html;
+  const col = (titolo, dot, items) => `<div class="lk-col"><div class="lk-col-h"><i style="background:${dot}"></i>${titolo}<span>${items.length}</span></div>${items.map(cardHtml).join('') || '<div class="lk-empty">nessun magazzino</div>'}</div>`;
+  grid.innerHTML = col('Stabili', 'var(--ink3)', stabili) + col('Tour', 'var(--teal)', tour);
 }
 let _detailMagId = null;
 function openMagDetail(magId) {
@@ -4043,12 +4467,12 @@ async function risolviConflitti() {
   if (!_listaCorrente?.mag_dest_id) return;
   const destId = parseInt(_listaCorrente.mag_dest_id);
   const righeConConflitto = (_listaCorrente.righe||[]).filter(r =>
-    (r.flags||[]).some(f => f.mag_id === destId && f.qty_presa > 0)
+    (r.flags||[]).some(f => f.mag_id === destId && (f.qty_presa > 0 || f.qty_prevista > 0))
   );
   if (!righeConConflitto.length) return;
   try {
     for (const r of righeConConflitto) {
-      await apiFetch('PUT', `/liste/flag/${r.id}/${destId}`, { qty_presa: 0 });
+      await apiFetch('PUT', `/liste/flag/${r.id}/${destId}`, { qty_prevista: 0, qty_presa: 0 });
     }
     const l = await apiFetch('GET', '/liste/' + _listaCorrente.id);
     _listaCorrente = l;
@@ -4422,6 +4846,7 @@ const THEMES = [
   {id:'ocean', name:'Ocean',   swatch:'linear-gradient(135deg,#042853 50%,#eef4fc 50%)'},
   {id:'sand',  name:'Sand',    swatch:'linear-gradient(135deg,#2a2318 50%,#faf8f4 50%)'},
   {id:'red',   name:'Pure Red',swatch:'linear-gradient(135deg,#2c2c2c 50%,#f6f6f6 50%)'},
+  {id:'cemento',name:'Cemento', swatch:'linear-gradient(135deg,#2a2a2a 50%,#b3b3b2 50%)'},
 ];
 
 function setTheme(theme) {
@@ -4466,6 +4891,7 @@ function initTheme() {
 
 // ─── LISTE DI CARICO ───
 let _listaCorrente = null;
+let _listeElenco = [];
 
 async function renderListe() {
   const el = document.getElementById('listeElenco');
@@ -4482,6 +4908,7 @@ async function renderListe() {
   el.style.display = '';
 
   const liste = await apiFetch('GET', '/liste');
+  _listeElenco = liste;
   const hdr = document.getElementById('listeElencoHeader');
   if (!liste.length) {
     if (hdr) hdr.style.display = 'none';
@@ -4489,41 +4916,86 @@ async function renderListe() {
     return;
   }
   if (hdr) hdr.style.display = '';
-  // Ordina: tipo (veloce prima) + stato (completa → in-prep → inattiva)
-  const statoOrd = s => s==='completa'?0:s==='in-preparazione'?1:2;
-  const sorted = [...liste].sort((a,b) => {
-    const ta = a.tipo==='veloce'?0:1, tb = b.tipo==='veloce'?0:1;
-    if (ta !== tb) return ta - tb;
-    return statoOrd(a.stato_display||a.stato) - statoOrd(b.stato_display||b.stato);
-  });
+  _renderListeBoard();
+}
 
-  const listaCardHtml = l => {
-    const hasConflitto = l.has_conflitto || (l.mag_dest_id && (l.righe||[]).some(r =>
-      (r.flags||[]).some(f => f.mag_id === parseInt(l.mag_dest_id) && f.qty_presa > 0)
-    ));
-    const conflittoPill = hasConflitto
-      ? ' <span class="lista-conflitto-pill">&#9888; conflitto</span>'
-      : '';
-    return `
-    <div class="lista-card stato-${l.stato_display||l.stato}${hasConflitto?' has-conflitto':''}" onclick="apriLista(${l.id})">
-      <div class="lista-info">
-        <div class="lista-nome">${h(l.nome)}${l.tipo==='veloce'?' <span class="tipo-badge-prov">veloce</span>':''}${conflittoPill}</div>
-        <div class="lista-meta">${l.mag_dest_nome ? '→ ' + h(l.mag_dest_nome) + ' · ' : ''}${l.n_righe} articoli · ${h(l.creato_da_nome||'—')} · ${l.creato_il?l.creato_il.slice(0,10):'—'}</div>
+// ── Tabellone liste: 3 colonne per stato (schede su schermi stretti) ──
+let _listeTab = 'completa';
+function setListeTab(st) { _listeTab = st; _renderListeBoard(); }
+
+function _renderListeBoard() {
+  const el = document.getElementById('listeElenco');
+  if (!el) return;
+  const liste = _listeElenco || [];
+  const stOf = l => l.stato_display || l.stato;
+  const cols = [
+    { st: 'completa',        titolo: 'Pronte',          tab: 'Pronte',    col: 'var(--teal)' },
+    { st: 'in-preparazione', titolo: 'In preparazione', tab: 'In prep.',  col: 'var(--amber)' },
+    { st: 'inattiva',        titolo: 'Inattive',        tab: 'Inattive',  col: 'var(--ink3)' }
+  ];
+  const by = st => liste.filter(l => stOf(l) === st);
+  const card = l => {
+    const st = stOf(l);
+    const veloce = l.tipo === 'veloce';
+    const tot = l.tot_richiesta || 0, pr = l.tot_pronti || 0;
+    const pct = tot ? Math.min(100, Math.round(pr / tot * 100)) : 0;
+    const colore = st === 'completa' ? 'var(--teal)' : st === 'in-preparazione' ? 'var(--amber)' : 'var(--ink3)';
+    const src = (l.mag_src_nomi || '').split('|').filter(Boolean).join(' + ');
+    const dest = l.mag_dest_nome || (veloce ? '?' : '');
+    const rotta = src ? `${src} → ${dest || '—'}` : (l.mag_dest_nome ? '→ ' + l.mag_dest_nome : 'Nessuna destinazione');
+    let azione;
+    if (st === 'completa') {
+      azione = (veloce && !l.mag_dest_id)
+        ? `<button class="lk-btn lk-ask" onclick="event.stopPropagation();scegliDestVeloce(${l.id})">Scegli destinazione</button>`
+        : `<button class="lk-btn lk-go" onclick="event.stopPropagation();eseguiDaCard(${l.id})">⇄ Esegui spostamento</button>`;
+    } else if (st === 'in-preparazione') {
+      azione = `<button class="lk-btn lk-prep" onclick="event.stopPropagation();apriLista(${l.id})">Continua</button>`;
+    } else {
+      azione = `<button class="lk-btn lk-idle" onclick="event.stopPropagation();apriLista(${l.id})">Inizia a preparare</button>`;
+    }
+    const admin = currentUser?.ruolo === 'admin';
+    return `<div class="lk-card${st==='completa'?' pronta':''}" onclick="apriLista(${l.id})">
+      <div class="lk-card-top">
+        <div class="lk-ring" style="--p:${pct};--c:${colore}"><span>${pct}%</span></div>
+        <div class="lk-info">
+          <div class="lk-nome">${h(l.nome)}${veloce?' <span class="tipo-badge-prov">veloce</span>':''}</div>
+          <div class="lk-rotta">${h(rotta)}</div>
+          <div class="lk-meta">${l.n_righe} ${l.n_righe===1?'articolo':'articoli'} · ${pr} / ${tot} pz</div>
+          <div class="lk-meta">${h(l.creato_da_nome||'—')} · ${l.creato_il?l.creato_il.slice(0,10):'—'}</div>
+        </div>
       </div>
-      <span class="lista-stato ${l.stato_display||l.stato}">${(l.stato_display||l.stato).replace('in-preparazione','in preparazione')}</span>
-      <div class="lista-azioni" onclick="event.stopPropagation()">
-        <button class="btn btn-ghost btn-xs" onclick="openModalListaEdit(${l.id},'${h(l.nome)}',${l.mag_dest_id||'null'},'${h(l.note||'')}','${l.tipo||'normale'}')">Modifica</button>
-        <button class="btn btn-danger btn-xs admin-only" style="${currentUser?.ruolo==='admin'?'':'display:none'}" onclick="eliminaLista(${l.id})">🗑</button>
+      <div class="lk-foot">
+        ${azione}
+        <div class="lk-tools" onclick="event.stopPropagation()">
+          <button class="lk-ico" title="Modifica" aria-label="Modifica lista" onclick="openModalListaEdit(${l.id},'${h(l.nome)}',${l.mag_dest_id||'null'},'${h(l.note||'')}','${l.tipo||'normale'}')">✎</button>
+          ${admin?`<button class="lk-ico lk-del" title="Elimina" aria-label="Elimina lista" onclick="eliminaLista(${l.id})">🗑</button>`:''}
+        </div>
       </div>
     </div>`;
   };
+  if (!cols.some(c => c.st === _listeTab)) _listeTab = 'completa';
+  const counters = `<div class="lk-counters">
+      <div class="lk-count"><b style="color:var(--teal)">${by('completa').length}</b><span>pronte</span></div>
+      <div class="lk-count"><b style="color:var(--amber)">${liste.filter(l=>l.tipo==='veloce').length}</b><span>veloci</span></div>
+      <div class="lk-count"><b>${liste.length}</b><span>liste</span></div>
+    </div>`;
+  const tabs = `<div class="lk-tabs">` + cols.map(c =>
+    `<button class="lk-tab${c.st===_listeTab?' on':''}" onclick="setListeTab('${c.st}')"><i style="background:${c.col}"></i>${c.tab}<span>${by(c.st).length}</span></button>`
+  ).join('') + `</div>`;
+  const board = `<div class="lk-board">` + cols.map(c => {
+    const items = by(c.st);
+    return `<div class="lk-col${c.st===_listeTab?' active':''}">
+      <div class="lk-col-h"><i style="background:${c.col}"></i>${c.titolo}<span>${items.length}</span></div>
+      ${items.map(card).join('') || '<div class="lk-empty">nessuna lista</div>'}
+    </div>`;
+  }).join('') + `</div>`;
+  el.innerHTML = `<div class="lk-wrap">${counters}${tabs}${board}</div>`;
+}
 
-  const veloci  = sorted.filter(l => l.tipo === 'veloce');
-  const normali = sorted.filter(l => l.tipo !== 'veloce');
-  let html = '';
-  if (veloci.length)  html += '<div class="lista-group-label">Veloci</div>'  + veloci.map(listaCardHtml).join('');
-  if (normali.length) html += '<div class="lista-group-label">Normali</div>' + normali.map(listaCardHtml).join('');
-  el.innerHTML = html;
+// Esegui direttamente dalla scheda: apre la lista e avvia il flusso di esecuzione
+async function eseguiDaCard(id) {
+  await apriLista(id);
+  await eseguiLista();
 }
 
 async function apriLista(id) {
@@ -4540,9 +5012,8 @@ async function apriLista(id) {
   const statoEl = document.getElementById('listaDetStato');
   statoEl.textContent = lista.stato;
   statoEl.className = 'lista-stato ' + lista.stato;
-  document.getElementById('listaDetMeta').textContent =
-    (lista.mag_dest_nome ? '→ ' + lista.mag_dest_nome : 'Nessuna destinazione') +
-    (lista.note ? ' · ' + h(lista.note) : '');
+  _setListaMeta(lista);
+  if (!_giro || _giro.listaId !== lista.id) _giroInit(lista.id);
   renderDettaglioRighe(lista);
   aggiornaStatoLista(lista);
   // Mostra "+ articolo" solo per liste normali
@@ -4557,87 +5028,461 @@ function chiudiDettaglioLista() {
   // Ripristina visibilità header (bottone + Nuova lista)
   const leh = document.getElementById('listeElencoHeader');
   if (leh) {
-    const liste = document.querySelectorAll('#listeElenco .lista-card');
+    const liste = document.querySelectorAll('#listeElenco .lk-card');
     leh.style.display = liste.length ? '' : 'none';
   }
+  renderListe();
+}
+
+// Magazzino/i di partenza di una lista (dai flag)
+function _listaSorgenti(lista) {
+  const m = new Map();
+  (lista.righe || []).forEach(r => (r.flags || []).forEach(f => { if (f.qty_presa > 0) m.set(f.mag_id, f.mag_nome); }));
+  return [...m].map(([id, nome]) => ({ id, nome }));
+}
+
+function _setListaMeta(lista) {
+  const src = lista.tipo === 'veloce' ? _listaSorgenti(lista) : [];
+  const chip = (t, extra) => `<span class="lk-chip"${extra||''}>${t}</span>`;
+  const tot = (lista.righe||[]).reduce((n,r) => n + (r.qty_richiesta||0), 0);
+  const pr = (lista.righe||[]).reduce((n,r) => n + Math.min(r.qty_richiesta||0, (r.flags||[]).reduce((a,f)=>a+(f.qty_presa||0),0)), 0);
+  let html = '';
+  if (src.length) html += chip('Da ' + h(src.map(s => s.nome).join(' + '))) + ' → ';
+  html += lista.mag_dest_nome ? chip(h(lista.mag_dest_nome)) : chip('Nessuna destinazione', ' style="border-style:dashed"');
+  if (tot) html += ' ' + chip(pr + ' / ' + tot + ' pz');
+  if (lista.note) html += ' <span>' + h(lista.note) + '</span>';
+  document.getElementById('listaDetMeta').innerHTML = html;
 }
 
 function renderDettaglioRighe(lista) {
-  const el = document.getElementById('listaDetRighe');
-  if (!lista.righe || !lista.righe.length) {
-    el.innerHTML = '<div class="empty" style="padding:30px;text-align:center;color:var(--ink3)">Lista vuota. Aggiungi articoli con "+ Articolo" o dal contenuto di un magazzino.</div>';
-    return;
-  }
-  // Banner conflitto destinazione
-  const warnEl = document.getElementById('listaConflittoWarn');
-  const destId_check = lista.mag_dest_id ? parseInt(lista.mag_dest_id) : null;
-  if (warnEl) {
-    const hasCon = destId_check && lista.righe.some(r => (r.flags||[]).some(f => f.mag_id === destId_check && f.qty_presa > 0));
-    warnEl.style.display = hasCon ? 'flex' : 'none';
-    if (hasCon) {
-      const destNome = lista.mag_dest_nome || 'destinazione';
-      document.getElementById('listaConflittoMsg').textContent =
-        `${destNome} è la destinazione — alcuni flag devono essere rimossi`;
-    }
-  }
+  _setListaMeta(lista);
+  if (lista.tipo !== 'veloce') { _renderGiro(lista); return; }
+  _renderVeloce(lista);
+}
 
-  el.innerHTML = sortBauliFirst(lista.righe, r => r.art_id).map(r => {
-    const destId = lista.mag_dest_id ? parseInt(lista.mag_dest_id) : null;
-    const qtyPresa = (r.flags||[]).reduce((s,f) => s + (destId && f.mag_id === destId ? 0 : f.qty_presa), 0);
-    const pct = Math.min(100, Math.round(qtyPresa / r.qty_richiesta * 100));
-    const completo = qtyPresa >= r.qty_richiesta;
-    const cat = getCat(r.cat_id);
-    const stockInfo = (r.stock||[]).map(s =>
-      `<span style="font-size:12px;font-family:'DM Mono',monospace;color:var(--ink3)">
-        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${s.mag_colore};margin-right:4px;vertical-align:middle"></span>
-        ${h(s.mag_nome)}: <strong>${s.qty}</strong>
-      </span>`
-    ).join(' &nbsp;');
-    const flagRows = (r.stock||[]).map(s => {
-      const flag = (r.flags||[]).find(f => f.mag_id === s.mag_id);
-      const qp = flag ? flag.qty_presa : 0;
-      const isDest = destId && s.mag_id === destId;
-      const rowClass = isDest ? 'lista-stock-row conflitto' : 'lista-stock-row';
-      const destPill = isDest ? '<span class="mag-dest-pill">⚠ destinazione</span>' : '';
-      const destStyle = isDest ? 'text-decoration:line-through;color:var(--ink3);' : '';
-      const flagClass = isDest ? 'lista-flag-qty lista-flag-dest' : 'lista-flag-qty';
-      const dotColor = isDest ? '#9ca3af' : s.mag_colore;
-      return `<div class="${rowClass}" id="flagrow-${r.id}-${s.mag_id}" style="${isDest?'opacity:.45':''}">
-        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${dotColor};flex-shrink:0"></span>
-        <span style="flex:1;font-size:13px;${destStyle}">${h(s.mag_nome)}</span>
-        ${destPill}
-        <span style="font-size:12px;color:var(--ink3);font-family:'DM Mono',monospace;margin-right:4px">disp: ${s.qty}</span>
-        <div class="${flagClass}">
-          <button class="lista-flag-btn" ${isDest?'disabled':''} onclick="${isDest?'':` stepFlag(${r.id},${s.mag_id},-1,${s.qty},${r.qty_richiesta})`}">−</button>
-          <span class="lista-flag-num" id="flag-num-${r.id}-${s.mag_id}">${isDest?0:qp}</span>
-          <button class="lista-flag-btn" ${isDest?'disabled':''} onclick="${isDest?'':` stepFlag(${r.id},${s.mag_id},+1,${s.qty},${r.qty_richiesta})`}">+</button>
-        </div>
-        ${isDest?'':'<span class="lista-flag-done" style="'+(qp>0?'':'opacity:0')+'" id="flag-done-'+r.id+'-'+s.mag_id+'">✓</span>'}
-      </div>`;
-    }).join('');
-    const hasConflict = destId && (r.flags||[]).some(f => f.mag_id === destId && f.qty_presa > 0);
-    const rigaClass = hasConflict ? 'lista-riga conflitto-dest' : 'lista-riga';
-    const conflictLabel = hasConflict ? '<span class="lista-riga-conflitto-label">⚠ flag da rimuovere</span>' : '';
-    return `<div class="${rigaClass}">
-      <div class="lista-riga-head" onclick="toggleRigaLista(this)">
-        <span style="font-size:13px;color:${hasConflict?'#dc2626':'var(--ink3)'};margin-right:4px">▶</span>
-        ${codiceBadge(r.art_codice, cat?.colore)}
-        <span style="flex:1;font-weight:600;font-size:13px">${h(r.art_nome)}</span>
-        <span data-riga="${r.id}" style="font-size:12px;font-family:'DM Mono',monospace;color:${completo?'var(--green)':'var(--ink2)'}">
-          ${qtyPresa}/${r.qty_richiesta} ${h(r.art_um)}
-        </span>
-        ${conflictLabel}
-        <button class="btn btn-ghost btn-xs" style="margin-left:8px" onclick="event.stopPropagation();modificaRiga(${r.id},${r.qty_richiesta},'${h(r.note_riga||'')}')">✏</button>
-        <button class="btn btn-danger btn-xs" style="margin-left:4px" onclick="event.stopPropagation();eliminaRiga(${r.id})">✕</button>
+// ── Lista veloce: stessa grafica delle liste normali, una sola schermata ──
+async function lsQtyV(rigaId, d) {
+  const r = (_listaCorrente.righe || []).find(x => x.id === rigaId);
+  if (!r) return;
+  const nq = Math.max(1, r.qty_richiesta + d);
+  if (nq === r.qty_richiesta) return;
+  try {
+    await apiFetch('PUT', `/liste/righe/${rigaId}`, { qty_richiesta: nq });
+    await _giroReload();
+  } catch(e) { toast(e.message, true); }
+}
+function _renderVeloce(lista) {
+  const el = document.getElementById('listaDetRighe');
+  const warn = document.getElementById('listaConflittoWarn');
+  if (warn) warn.style.display = 'none';
+  const righe = lista.righe || [];
+  const src = _listaSorgenti(lista);
+  const srcIds = src.map(s => s.id);
+  const destId = lista.mag_dest_id ? parseInt(lista.mag_dest_id) : null;
+  const totPz = righe.reduce((n, r) => n + r.qty_richiesta, 0);
+  const rows = sortBauliFirst(righe, r => r.art_id).map(r => {
+    const f0 = (r.flags || []).find(f => f.qty_presa > 0);
+    const stock = f0 ? ((r.stock || []).find(s => s.mag_id === f0.mag_id)?.qty || 0) : 0;
+    return `<div class="ph-row">
+      <div class="ph-r-main">
+        <div class="ph-r-n">${h(r.art_nome)}</div>
+        <div class="ph-r-s">${h(r.art_codice)}${f0 ? ' · da ' + h(f0.mag_nome) + ' · disp. ' + stock : ''}${r.note_riga ? ' · ' + h(r.note_riga) : ''}</div>
       </div>
-      <div class="lista-riga-body" style="display:none">
-        <div class="lista-progress"><div id="pb-${r.id}" class="lista-progress-bar${completo?' completo':''}" style="width:${pct}%"></div></div>
-        <div style="margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap">${stockInfo||'<span style="color:var(--ink3);font-size:12px">Nessuno stock disponibile</span>'}</div>
-        ${r.note_riga?`<div style="font-size:12px;color:var(--ink3);margin-bottom:8px;font-style:italic">${h(r.note_riga)}</div>`:''}
-        <div>${flagRows}</div>
-      </div>
+      <div class="ph-q"><button onclick="lsQtyV(${r.id},-1)" aria-label="Meno">−</button><button class="ph-qn" onclick="modificaRiga(${r.id},${r.qty_richiesta},'${h(r.note_riga || '')}')" aria-label="Modifica quantità">${r.qty_richiesta}</button><button onclick="lsQtyV(${r.id},1)" aria-label="Più">+</button></div>
+      <button class="gr-ico gr-del ph-del" aria-label="Rimuovi dalla lista" onclick="eliminaRiga(${r.id})">✕</button>
     </div>`;
   }).join('');
+  if (!righe.length) {
+    el.innerHTML = '<div class="empty" style="padding:30px;text-align:center;color:var(--ink3)">Lista vuota. Aggiungi articoli dal contenuto di un magazzino con "Aggiungi a lista veloce".</div>';
+    return;
+  }
+  const conflitto = destId && srcIds.includes(destId);
+  const pronto = !!destId && !conflitto && src.length > 0;
+  let motivo = '';
+  if (!destId) motivo = 'Scegli la destinazione';
+  else if (conflitto) motivo = 'La destinazione coincide con la partenza';
+  const destOpts = '<option value="">— Scegli la destinazione —</option>' +
+    getMagReali().filter(m => !srcIds.includes(m.id)).map(m => `<option value="${m.id}"${m.id === destId ? ' selected' : ''}>${h(m.nome)}</option>`).join('');
+  el.innerHTML = `<div class="ph-wrap">
+    <div class="ph-hint">${src.length ? 'Parte da <b>' + h(src.map(s => s.nome).join(' + ')) + '</b>. ' : ''}Gli articoli sono già pronti: scegli la destinazione e sposta.</div>
+    <div class="ph-rows">${rows}</div>
+    <div class="ph-foot ph-cons">
+      <div class="ph-foot-t"><div class="ph-foot-a">${righe.length} ${righe.length === 1 ? 'articolo' : 'articoli'} · ${totPz} pz</div>
+        <select class="finput ph-dest" onchange="giroSetDest(this.value)">${destOpts}</select></div>
+      <div class="gr-slide${pronto ? '' : ' off'}" id="grSlide" data-on="${pronto ? 1 : 0}">
+        <button class="gr-knob" aria-label="Esegui lo spostamento" ${pronto ? '' : 'disabled'}>${pronto ? '→' : '🔒'}</button>
+        <span>${pronto ? 'Scorri per eseguire lo spostamento' : h(motivo)}</span>
+      </div>
+    </div>
+  </div>`;
+  _giroBindSlider();
+}
+
+// ─── DETTAGLIO LISTA A 4 FASI (liste normali) ───
+// 1 Articoli → 2 Provenienza → 3 Giro → 4 Carico.
+// La lista degli articoli è sempre visibile. Per ogni (articolo, magazzino):
+//   qty_prevista = quanto si prevede di prendere da lì (fase 2)
+//   qty_presa    = quanto è stato caricato/spuntato (fase 4), sempre <= qty_prevista
+// Il giro (ordine dei magazzini) è salvato sul dispositivo; con una sola sorgente la fase 3 si salta.
+let _giro = null;
+function _giroInit(listaId) {
+  let tappe = [];
+  try { tappe = JSON.parse(localStorage.getItem('wf-giro-' + listaId) || '[]') || []; } catch(e) {}
+  _giro = { listaId, tappe, fase: null, newRiga: null };
+}
+function _giroSave() {
+  try { localStorage.setItem('wf-giro-' + _giro.listaId, JSON.stringify(_giro.tappe)); } catch(e) {}
+}
+function _giroMagNome(id) { return getMag(id)?.nome || ('Magazzino ' + id); }
+function _giroMagCol(id) { return getMag(id)?.colore || '#8c8278'; }
+
+function _lsCalc(lista) {
+  const destId = lista.mag_dest_id ? parseInt(lista.mag_dest_id) : null;
+  const info = (lista.righe || []).map(r => {
+    const flags = (r.flags || []).filter(f => f.qty_prevista > 0);
+    const valid = flags.filter(f => f.mag_id !== destId);
+    const plan = valid.reduce((s, f) => s + f.qty_prevista, 0);
+    const taken = valid.reduce((s, f) => s + Math.min(f.qty_presa, f.qty_prevista), 0);
+    return { r, valid, plan, taken, missing: Math.max(0, r.qty_richiesta - plan), conflict: flags.some(f => f.mag_id === destId) };
+  });
+  const used = [];
+  info.forEach(x => x.valid.forEach(f => { if (!used.includes(f.mag_id)) used.push(f.mag_id); }));
+  const tappe = _giro.tappe.filter(id => used.includes(id));
+  used.forEach(id => { if (!tappe.includes(id)) tappe.push(id); });
+  const stops = tappe.map(id => {
+    const voci = [];
+    info.forEach(x => { const f = x.valid.find(f => f.mag_id === id); if (f) voci.push({ x, f }); });
+    const done = voci.length > 0 && voci.every(v => v.f.qty_presa >= v.f.qty_prevista);
+    return { id, voci, done, nDone: voci.filter(v => v.f.qty_presa >= v.f.qty_prevista).length };
+  });
+  const planComplete = info.length > 0 && info.every(x => x.missing <= 0);
+  return {
+    destId, info, tappe, stops, planComplete,
+    planAny: info.some(x => x.plan > 0),
+    allTaken: planComplete && stops.every(s => s.done),
+    conflict: info.some(x => x.conflict),
+    totReq: info.reduce((n, x) => n + x.r.qty_richiesta, 0),
+    totTaken: info.reduce((n, x) => n + Math.min(x.taken, x.r.qty_richiesta), 0)
+  };
+}
+
+async function _giroReload() {
+  const main = document.querySelector('main');
+  const t = main ? main.scrollTop : 0;
+  const l = await apiFetch('GET', '/liste/' + _listaCorrente.id);
+  _listaCorrente = l;
+  renderDettaglioRighe(l);
+  aggiornaStatoLista(l);
+  if (main) main.scrollTop = t;
+}
+function _giroRender() { renderDettaglioRighe(_listaCorrente); }
+
+// ── navigazione tra le fasi ──
+function lsGo(n) {
+  const c = _lsCalc(_listaCorrente);
+  if (n >= 2 && !c.info.length) { toast('Aggiungi prima almeno un articolo', true); n = 1; }
+  if (n >= 3 && !c.planComplete) { toast('Prima decidi da dove prendere tutti gli articoli', true); n = 2; }
+  if (_giro.fase === 3 && n > 3) _giroConferma(c);
+  _giro.fase = n;
+  _giro.newRiga = null;
+  _giroRender();
+  const main = document.querySelector('main');
+  if (main) main.scrollTop = 0;
+}
+function lsAvanti() {
+  const c = _lsCalc(_listaCorrente);
+  let n = _giro.fase + 1;
+  if (n === 3 && c.tappe.length <= 1) n = 4;
+  lsGo(Math.min(4, n));
+}
+function lsIndietro() {
+  const c = _lsCalc(_listaCorrente);
+  let n = _giro.fase - 1;
+  if (n === 3 && c.tappe.length <= 1) n = 2;
+  lsGo(Math.max(1, n));
+}
+
+// ── fase 1: quantità richiesta ──
+async function _lsApplyQty(rigaId, nq) {
+  const r = (_listaCorrente.righe || []).find(x => x.id === rigaId);
+  if (!r) return;
+  const stockTot = (r.stock || []).reduce((n, s) => n + s.qty, 0);
+  if (stockTot && nq > stockTot) { toast('Disponibili in totale: ' + stockTot, true); return; }
+  try {
+    await apiFetch('PUT', `/liste/righe/${rigaId}`, { qty_richiesta: nq });
+    // se si scende sotto la quantità già assegnata, si riduce l'ultima provenienza
+    let eccesso = (r.flags || []).reduce((s, f) => s + f.qty_prevista, 0) - nq;
+    for (const f of [...(r.flags || [])].reverse()) {
+      if (eccesso <= 0) break;
+      if (f.qty_prevista <= 0) continue;
+      const t = Math.min(eccesso, f.qty_prevista);
+      await apiFetch('PUT', `/liste/flag/${rigaId}/${f.mag_id}`, { qty_prevista: f.qty_prevista - t });
+      eccesso -= t;
+    }
+    await _giroReload();
+  } catch(e) { toast(e.message, true); }
+}
+function lsQty(rigaId, d) {
+  const r = (_listaCorrente.righe || []).find(x => x.id === rigaId);
+  if (!r) return;
+  const nq = Math.max(1, r.qty_richiesta + d);
+  if (nq === r.qty_richiesta) return;
+  _lsApplyQty(rigaId, nq);
+}
+
+// ── fase 2: da dove prendere ──
+async function lsFonte(rigaId, magId, mode) {
+  const c = _lsCalc(_listaCorrente);
+  const x = c.info.find(i => i.r.id === rigaId);
+  if (!x) return;
+  const stock = (x.r.stock || []).find(s => s.mag_id === magId)?.qty || 0;
+  const cur = x.valid.find(f => f.mag_id === magId)?.qty_prevista || 0;
+  const resto = x.r.qty_richiesta - x.plan;
+  let nv;
+  if (mode === 't') nv = cur > 0 ? 0 : Math.min(stock, resto);
+  else nv = Math.max(0, Math.min(Math.max(stock, cur), cur + mode, cur + resto));
+  if (nv === cur) { if (mode === 't' && cur === 0) toast('Questo articolo è già assegnato per intero', true); return; }
+  try {
+    await apiFetch('PUT', `/liste/flag/${rigaId}/${magId}`, { qty_prevista: nv });
+    await _giroReload();
+  } catch(e) { toast(e.message, true); }
+}
+
+// ── fase 3: ordine dei magazzini ──
+function lsMove(id, d) {
+  const c = _lsCalc(_listaCorrente);
+  const a = [...c.tappe], i = a.indexOf(id), j = i + d;
+  if (i < 0 || j < 0 || j >= a.length) return;
+  [a[i], a[j]] = [a[j], a[i]];
+  _giro.tappe = a;
+  _giroSave();
+  _giroRender();
+}
+
+// ── fase 4: spunta dei pezzi caricati ──
+async function lsTick(rigaId, magId) {
+  const r = (_listaCorrente.righe || []).find(x => x.id === rigaId);
+  const f = r && (r.flags || []).find(f => f.mag_id === magId);
+  if (!f) return;
+  const nv = f.qty_presa >= f.qty_prevista ? 0 : f.qty_prevista;
+  try {
+    await apiFetch('PUT', `/liste/flag/${rigaId}/${magId}`, { qty_presa: nv });
+    await _giroReload();
+  } catch(e) { toast(e.message, true); }
+}
+function lsVaiTappa(id) {
+  const el = document.getElementById('lsg-' + id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+async function giroSetDest(v) {
+  if (!v) return;
+  try {
+    await apiFetch('PUT', '/liste/' + _listaCorrente.id, { mag_dest_id: parseInt(v) });
+    await _giroReload();
+    await load();
+  } catch(err) { toast(err.message, true); }
+}
+
+async function giroEsegui() {
+  const l = _listaCorrente;
+  if (!l) return;
+  if (l.tipo === 'veloce') {
+    try {
+      const r = await apiFetch('POST', `/liste/${l.id}/esegui`, { mag_dest_id: parseInt(l.mag_dest_id) });
+      await loadPartial('spostamenti');
+      playSpostamentoSound();
+      toast(`✓ ${r.spostamenti} spostamenti registrati`);
+      _listaCorrente = null;
+      chiudiDettaglioLista();
+      renderListe();
+    } catch(err) { toast(err.message, true); _giroRender(); }
+    return;
+  }
+  try {
+    const r = await apiFetch('POST', `/liste/${l.id}/esegui`);
+    await loadPartial('spostamenti');
+    playSpostamentoSound();
+    toast(`✓ ${r.spostamenti} spostamenti registrati`);
+    _giro.fase = null; _giro.newRiga = null;
+    apriLista(l.id);
+  } catch(err) { toast(err.message, true); _giroRender(); }
+}
+
+function _giroBindSlider() {
+  const tr = document.getElementById('grSlide');
+  if (!tr || tr.dataset.on !== '1') return;
+  const kn = tr.querySelector('.gr-knob');
+  if (!kn) return;
+  let x0 = null, max = 0, dx = 0;
+  kn.onpointerdown = e => { x0 = e.clientX; dx = 0; max = tr.clientWidth - kn.offsetWidth - 12; kn.setPointerCapture(e.pointerId); kn.style.transition = 'none'; };
+  kn.onpointermove = e => { if (x0 === null) return; dx = Math.max(0, Math.min(max, e.clientX - x0)); kn.style.transform = `translateX(${dx}px)`; };
+  kn.onpointerup = () => {
+    if (x0 === null) return;
+    x0 = null;
+    kn.style.transition = 'transform .2s';
+    if (max > 0 && dx >= max * 0.9) { kn.style.transform = `translateX(${max}px)`; giroEsegui(); }
+    else kn.style.transform = 'translateX(0)';
+  };
+  kn.onkeydown = e => { if (e.key === 'Enter') giroEsegui(); };
+}
+
+function _giroSig(c) { return [...c.tappe].sort((a, b) => a - b).join(','); }
+function _giroConfermato(c) {
+  if (!c.planComplete) return false;
+  if (c.tappe.length <= 1) return true;
+  try { return localStorage.getItem('wf-giro-ok-' + _giro.listaId) === _giroSig(c); } catch(e) { return false; }
+}
+function _giroConferma(c) {
+  try { localStorage.setItem('wf-giro-ok-' + _giro.listaId, _giroSig(c)); } catch(e) {}
+}
+
+function _lsStepper(c, fase) {
+  const nomi = ['Articoli', 'Provenienza', 'Giro', 'Carico'];
+  const skip3 = c.tappe.length <= 1 && c.planComplete;
+  const compl = [c.info.length > 0, c.planComplete, _giroConfermato(c), c.allTaken];
+  return `<div class="ph-steps">${nomi.map((nm, i) => {
+    const n = i + 1;
+    const locked = (n >= 2 && !c.info.length) || (n >= 3 && !c.planComplete);
+    const done = compl[i] && !locked;
+    const cls = (n === fase ? ' on' : locked ? ' lock' : '') + (done ? ' done' : '');
+    const sub = n === 3 && skip3 ? '<em>tappa unica</em>' : '';
+    return `<button class="ph-step${cls}" onclick="lsGo(${n})" ${locked ? 'aria-disabled="true"' : ''}><span class="ph-dot">${done ? '✓' : n}</span><span class="ph-sl">${nm}${sub}</span></button>`;
+  }).join('')}</div>`;
+}
+
+function _lsFoot(left, leftSub, nextLabel, nextOk, nextAction, backAction) {
+  return `<div class="ph-foot">
+    ${backAction ? `<button class="btn btn-ghost ph-back" onclick="${backAction}" aria-label="Fase precedente">←<span class="ph-back-l"> Indietro</span></button>` : ''}
+    <div class="ph-foot-t"><div class="ph-foot-a">${left}</div><div class="ph-foot-b">${leftSub}</div></div>
+    ${nextLabel ? `<button class="lk-btn ${nextOk ? 'lk-go' : 'lk-idle'} ph-next" ${nextOk ? '' : 'disabled'} onclick="${nextAction}">${nextLabel}</button>` : ''}
+  </div>`;
+}
+
+function _renderGiro(lista) {
+  const el = document.getElementById('listaDetRighe');
+  const warn = document.getElementById('listaConflittoWarn');
+  if (warn) warn.style.display = 'none';
+  if (!_giro || _giro.listaId !== lista.id) _giroInit(lista.id);
+  const c = _lsCalc(lista);
+  if (_giro.fase === null) _giro.fase = !c.info.length || !c.planAny ? 1 : !c.planComplete ? 2 : 4;
+  if (_giro.fase >= 2 && !c.info.length) _giro.fase = 1;
+  if (_giro.fase >= 3 && !c.planComplete) _giro.fase = 2;
+  const fase = _giro.fase;
+  const stepper = _lsStepper(c, fase);
+  const righe = sortBauliFirst(c.info, x => x.r.art_id);
+  const nPz = c.totReq;
+  let body = '', foot = '';
+
+  if (fase === 1) {
+    const rows = righe.map(x => {
+      const r = x.r;
+      const stockTot = (r.stock || []).reduce((n, s) => n + s.qty, 0);
+      const nMag = (r.stock || []).length;
+      const isNew = _giro.newRiga === r.id;
+      return `<div class="ph-row${isNew ? ' new' : ''}" id="lsr-${r.id}">
+        <div class="ph-r-main">
+          <div class="ph-r-n">${h(r.art_nome)}${isNew ? ' <span class="ph-tag">APPENA AGGIUNTO</span>' : ''}</div>
+          <div class="ph-r-s">${h(r.art_codice)} · disp. ${stockTot}${nMag ? ' · ' + nMag + ' mag.' : ''}${r.note_riga ? ' · ' + h(r.note_riga) : ''}</div>
+        </div>
+        <div class="ph-q"><button onclick="lsQty(${r.id},-1)" aria-label="Meno">−</button><button class="ph-qn" onclick="modificaRiga(${r.id},${r.qty_richiesta},'${h(r.note_riga || '')}')" aria-label="Modifica quantità">${r.qty_richiesta}</button><button onclick="lsQty(${r.id},1)" aria-label="Più">+</button></div>
+        <button class="gr-ico gr-del ph-del" aria-label="Rimuovi dalla lista" onclick="eliminaRiga(${r.id})">✕</button>
+      </div>`;
+    }).join('');
+    body = `<div class="ph-add"><button class="lk-btn lk-ask ph-addb" onclick="aggiungiArticoloLista()">+ Aggiungi articolo</button></div>
+      <div class="ph-rows">${rows || '<div class="empty" style="padding:30px;text-align:center;color:var(--ink3)">Lista vuota. Aggiungi gli articoli che servono.</div>'}</div>`;
+    foot = _lsFoot(`${c.info.length} ${c.info.length === 1 ? 'articolo' : 'articoli'} · ${nPz} pz richiesti`,
+      'Aggiungi tutto ciò che serve. Dopo decidi da dove prenderlo.',
+      'Avanti · Da dove li prendi →', c.info.length > 0, 'lsAvanti()', '');
+  } else if (fase === 2) {
+    const nMiss = c.info.filter(x => x.missing > 0).length;
+    const rows = righe.map(x => {
+      const r = x.r;
+      const complete = x.missing <= 0;
+      const over = x.plan > r.qty_richiesta;
+      const srcs = (r.stock || []).filter(s => s.mag_id !== c.destId).map(s => ({ mag_id: s.mag_id, mag_nome: s.mag_nome, mag_colore: s.mag_colore, qty: s.qty }));
+      x.valid.forEach(f => { if (!srcs.some(s => s.mag_id === f.mag_id)) srcs.push({ mag_id: f.mag_id, mag_nome: f.mag_nome, mag_colore: f.mag_colore, qty: 0 }); });
+      const chips = srcs.map(s => {
+        const cur = x.valid.find(f => f.mag_id === s.mag_id)?.qty_prevista || 0;
+        return `<div class="ph-src${cur ? ' on' : ''}">
+          <button class="ph-src-b" onclick="lsFonte(${r.id},${s.mag_id},'t')"><i style="background:${s.mag_colore}"></i><span class="ph-src-n">${h(s.mag_nome)}</span><span class="ph-src-d">${s.qty} disp.</span></button>
+          ${cur ? `<div class="ph-q sm"><button onclick="lsFonte(${r.id},${s.mag_id},-1)" aria-label="Meno">−</button><span>${cur}</span><button onclick="lsFonte(${r.id},${s.mag_id},1)" aria-label="Più">+</button></div>` : '<span class="ph-src-hint">tocca</span>'}
+        </div>`;
+      }).join('') || '<span class="ph-r-s">Nessuno stock disponibile</span>';
+      return `<div class="ph-row ph-row2${complete ? ' ok' : ' miss'}">
+        <div class="ph-r-top"><span class="ph-badge${complete ? ' ok' : ''}">${complete ? '✓' : '!'}</span>
+          <div class="ph-r-main"><div class="ph-r-n">${h(r.art_nome)}</div>
+            <div class="ph-r-s">${h(r.art_codice)} · servono ${r.qty_richiesta} · assegnati ${x.plan}${over ? ' (troppi)' : ''}</div></div></div>
+        <div class="ph-srcs">${chips}</div>
+      </div>`;
+    }).join('');
+    const riep = c.stops.map(s => `<span class="ph-riep"><i style="background:${_giroMagCol(s.id)}"></i><b>${h(_giroMagNome(s.id))}</b> ${s.voci.length} ${s.voci.length === 1 ? 'articolo' : 'articoli'} · ${s.voci.reduce((n, v) => n + v.f.qty_prevista, 0)} pz</span>`).join('');
+    const conflitto = c.conflict ? `<div class="gr-warn">⚠ Alcuni articoli risultano assegnati proprio alla destinazione. <button class="btn btn-danger btn-xs" onclick="risolviConflitti()">Risolvi</button></div>` : '';
+    body = `<div class="ph-hint">Per ogni articolo scegli da quale magazzino lo prendi: tocca un magazzino per assegnare ciò che serve, poi regola la quantità se vuoi dividerlo.</div>
+      ${conflitto}<div class="ph-rows">${rows}</div>
+      <div class="ph-riepilogo"><span class="ph-riep-t">DA DOVE PRENDI</span>${riep || '<span class="ph-r-s">nessuno ancora</span>'}</div>`;
+    foot = _lsFoot(nMiss ? `Manca ${nMiss} ${nMiss === 1 ? 'articolo' : 'articoli'}: ${c.info.filter(x => x.missing > 0).map(x => h(x.r.art_nome)).join(', ')}` : 'Tutti gli articoli hanno una provenienza',
+      'Puoi tornare indietro e modificare gli articoli in qualsiasi momento.',
+      c.tappe.length > 1 ? 'Avanti · Imposta il giro →' : 'Avanti · Carico →', c.planComplete, 'lsAvanti()', 'lsIndietro()');
+  } else if (fase === 3) {
+    const cards = c.stops.map((s, i) => `<div class="ph-stop">
+      <span class="ph-stop-n">${i + 1}</span>
+      <div class="ph-stop-b">
+        <div class="gr-stop-n"><i style="background:${_giroMagCol(s.id)}"></i>${h(_giroMagNome(s.id))}<span class="ph-stop-t">${s.voci.reduce((n, v) => n + v.f.qty_prevista, 0)} pz</span></div>
+        <div class="ph-chips">${s.voci.map(v => `<span class="ph-chip">${h(v.x.r.art_nome)} × ${v.f.qty_prevista}</span>`).join('')}</div>
+      </div>
+      <div class="ph-mv"><button class="gr-ico" ${i === 0 ? 'disabled style="opacity:.3"' : ''} onclick="lsMove(${s.id},-1)" aria-label="Sposta su">↑</button><button class="gr-ico" ${i === c.stops.length - 1 ? 'disabled style="opacity:.3"' : ''} onclick="lsMove(${s.id},1)" aria-label="Sposta giù">↓</button></div>
+    </div>`).join('');
+    const dest = c.destId ? _giroMagNome(c.destId) : null;
+    body = `<div class="ph-hint">In che ordine passi dai magazzini? Qui compaiono solo quelli scelti nella fase 2.</div>
+      <div class="ph-rows">${cards}
+        <div class="ph-stop ph-stop-end"><span class="ph-stop-n">⚑</span><div class="ph-stop-b"><div class="gr-stop-n">${dest ? 'Consegna a ' + h(dest) : 'Consegna'}</div><div class="gr-stop-m">sempre ultima</div></div></div>
+      </div>`;
+    foot = _lsFoot(`${c.stops.length} ${c.stops.length === 1 ? 'tappa' : 'tappe'} · ${nPz} pz`, "L'ordine si può cambiare anche durante il carico.", 'Avanti · Inizia il carico →', true, 'lsAvanti()', 'lsIndietro()');
+  } else {
+    const cur = c.stops.find(s => !s.done);
+    const pills = c.stops.map(s => `<button class="ph-pill${cur && cur.id === s.id ? ' on' : ''}${s.done ? ' done' : ''}" onclick="lsVaiTappa(${s.id})"><i style="background:${_giroMagCol(s.id)}"></i>${h(_giroMagNome(s.id))}<span>${s.nDone}/${s.voci.length}</span></button>`).join('');
+    const groups = c.stops.map((s, i) => `<div class="ph-grp${cur && cur.id === s.id ? ' cur' : ''}" id="lsg-${s.id}">
+      <div class="ph-grp-h"><i style="background:${_giroMagCol(s.id)}"></i><b>${c.stops.length > 1 ? (i + 1) + '. ' : ''}${h(_giroMagNome(s.id))}</b><span class="ph-grp-p">${s.nDone} / ${s.voci.length}</span>${cur && cur.id === s.id && c.stops.length > 1 ? '<span class="ph-grp-tag">TAPPA CORRENTE</span>' : ''}</div>
+      ${s.voci.map(v => {
+        const r = v.x.r, done = v.f.qty_presa >= v.f.qty_prevista;
+        const altri = v.x.valid.filter(f => f.mag_id !== s.id);
+        const nota = altri.length ? `${v.f.qty_prevista} di ${r.qty_richiesta} · altri ${altri.reduce((n, f) => n + f.qty_prevista, 0)} da ${altri.map(f => h(_giroMagNome(f.mag_id))).join(', ')}` : `${(r.stock || []).find(s2 => s2.mag_id === s.id)?.qty ?? '—'} disponibili`;
+        return `<div class="ph-v${done ? ' done' : ''}">
+          <button class="gr-chk${done ? ' on' : ''}" aria-label="Spunta ${h(r.art_nome)}" onclick="lsTick(${r.id},${s.id})">${done ? '✓' : ''}</button>
+          <div class="ph-r-main"><div class="ph-r-n">${h(r.art_nome)}</div><div class="ph-r-s">${h(r.art_codice)} · ${nota}</div></div>
+          <div class="ph-vq">× ${v.f.qty_prevista}</div>
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+    const pronto = c.allTaken && c.destId && !c.conflict;
+    const mancano = c.stops.reduce((n, s) => n + s.voci.reduce((m, v) => m + Math.max(0, v.f.qty_prevista - v.f.qty_presa), 0), 0);
+    let motivo = '';
+    if (!c.destId) motivo = 'Scegli la destinazione';
+    else if (c.conflict) motivo = 'Alcuni articoli sono assegnati alla destinazione';
+    else if (!c.allTaken) motivo = `Spunta tutto per sbloccare · mancano ${mancano} pz`;
+    const destOpts = '<option value="">— Scegli la destinazione —</option>' +
+      getMagReali().map(m => `<option value="${m.id}"${m.id === c.destId ? ' selected' : ''}>${h(m.nome)}</option>`).join('');
+    const conflitto = c.conflict ? `<div class="gr-warn">⚠ Alcuni articoli risultano assegnati proprio alla destinazione. <button class="btn btn-danger btn-xs" onclick="risolviConflitti()">Risolvi</button></div>` : '';
+    body = `${c.stops.length > 1 ? `<div class="ph-pills"><span class="ph-riep-t">GIRO</span>${pills}</div>` : ''}${conflitto}
+      <div class="ph-rows">${groups}</div>`;
+    foot = `<div class="ph-foot ph-cons">
+      <button class="btn btn-ghost ph-back" onclick="lsIndietro()" aria-label="Fase precedente">←<span class="ph-back-l"> Indietro</span></button>
+      <div class="ph-foot-t"><div class="ph-foot-a">Consegna</div>
+        <select class="finput ph-dest" onchange="giroSetDest(this.value)">${destOpts}</select></div>
+      <div class="gr-slide${pronto ? '' : ' off'}" id="grSlide" data-on="${pronto ? 1 : 0}">
+        <button class="gr-knob" aria-label="Esegui lo spostamento" ${pronto ? '' : 'disabled'}>${pronto ? '→' : '🔒'}</button>
+        <span>${pronto ? 'Scorri per eseguire lo spostamento' : h(motivo)}</span>
+      </div>
+    </div>`;
+  }
+
+  el.innerHTML = `<div class="ph-wrap">${stepper}${body}${foot}</div>`;
+  _giroBindSlider();
+  if (fase === 1 && _giro.newRiga) {
+    const nr = document.getElementById('lsr-' + _giro.newRiga);
+    if (nr) nr.scrollIntoView({ block: 'nearest' });
+  }
 }
 
 function toggleRigaLista(head) {
@@ -4681,15 +5526,13 @@ async function stepFlag(rigaId, magId, delta, maxQty, qtyRichiesta) {
 // Aggiorna progress bar e contatori senza ricostruire il DOM delle righe
 function calcolaStatoLista(lista) {
   const righe = lista.righe || [];
-  if (!righe.length) return 'inattiva';
+  if (!righe.length) return 'vuota';
   const destId = lista.mag_dest_id ? parseInt(lista.mag_dest_id) : null;
-  const totFlag = righe.reduce((s,r) =>
-    s + (r.flags||[]).reduce((n,f) => n + (destId && f.mag_id === destId ? 0 : f.qty_presa), 0), 0);
-  if (totFlag === 0) return 'inattiva';
-  const completa = righe.every(r => {
-    const qp = (r.flags||[]).reduce((s,f) => s + (destId && f.mag_id === destId ? 0 : f.qty_presa), 0);
-    return qp >= r.qty_richiesta;
-  });
+  const valide = r => (r.flags||[]).filter(f => !(destId && f.mag_id === destId));
+  // inattiva = articoli inseriti ma nessuna provenienza; in preparazione = almeno una provenienza
+  const totPrev = righe.reduce((s,r) => s + valide(r).reduce((n,f) => n + (f.qty_prevista||0), 0), 0);
+  if (totPrev === 0) return 'inattiva';
+  const completa = righe.every(r => valide(r).reduce((s,f) => s + f.qty_presa, 0) >= r.qty_richiesta);
   return completa ? 'completa' : 'in-preparazione';
 }
 
@@ -4697,8 +5540,9 @@ function aggiornaStatoLista(lista) {
   const statoEl = document.getElementById('listaDetStato');
   const statoMob = document.getElementById('listaDetStatoMobile');
   if (!statoEl) return;
-  const stato = lista.stato === 'inattiva' && !lista.righe?.some(r=>(r.flags||[]).some(f=>f.qty_presa>0))
-    ? 'inattiva' : calcolaStatoLista(lista);
+  const stato = calcolaStatoLista(lista);
+  if (stato === 'vuota') { statoEl.style.display = 'none'; return; }
+  statoEl.style.display = '';
   const label = {'inattiva':'inattiva','in-preparazione':'in preparazione','completa':'completa'}[stato] || stato;
   statoEl.textContent = label;
   statoEl.className = 'lista-stato lista-stato-desktop ' + stato;
@@ -4748,8 +5592,10 @@ function openModalListaEdit(id, nome, magDestId, note, tipo) {
   document.getElementById('listaNota').value = note;
   document.getElementById('listaTipo').value = tipo || 'normale';
   const sel = document.getElementById('listaMagDest');
+  // Lista veloce: il magazzino di partenza non è tra le destinazioni possibili
+  const srcId = tipo === 'veloce' ? ((_listeElenco.find(l => l.id == id) || {}).mag_src_id || null) : null;
   sel.innerHTML = '<option value="">— Nessuna destinazione —</option>' +
-    getMagReali().map(m => `<option value="${m.id}"${m.id==magDestId?' selected':''}>${h(m.nome)}</option>`).join('');
+    getMagReali().filter(m => !srcId || m.id != srcId).map(m => `<option value="${m.id}"${m.id==magDestId?' selected':''}>${h(m.nome)}</option>`).join('');
   openModal('modalLista');
 }
 
@@ -4788,16 +5634,20 @@ function aggiungiArticoloLista() {
   const catSel = document.getElementById('aggArtCat');
   catSel.innerHTML = '<option value="">Tutte</option>' +
     D.categorie.map(c => `<option value="${c.id}">[${h(c.prefisso)}] ${h(c.nome)}</option>`).join('');
+  const srch = document.getElementById('aggArtSearch'); if (srch) srch.value = '';
   filterAggArtArticoli();
   document.getElementById('aggArtQty').value = '';
   document.getElementById('aggArtNota').value = '';
   openModal('modalAggArt');
+  setTimeout(() => { if (srch) srch.focus(); }, 80);
 }
 
 function filterAggArtArticoli() {
   const catId = document.getElementById('aggArtCat').value;
   const sel = document.getElementById('aggArtArticolo');
-  const lista = catId ? D.articoli.filter(a => a.cat_id == catId) : D.articoli;
+  let lista = catId ? D.articoli.filter(a => a.cat_id == catId) : D.articoli;
+  const terms = (document.getElementById('aggArtSearch')?.value || '').toLowerCase().split(/\s+/).filter(Boolean);
+  if (terms.length) lista = lista.filter(a => { const t = `${a.nome} ${a.codice} ${a.variante || ''}`.toLowerCase(); return terms.every(w => t.includes(w)); });
   const artsSConStock = lista.filter(a => D.stock.some(s => s.art_id == a.id && s.qty > 0));
   sel.innerHTML = artsSConStock.map(a => `<option value="${a.id}">[${h(a.codice)}] ${h(a.nome)}${a.variante?' · '+h(a.variante):''}</option>`).join('');
   aggArtShowStock();
@@ -4808,8 +5658,7 @@ function stepAddToListaQty(delta) {
   const curr = parseInt(input.value) || 0;
   const artId = document.getElementById('addToListaArtId').value;
   const maxStock = artId
-    ? D.stock.filter(s => s.art_id == artId && !D.magazzini.find(m => m.id == s.mag_id)?.virtuale)
-        .reduce((n, s) => n + s.qty, 0)
+    ? D.stock.filter(s => s.art_id == artId && s.mag_id == _detailMagId).reduce((n, s) => n + s.qty, 0)
     : 9999;
   input.value = Math.max(1, Math.min(maxStock, curr + delta));
 }
@@ -4842,9 +5691,11 @@ async function salvaAggArt() {
   if (!artId) { toast('Seleziona un articolo', true); return; }
   if (!qty || qty < 1) { toast('Inserisci una quantità', true); return; }
   try {
-    await apiFetch('POST', `/liste/${listaId}/righe`, { art_id: artId, qty_richiesta: qty, note_riga: note });
+    const nr = await apiFetch('POST', `/liste/${listaId}/righe`, { art_id: artId, qty_richiesta: qty, note_riga: note });
     closeModal('modalAggArt');
     await apriLista(listaId);
+    // Lista normale: si resta/torna alla fase Articoli con la riga appena inserita in evidenza
+    if (_giro && _listaCorrente && _listaCorrente.tipo !== 'veloce' && nr && nr.id) { _giro.fase = 1; _giro.newRiga = nr.id; _giroRender(); }
     toast('Articolo aggiunto ✓');
   } catch(e) { toast(e.message, true); }
 }
@@ -4854,6 +5705,7 @@ async function modificaRiga(rigaId, qtyAttuare, noteRiga) {
   if (nuovaQty === null) return;
   const qty = +nuovaQty;
   if (!qty || qty < 1) { toast('Quantità non valida', true); return; }
+  if (_listaCorrente && _listaCorrente.tipo !== 'veloce') { await _lsApplyQty(rigaId, qty); return; }
   try {
     await apiFetch('PUT', `/liste/righe/${rigaId}`, { qty_richiesta: qty });
     const l = await apiFetch('GET', '/liste/' + _listaCorrente.id);
@@ -4870,8 +5722,66 @@ async function eliminaRiga(rigaId) {
   toast('Articolo rimosso');
 }
 
+// Lista veloce: destinazione scelta al momento dell'esecuzione
+function _sorgentiIdsVeloce() { return _listaSorgenti(_listaCorrente).map(s => s.id); }
+
+async function _eseguiVeloce(destId, destNome) {
+  const lista = _listaCorrente;
+  const totPz = (lista.righe||[]).reduce((s,r) => s + (r.flags||[]).reduce((n,f) => n + (f.qty_presa>0?f.qty_presa:0), 0), 0);
+  const nRighe = (lista.righe||[]).filter(r => (r.flags||[]).some(f => f.qty_presa>0)).length;
+  const src = _listaSorgenti(lista).map(s => s.nome).join(', ');
+  if (!confirm(`Spostare ${totPz} pz (${nRighe} articoli) da "${src}" a "${destNome}"?`)) return;
+  try {
+    const r = await apiFetch('POST', `/liste/${lista.id}/esegui`, { mag_dest_id: destId });
+    await loadPartial('spostamenti');
+    playSpostamentoSound();
+    toast(`✓ ${r.spostamenti} spostamenti registrati`);
+    _listaCorrente = null;
+    chiudiDettaglioLista();
+    renderListe();
+  } catch(e) { toast(e.message, true); }
+}
+
+// La destinazione viene solo salvata: lo spostamento si esegue poi con "Esegui spostamento"
+let _destVeloceListaId = null;
+async function scegliDestVeloce(id) {
+  try {
+    const l = await apiFetch('GET', '/liste/' + id);
+    const src = _listaSorgenti(l).map(s => s.id);
+    _destVeloceListaId = id;
+    document.getElementById('destVeloceSel').innerHTML = '<option value="">— Scegli il magazzino —</option>' +
+      getMagReali().filter(m => !src.includes(m.id)).map(m => `<option value="${m.id}"${m.id == l.mag_dest_id ? ' selected' : ''}>${h(m.nome)}</option>`).join('');
+    openModal('modalDestVeloce');
+  } catch(e) { toast(e.message, true); }
+}
+async function confermaDestVeloce() {
+  const v = document.getElementById('destVeloceSel').value;
+  if (!v) { toast('Scegli il magazzino di destinazione', true); return; }
+  const id = _destVeloceListaId || (_listaCorrente && _listaCorrente.id);
+  if (!id) return;
+  try {
+    await apiFetch('PUT', '/liste/' + id, { mag_dest_id: parseInt(v) });
+    closeModal('modalDestVeloce');
+    _destVeloceListaId = null;
+    await load();
+    if (_listaCorrente && _listaCorrente.id === id) await apriLista(id);
+    renderListe();
+    toast('Destinazione impostata ✓');
+  } catch(e) { toast(e.message, true); }
+}
+
 async function eseguiLista() {
   if (!_listaCorrente) return;
+  // Liste normali: l'esecuzione avviene dalla fase "Carico" (consegna con gesto di conferma)
+  if (_listaCorrente.tipo !== 'veloce') { lsGo(4); return; }
+  if (_listaCorrente.tipo === 'veloce' && _listaSorgenti(_listaCorrente).length) {
+    const src = _sorgentiIdsVeloce();
+    const destId = _listaCorrente.mag_dest_id ? parseInt(_listaCorrente.mag_dest_id) : null;
+    if (destId && src.includes(destId)) { toast('La destinazione coincide con il magazzino di partenza', true); return; }
+    if (destId) { _eseguiVeloce(destId, _listaCorrente.mag_dest_nome || 'destinazione'); return; }
+    scegliDestVeloce(_listaCorrente.id);
+    return;
+  }
   if (!_listaCorrente.mag_dest_id) { toast('Imposta un magazzino destinazione prima di eseguire', true); return; }
   // Blocca se la lista non è completa
   const stato = calcolaStatoLista(_listaCorrente);
@@ -4908,6 +5818,51 @@ async function eseguiLista() {
   } catch(e) { toast(e.message, true); }
 }
 
+async function _fillAddToListaSelect(selectId) {
+  const liste = await apiFetch('GET', '/liste');
+  // Escludi liste veloci che hanno come destinazione il magazzino corrente
+  const magCorrente = _detailMagId ? parseInt(_detailMagId) : null;
+  // Una lista veloce ha un solo magazzino di partenza: ok se vuota o già "da" questo magazzino
+  const veloci = liste.filter(l =>
+    l.tipo === 'veloce' &&
+    !(magCorrente && l.mag_dest_id && parseInt(l.mag_dest_id) === magCorrente) &&
+    (!l.mag_src_id || !magCorrente || parseInt(l.mag_src_id) === magCorrente)
+  );
+  const sel = document.getElementById('addToListaId');
+  if (!veloci.length) {
+    sel.innerHTML = '<option value="">Nessuna lista veloce disponibile per questo magazzino</option>';
+  } else {
+    sel.innerHTML = veloci.map(l => `<option value="${l.id}">${h(l.nome)}</option>`).join('');
+    if (selectId && veloci.some(l => String(l.id) === String(selectId))) sel.value = String(selectId);
+  }
+  return liste;
+}
+
+// Crea una nuova lista veloce "<utente> <n>" e la preseleziona
+async function creaNuovaListaVeloce() {
+  const btn = document.getElementById('addToListaNewBtn');
+  if (btn) btn.disabled = true;
+  try {
+    const liste = await apiFetch('GET', '/liste');
+    const base = (currentUser?.username || 'Lista').trim();
+    const re = new RegExp('^' + base.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ' (\\d+)$', 'i');
+    let max = 0;
+    liste.forEach(l => { const m = re.exec(l.nome || ''); if (m) max = Math.max(max, parseInt(m[1])); });
+    const r = await apiFetch('POST', '/liste', { nome: `${base} ${max + 1}`, note: '', mag_dest_id: null, tipo: 'veloce' });
+    await _fillAddToListaSelect(r.id);
+    toast('Lista veloce creata ✓');
+  } catch(e) { toast(e.message, true); }
+  finally { if (btn) btn.disabled = false; }
+}
+
+// Tasto ⚡ nel contenuto magazzino: contatore verde se l'articolo è già in una lista veloce
+function velociQtyArt(artId) {
+  return (D.liste || []).reduce((n, l) => n + (l.tipo === 'veloce' ? (+(l.art_qty || {})[artId] || 0) : 0), 0);
+}
+function velociBtn(artId) {
+  const q = velociQtyArt(artId);
+  return `<button class="vl-btn${q ? ' on' : ''}" onclick="event.stopPropagation();openAddToLista(${artId})" title="${q ? q + ' pz già in liste veloci · ' : ''}Aggiungi a lista veloce" aria-label="Aggiungi a lista veloce">⚡${q ? `<span>${q}</span>` : '+'}</button>`;
+}
 // Apri modal "Aggiungi a lista" dal modal contenuto magazzino
 async function openAddToLista(artId) {
   const art = getArt(artId);
@@ -4915,22 +5870,9 @@ async function openAddToLista(artId) {
   document.getElementById('addToListaArtId').value = artId;
   document.getElementById('addToListaArtInfo').innerHTML =
     `${codiceBadge(art.codice, getCat(art.cat_id)?.colore)} <strong>${h(art.nome)}</strong>`;
-  const tot = D.stock.filter(s => s.art_id==artId && !D.magazzini.find(m=>m.id==s.mag_id)?.virtuale)
-    .reduce((n,s) => n+s.qty, 0);
-  document.getElementById('addToListaStockInfo').textContent = `Stock totale: ${tot} pz`;
-  const liste = await apiFetch('GET', '/liste');
-  // Escludi liste veloci che hanno come destinazione il magazzino corrente
-  const magCorrente = _detailMagId ? parseInt(_detailMagId) : null;
-  const veloci = liste.filter(l =>
-    l.tipo === 'veloce' &&
-    !(magCorrente && l.mag_dest_id && parseInt(l.mag_dest_id) === magCorrente)
-  );
-  const sel = document.getElementById('addToListaId');
-  if (!veloci.length) {
-    sel.innerHTML = '<option value="">Nessuna lista veloce disponibile per questo magazzino</option>';
-  } else {
-    sel.innerHTML = veloci.map(l => `<option value="${l.id}">${h(l.nome)}</option>`).join('');
-  }
+  const tot = D.stock.filter(s => s.art_id==artId && s.mag_id==_detailMagId).reduce((n,s) => n+s.qty, 0);
+  document.getElementById('addToListaStockInfo').textContent = `Disponibili in ${getMag(parseInt(_detailMagId))?.nome || 'magazzino'}: ${tot} pz`;
+  await _fillAddToListaSelect();
   document.getElementById('addToListaQty').value = '';
   openModal('modalAddToLista');
 }
@@ -4942,8 +5884,9 @@ async function salvaAddToLista() {
   if (!listaId) { toast('Nessuna lista disponibile', true); return; }
   if (!qty || qty < 1) { toast('Inserisci una quantità', true); return; }
   try {
-    await apiFetch('POST', `/liste/${listaId}/righe`, { art_id: artId, qty_richiesta: qty });
+    await apiFetch('POST', `/liste/${listaId}/righe`, { art_id: artId, qty_richiesta: qty, mag_id: _detailMagId });
     closeModal('modalAddToLista');
+    try { D.liste = await apiFetch('GET', '/liste'); renderMagDetailTable(); } catch (e) {}
     toast('Aggiunto alla lista ✓');
   } catch(e) { toast(e.message, true); }
 }
@@ -5026,7 +5969,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 9;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 10;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
@@ -5409,6 +6352,7 @@ function playSpostamentoSound() {
 let _bauleCorrente = null;
 
 function renderBauli() {
+  _bauliTabCounts();
   // Reset to bauli tab
   if (_bauliTab === 'flc' || _bauliTab === 'flck') { switchBauliTab(_bauliTab); return; }
   const grid = document.getElementById('bauliGrid');
@@ -5416,41 +6360,15 @@ function renderBauli() {
   grid.style.display = '';
 
   if (!D.bauli.length) {
-    grid.innerHTML = `<div class="empty" style="grid-column:1/-1">
-      Nessun baule — clicca "+ Nuovo baule" per crearne uno
-    </div>`;
+    _btRender(grid, [], 'Nessun baule — clicca "+ Baule" per crearne uno');
     return;
   }
 
-  grid.innerHTML = D.bauli.map(b => {
-    const badge = b.n_voci > 0
-      ? `<span class="baule-badge compilato">${b.n_voci} voci</span>`
-      : `<span class="baule-badge vuoto">vuoto</span>`;
-    const stockRealeB = totalArtReale(b.id);
-    const eliminabile = true;
-    const adminFoot = currentUser?.ruolo === 'admin'
-      ? `<div class="baule-foot">
-           ${eliminabile
-             ? `<span class="mag-foot-btn danger" onclick="event.stopPropagation();eliminaBaule(${b.id})">elimina</span>`
-             : `<span class="mag-foot-btn ghost" style="opacity:.35;cursor:default" title="Sposta nel cestino prima di eliminare">elimina</span>`
-           }
-         </div>`
-      : '';
-    return `
-      <div class="baule-card" onclick="apriBaule(${b.id})" style="border-top:4px solid #92400e">
-        <div class="baule-card-body">
-          <div class="baule-card-left">
-            <div class="baule-icon"><svg width="44" height="44" viewBox="0 0 48 48" fill="none"><rect x="6" y="12" width="36" height="26" rx="2" stroke="#8a6b8d" stroke-width="2.5" fill="none"/><path d="M6 12l3-3h30l3 3" stroke="#8a6b8d" stroke-width="2" fill="none"/><rect x="6" y="12" width="4" height="4" rx="0.5" fill="#a8a29e"/><rect x="38" y="12" width="4" height="4" rx="0.5" fill="#a8a29e"/><rect x="6" y="34" width="4" height="4" rx="0.5" fill="#a8a29e"/><rect x="38" y="34" width="4" height="4" rx="0.5" fill="#a8a29e"/><line x1="6" y1="25" x2="42" y2="25" stroke="#8a6b8d" stroke-width="1.5"/><circle cx="16" cy="25" r="2" fill="#a8a29e"/><circle cx="32" cy="25" r="2" fill="#a8a29e"/></svg></div>
-          </div>
-          <div class="baule-info">
-            <div class="baule-nome">${h(b.nome)}</div>
-            <div class="baule-meta">${h(b.codice)}</div>
-            ${badge}
-          </div>
-        </div>
-        ${adminFoot}
-      </div>`;
-  }).join('');
+  _btRender(grid, D.bauli.map(b => ({
+    nome: b.nome, cod: b.codice, sub: '', col: _btCol('BAU', '#92400e'),
+    chip: b.n_voci > 0 ? `${b.n_voci} VOCI` : 'VUOTO', ok: b.n_voci > 0,
+    onOpen: `apriBaule(${b.id})`, delOk: true, onDel: `eliminaBaule(${b.id})`
+  })), '');
 }
 
 async function apriBaule(id) {
@@ -5620,52 +6538,62 @@ function switchBauliTab(tab) {
   document.getElementById('bauliTabContent').style.display = tab === 'bauli' ? '' : 'none';
   document.getElementById('flcTabContent').style.display = tab === 'flc' ? '' : 'none';
   document.getElementById('flckTabContent').style.display = tab === 'flck' ? '' : 'none';
+  const nb = document.getElementById('bauliNewBtn');
+  if (nb) nb.textContent = { bauli: '+ Baule', flc: '+ Flight Case', flck: '+ Flightcase K' }[tab];
+  _bauliTabCounts();
   if (tab === 'flc') renderFlc();
   if (tab === 'flck') renderFlck();
+}
+function nuovoBauliCorrente() {
+  ({ bauli: openModalBauleNew, flc: openModalFlcNew, flck: openModalFlckNew })[_bauliTab]();
+}
+function _bauliTabCounts() {
+  const set = (id, n) => { const el = document.getElementById(id); if (el) el.textContent = n; };
+  set('tabBauliN', (D.bauli || []).length); set('tabFlcN', (D.flightcase || []).length); set('tabFlckN', (D.flck || []).length);
+}
+
+// ── Riquadri / lista compatta per Bauli, Flight Case, Flightcase K ──
+let _bauliView = (() => { try { return localStorage.getItem('bauliView') === 'list' ? 'list' : 'tile'; } catch (e) { return 'tile'; } })();
+function _btCol(pref, fb) { const c = (D.categorie || []).find(x => x.prefisso === pref); return (c && c.colore) || fb; }
+const _BT_SVG = '<svg width="52" height="52" viewBox="0 0 48 48" fill="none" stroke="currentColor"><rect x="6" y="12" width="36" height="26" rx="2" stroke-width="2.5"/><path d="M6 12l3-3h30l3 3" stroke-width="2"/><line x1="6" y1="25" x2="42" y2="25" stroke-width="1.8"/><circle cx="16" cy="25" r="2.5" fill="currentColor" stroke="none"/><circle cx="32" cy="25" r="2.5" fill="currentColor" stroke="none"/></svg>';
+function _btSyncToggle() {
+  document.getElementById('btvTile')?.classList.toggle('on', _bauliView !== 'list');
+  document.getElementById('btvList')?.classList.toggle('on', _bauliView === 'list');
+}
+function setBauliView(v) {
+  _bauliView = v === 'list' ? 'list' : 'tile';
+  try { localStorage.setItem('bauliView', _bauliView); } catch (e) {}
+  _btSyncToggle();
+  // con un dettaglio aperto il cambio vale al ritorno all'elenco
+  const open = ['bauleDettaglio', 'flcDettaglio', 'flckDettaglio'].some(id => document.getElementById(id)?.style.display === '');
+  if (open) return;
+  ({ bauli: renderBauli, flc: renderFlc, flck: renderFlck })[_bauliTab]();
+}
+function _btRender(grid, items, vuoto) {
+  _btSyncToggle();
+  if (!items.length) { grid.className = 'bt-grid'; grid.innerHTML = `<div class="lk-empty" style="grid-column:1/-1">${vuoto}</div>`; return; }
+  const admin = currentUser?.ruolo === 'admin';
+  const list = _bauliView === 'list';
+  const del = i => !admin ? '' : i.delOk
+    ? `<button class="bt-del" title="Elimina" aria-label="Elimina" onclick="event.stopPropagation();${i.onDel}">✕</button>`
+    : `<button class="bt-del off" title="Sposta nel cestino prima di eliminare" aria-label="Elimina non disponibile" onclick="event.stopPropagation()">✕</button>`;
+  const chip = i => `<span class="bt-chip ${i.ok ? 'ok' : 'no'}">${h(i.chip)}</span>`;
+  const cod = i => h(i.cod) + (i.sub ? ' · ' + h(i.sub) : '');
+  grid.className = list ? 'bt-list' : 'bt-grid';
+  grid.innerHTML = items.map(i => list
+    ? `<div class="bt-row" style="--bc:${i.col}" onclick="${i.onOpen}"><i class="bt-dot"></i><span class="bt-rn">${h(i.nome)}</span><span class="bt-rc">${cod(i)}</span>${chip(i)}${del(i)}</div>`
+    : `<div class="bt-card" style="--bc:${i.col}" onclick="${i.onOpen}">${del(i)}<div class="bt-band">${_BT_SVG}</div><div class="bt-foot"><div class="bt-txt"><div class="bt-nome">${h(i.nome)}</div><div class="bt-cod">${cod(i)}</div></div>${chip(i)}</div></div>`
+  ).join('');
 }
 
 function renderFlc() {
   const grid = document.getElementById('flcGrid');
-  if (!D.flightcase.length) {
-    grid.innerHTML = `<div class="empty" style="grid-column:1/-1">
-      Nessun flight case — clicca "+ Flight Case" per crearne uno
-    </div>`;
-    return;
-  }
-
-  grid.innerHTML = D.flightcase.map(fc => {
-    const stockReale = totalArtReale(fc.id);
-    const eliminabile = true;
-    const qtyInfo = fc.art_contenuto_nome
-      ? `<div style="font-size:10px;color:var(--ink3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${h(fc.art_contenuto_nome)}</div>`
-      : '';
-    const badge = fc.qty_caricata > 0
-      ? `<span class="baule-badge compilato">${fc.qty_caricata}/${fc.qty_max}</span>`
-      : `<span class="baule-badge vuoto">vuoto · max ${fc.qty_max}</span>`;
-    const adminFoot = currentUser?.ruolo === 'admin'
-      ? `<div class="baule-foot">
-           ${eliminabile
-             ? `<span class="mag-foot-btn danger" onclick="event.stopPropagation();eliminaBaule(${fc.id})">elimina</span>`
-             : `<span class="mag-foot-btn ghost" style="opacity:.35;cursor:default" title="Sposta nel cestino prima di eliminare">elimina</span>`
-           }
-         </div>`
-      : '';
-    return `
-      <div class="baule-card" onclick="apriFlc(${fc.id})" style="border-top:4px solid #6b4c6e">
-        <div class="baule-card-body">
-          <div class="baule-card-left" style="background:var(--surface2)">
-            <div class="baule-icon"><svg width="44" height="44" viewBox="0 0 48 48" fill="none"><rect x="6" y="12" width="36" height="26" rx="2" stroke="#6b4c6e" stroke-width="2.5" fill="none"/><path d="M6 12l3-3h30l3 3" stroke="#6b4c6e" stroke-width="2" fill="none"/><rect x="6" y="12" width="4" height="4" rx="0.5" fill="#8a6b8d"/><rect x="38" y="12" width="4" height="4" rx="0.5" fill="#8a6b8d"/><rect x="6" y="34" width="4" height="4" rx="0.5" fill="#8a6b8d"/><rect x="38" y="34" width="4" height="4" rx="0.5" fill="#8a6b8d"/><line x1="6" y1="25" x2="42" y2="25" stroke="#6b4c6e" stroke-width="1.5"/><circle cx="16" cy="25" r="2" fill="#8a6b8d"/><circle cx="32" cy="25" r="2" fill="#8a6b8d"/></svg></div>
-          </div>
-          <div class="baule-info">
-            <div class="baule-nome">${h(fc.nome)}</div>
-            <div class="baule-meta">${h(fc.codice)}</div>
-            ${qtyInfo}
-            ${badge}
-          </div>
-        </div>
-        ${adminFoot}
-      </div>`;
-  }).join('');
+  _bauliTabCounts();
+  _btRender(grid, D.flightcase.map(fc => ({
+    nome: fc.nome, cod: fc.codice, sub: fc.art_contenuto_nome || '', col: _btCol('FLC', '#6b4c6e'),
+    chip: `${fc.qty_caricata || 0}/${fc.qty_max}`, ok: fc.qty_caricata > 0,
+    onOpen: `apriFlc(${fc.id})`, delOk: true, onDel: `eliminaBaule(${fc.id})`
+  })), 'Nessun flight case — clicca "+ Flight Case" per crearne uno');
 }
 
 let _flcCorrente = null;
@@ -5815,27 +6743,13 @@ function flckContenutoBox(k) {
 let _flckCorrente = null;     // id del flightcase K aperto
 function renderFlck() {
   const grid = document.getElementById('flckGrid');
+  _bauliTabCounts();
   if (!_flckCorrente) { document.getElementById('flckDettaglio').style.display = 'none'; grid.style.display = ''; }
-  if (!(D.flck || []).length) {
-    grid.innerHTML = `<div class="empty" style="grid-column:1/-1">Nessun flightcase K — clicca "+ Flightcase K" per crearne uno</div>`;
-    return;
-  }
-  grid.innerHTML = D.flck.map(k => {
-    const eliminabile = !!window.localFetch || totalArtReale(k.id) === 0;
-    const badge = k.voci.length
-      ? `<span class="baule-badge compilato">${k.voci.length} voci · ${flckTot(k)}/${flckMax(k)}</span>`
-      : `<span class="baule-badge vuoto">vuoto</span>`;
-    const adminFoot = currentUser?.ruolo === 'admin'
-      ? `<div class="baule-foot">${eliminabile
-          ? `<span class="mag-foot-btn danger" onclick="event.stopPropagation();eliminaFlck(${k.id})">elimina</span>`
-          : `<span class="mag-foot-btn ghost" style="opacity:.35;cursor:default" title="Sposta nel cestino prima di eliminare">elimina</span>`}</div>`
-      : '';
-    return `<div class="baule-card" onclick="apriFlck(${k.id})" style="border-top:4px solid ${FLCK_COL}">
-      <div class="baule-card-body">
-        <div class="baule-card-left" style="background:var(--surface2)"><div class="baule-icon">${_svgCont(FLCK_COL, 44)}</div></div>
-        <div class="baule-info"><div class="baule-nome">${h(k.nome)}</div><div class="baule-meta">${h(k.codice)}</div>${badge}</div>
-      </div>${adminFoot}</div>`;
-  }).join('');
+  _btRender(grid, (D.flck || []).map(k => ({
+    nome: k.nome, cod: k.codice, sub: '', col: _btCol('FLCK', FLCK_COL),
+    chip: k.voci.length ? `${k.voci.length} VOCI · ${flckTot(k)}/${flckMax(k)}` : 'VUOTO', ok: k.voci.length > 0,
+    onOpen: `apriFlck(${k.id})`, delOk: !!window.localFetch || totalArtReale(k.id) === 0, onDel: `eliminaFlck(${k.id})`
+  })), 'Nessun flightcase K — clicca "+ Flightcase K" per crearne uno');
 }
 function apriFlck(id) {
   if (!getFlck(id)) return;
