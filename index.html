@@ -430,6 +430,73 @@ body.dark .badge-orange{background:#2d1404;color:#fb923c;border-color:#7c2d12;}
 #modalMagDetail td.wrap .cat-pill{display:inline-block;max-width:100%;white-space:normal;line-height:1.25;word-break:break-word}
 .cat-pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:2px 8px;border-radius:4px;}
 
+body.dark .cat-pill{color:var(--cc)!important}
+
+/* ═══ Tabelle uniformi: Articoli · Stock · Storico ═══ */
+.tbl-uni{container-type:inline-size}
+.tbl-uni table{font-size:13px}
+.tbl-uni th{padding:6px 12px}
+.tbl-uni td{padding:5px 12px}
+.tbl-uni .tbl-wrap th:first-child,.tbl-uni .tbl-wrap td:first-child{padding-left:14px}
+.tbl-uni .tbl-wrap th:last-child,.tbl-uni .tbl-wrap td:last-child{padding-right:14px}
+.tbl-uni td strong{font-weight:600}
+.tbl-uni .cat-pill{font-size:10px;padding:1px 6px;margin-left:6px;vertical-align:middle}
+.tbl-uni .nm-note{font-size:11px;color:var(--ink3);margin-left:8px}
+.tbl-uni .c-exp{display:none}
+.tbl-uni .r{text-align:right}
+.q-n{font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:var(--ink)}
+.q-u{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3);margin-left:3px;font-weight:400}
+.tbl-uni .stock-inline{flex-wrap:wrap;gap:3px 4px;max-height:46px}
+.tbl-uni td.col-depositi{white-space:normal}
+.tbl-uni .stock-pill.mp{font-family:inherit}
+.tbl-uni .flow{display:flex;align-items:center;gap:3px 5px;flex-wrap:wrap;min-width:0}
+.tbl-uni .flow i{font-style:normal;color:var(--ink3)}
+.tbl-uni .sto-dt{font-family:'DM Mono',monospace;font-size:12px;color:var(--ink2)}
+.tbl-uni .sto-dt small{color:var(--ink3);font-size:10px;margin-left:5px}
+.tbl-uni .ib{padding:0;width:26px;height:24px;display:inline-flex;align-items:center;justify-content:center;margin-left:3px;font-size:12px}
+.tbl-uni td.act{text-align:right;white-space:nowrap}
+.tbl-uni .cnt-dash{color:var(--ink3);font-family:'DM Mono',monospace}
+.cnt{font:500 12px 'DM Mono',monospace;color:var(--ink3);background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:3px 12px;white-space:nowrap;align-self:flex-end}
+@container (max-width:680px){
+  .tbl-uni .tbl-wrap > table,.tbl-uni .tbl-wrap > table > tbody,.tbl-uni .sto-inner,.tbl-uni .sto-inner tbody{display:block}
+  .tbl-uni .tbl-wrap > table > thead,.tbl-uni .tbl-wrap > table > colgroup{display:none}
+  .tbl-uni .tbl-wrap > table > tbody > tr:not(.art-expand-row):not(.sto-batch-detail),.tbl-uni .sto-inner tr{display:grid;gap:2px 8px;padding:6px 10px;align-items:center;border-bottom:.5px solid var(--border)}
+  .tbl-uni .tbl-wrap > table > tbody > tr:nth-child(even){background:rgba(29,158,117,.04)}
+  .tbl-uni .tbl-wrap > table > tbody > tr > td,.tbl-uni .sto-inner td{padding:0!important;border:0!important;background:none!important;min-width:0}
+  .tbl-uni .tbl-wrap > table > tbody > tr > td,.tbl-uni .sto-inner td{overflow:visible}
+  .tbl-uni .art-expand-row.open,.tbl-uni .sto-batch-detail{display:block}
+  .tbl-uni .art-expand-row.open > td,.tbl-uni .sto-batch-detail > td{display:block}
+  .tbl-uni .nm-note{display:none}
+  .tbl-uni .c-exp{display:block}
+  .tbl-uni .art-expand-btn{display:flex}
+  .tbl-uni td.name{white-space:normal}
+  /* Articoli: ▼ | codice | articolo | qtà  /  ▼ | codice | magazzini | azioni */
+  #tbArt > tr:not(.art-expand-row){grid-template-columns:24px 52px 1fr auto;grid-template-areas:"e c n q" "e c m x"}
+  #tbArt > tr > td:nth-child(1){grid-area:e;align-self:start}
+  #tbArt > tr > td:nth-child(2){grid-area:c;align-self:start}
+  #tbArt > tr > td:nth-child(3){grid-area:n}
+  #tbArt > tr > td:nth-child(4){grid-area:q;text-align:right}
+  #tbArt > tr > td:nth-child(5){grid-area:m;display:block!important}
+  #tbArt > tr > td:nth-child(6){grid-area:x}
+  #tbArt .stock-inline{flex-wrap:wrap}
+  /* Stock: codice | articolo | qtà  /  codice | magazzino */
+  #tbStock > tr:not(.art-expand-row){grid-template-columns:52px 1fr auto;grid-template-areas:"c n q" "c m m"}
+  #tbStock > tr > td:nth-child(1){grid-area:c;align-self:start}
+  #tbStock > tr > td:nth-child(2){grid-area:n}
+  #tbStock > tr > td:nth-child(3){grid-area:m}
+  #tbStock > tr > td:nth-child(4){grid-area:q;text-align:right}
+  /* Storico: articolo | qtà  /  data | tipo | da→a */
+  #tbSto > tr:not(.sto-batch-detail),.tbl-uni .sto-inner tr{grid-template-columns:1fr auto auto;grid-template-areas:"a a q" "w t u" "f f f"}
+  #tbSto > tr > td:nth-child(1),.sto-inner td:nth-child(1){grid-area:w}
+  #tbSto > tr > td:nth-child(2),.sto-inner td:nth-child(2){grid-area:t}
+  #tbSto > tr > td:nth-child(3),.sto-inner td:nth-child(3){grid-area:a}
+  #tbSto > tr > td:nth-child(4),.sto-inner td:nth-child(4){grid-area:f}
+  #tbSto > tr > td:nth-child(5),.sto-inner td:nth-child(5){grid-area:q;text-align:right}
+  #tbSto > tr > td:nth-child(6),.sto-inner td:nth-child(6){grid-area:u}
+  .tbl-uni .tbl-wrap td:empty{display:none}
+  .tbl-uni .flow{flex-wrap:wrap}
+  .tbl-uni .stock-pill.mp{white-space:nowrap}
+}
 .form-grid{display:grid;gap:14px;}
 .form-row-2{grid-template-columns:1fr 1fr;}
 .form-row-3{grid-template-columns:1fr 1fr 1fr;}
@@ -782,14 +849,10 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
 
   .col-depositi{display:none!important;}
     th.col-depositi,td.col-depositi{display:none!important;}
-    /* Nascondi anche categoria su mobile (visibile nell'expand) */
-    #page-articoli th:nth-child(7),#page-articoli td:nth-child(7){display:none!important;}
     .art-expand-btn{display:flex;}
     .art-expand-row.open{display:table-row;}
     .art-expand-cell{background:rgba(29,158,117,.04);padding:6px 10px 8px 14px!important;}
     .art-expand-cell .stock-inline{max-height:none;flex-wrap:wrap;}
-    /* Avvicina nota al totale: riduci padding */
-    #page-articoli td:nth-child(5){padding-left:4px;padding-right:4px;}
   .lista-stato-desktop{display:none!important;}
     .lista-stato-mobile{display:inline-block!important;}
   .lista-det-header{flex-direction:column;align-items:stretch;gap:10px;}
@@ -1351,6 +1414,7 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
     <div class="page" id="page-articoli">
       <div class="page-head">
         <div><div class="page-title">Articoli</div><div class="page-sub" id="artPageSub">Catalogo articoli</div></div>
+        <span class="cnt" id="cntArt"></span>
       </div>
       <!-- TABS -->
       <div class="art-tabs">
@@ -1368,11 +1432,11 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
             <option value="">Tutti i magazzini</option>
           </select>
         </div>
-        <div class="card tbl-compact">
+        <div class="card tbl-compact tbl-uni">
           <div class="tbl-wrap">
             <table>
-              <colgroup><col style="width:30px"><col class="cw-code"><col class="cw-xl"><col style="width:60px"><col class="cw-note"><col style="width:280px"><col class="cw-lg"><col class="cw-act"></colgroup>
-<thead><tr><th></th><th>Codice</th><th>Nome</th><th>Tot.</th><th class="wrap">Note art.</th><th class="col-depositi">Depositi</th><th>Categoria</th><th></th></tr></thead>
+              <colgroup><col class="c-exp" style="width:28px"><col style="width:76px"><col><col style="width:78px"><col style="width:290px"><col style="width:132px"></colgroup>
+<thead><tr><th class="c-exp"></th><th>Codice</th><th>Articolo</th><th>Tot.</th><th class="col-depositi">Magazzini</th><th></th></tr></thead>
               <tbody id="tbArt"></tbody>
             </table>
           </div>
@@ -1438,27 +1502,31 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
     <div class="page" id="page-storico">
       <div class="page-head">
         <div><div class="page-title">Storico</div><div class="page-sub">Tutti i movimenti registrati</div></div>
+        <span class="cnt" id="cntSto"></span>
       </div>
       <div class="toolbar">
         <input class="search" id="searchSto" placeholder="Cerca codice, articolo o note..." oninput="renderStorico()" autocomplete="off">
+        <select class="finput" id="filterCatSto" onchange="renderStorico()" style="width:auto" autocomplete="off">
+          <option value="">Tutte le categorie</option>
+        </select>
+        <select class="finput" id="filterMagSto" onchange="renderStorico()" style="width:auto" autocomplete="off">
+          <option value="">Tutti i magazzini</option>
+        </select>
         <select class="finput" id="filterTipoSto" onchange="renderStorico()" style="width:auto" autocomplete="off">
           <option value="">Tutti i tipi</option>
           <option value="spostamento">Spostamenti</option>
           <option value="carico">Carichi</option>
           <option value="scarico">Scarichi</option>
         </select>
-        <select class="finput" id="filterMagSto" onchange="renderStorico()" style="width:auto" autocomplete="off">
-          <option value="">Tutti i magazzini</option>
-        </select>
         <select class="finput admin-only" id="filterUtenteSto" onchange="renderStorico()" style="width:auto;display:none" autocomplete="off">
           <option value="">Tutti gli utenti</option>
         </select>
       </div>
-      <div class="card">
+      <div class="card tbl-compact tbl-uni">
         <div class="tbl-wrap">
           <table>
-            <colgroup><col style="width:50px"><col style="width:120px"><col style="width:130px"><col style="width:85px"><col style="width:180px"><col style="width:55px"><col style="width:130px"><col style="width:130px"><col style="width:160px"><col class="admin-only" style="width:100px;display:none"><col class="admin-only" style="width:100px;display:none"></colgroup>
-<thead><tr><th>#</th><th>Data</th><th>Tipo</th><th>Codice</th><th>Articolo</th><th>Qtà</th><th>Da</th><th>A</th><th class="wrap">Note</th><th class="admin-only" style="display:none">Utente</th><th class="admin-only" style="display:none"></th></tr></thead>
+            <colgroup><col style="width:158px"><col style="width:112px"><col><col style="width:230px"><col style="width:62px"><col style="width:62px"></colgroup>
+<thead><tr><th>Data</th><th>Tipo</th><th>Articolo</th><th>Da → A</th><th class="r">Qtà</th><th></th></tr></thead>
             <tbody id="tbSto"></tbody>
           </table>
         </div>
@@ -1473,21 +1541,22 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
     <div class="page" id="page-stock">
       <div class="page-head">
         <div><div class="page-title">Stock</div><div class="page-sub">Giacenze attuali per articolo e magazzino</div></div>
+        <span class="cnt" id="cntStock"></span>
       </div>
       <div class="toolbar">
         <input class="search" id="searchStock" placeholder="Cerca codice o articolo..." oninput="renderStock()" autocomplete="off">
-        <select class="finput" id="filterMagStock" onchange="renderStock()" style="width:auto" autocomplete="off">
-          <option value="">Tutti i magazzini</option>
-        </select>
         <select class="finput" id="filterCatStock" onchange="renderStock()" style="width:auto" autocomplete="off">
           <option value="">Tutte le categorie</option>
         </select>
+        <select class="finput" id="filterMagStock" onchange="renderStock()" style="width:auto" autocomplete="off">
+          <option value="">Tutti i magazzini</option>
+        </select>
       </div>
-      <div class="card">
+      <div class="card tbl-compact tbl-uni">
         <div class="tbl-wrap">
           <table>
-            <colgroup><col class="cw-code"><col class="cw-xl"><col class="cw-lg"><col class="cw-mag"><col class="cw-qty"><col class="cw-um"><col></colgroup>
-<thead><tr><th>Codice</th><th>Articolo</th><th>Categoria</th><th>Magazzino</th><th>Qtà</th><th>U.M.</th><th class="wrap">Note art.</th></tr></thead>
+            <colgroup><col style="width:76px"><col><col style="width:200px"><col style="width:90px"></colgroup>
+<thead><tr><th>Codice</th><th>Articolo</th><th>Magazzino</th><th class="r">Qtà</th></tr></thead>
             <tbody id="tbStock"></tbody>
           </table>
         </div>
@@ -2307,10 +2376,30 @@ async function deleteConfirm(url, msg, successMsg, reloadFn) {
   try { await apiFetch('DELETE', url); if(reloadFn) await reloadFn(); toast(successMsg); }
   catch(e) { toast(e.message||'Errore', true); }
 }
+// Contrasto automatico: testo chiaro o scuro in base al colore della categoria
+const _HEX6 = /^#[0-9a-fA-F]{6}$/;
+function _lum(hex) {
+  const f = c => { c /= 255; return c <= .03928 ? c / 12.92 : Math.pow((c + .055) / 1.055, 2.4); };
+  return .2126 * f(parseInt(hex.slice(1,3),16)) + .7152 * f(parseInt(hex.slice(3,5),16)) + .0722 * f(parseInt(hex.slice(5,7),16));
+}
+function _cr(a, b) { const x = _lum(a), y = _lum(b); return (Math.max(x,y) + .05) / (Math.min(x,y) + .05); }
+function _mixHex(a, b, t) {
+  const c = i => Math.round(parseInt(a.slice(i,i+2),16) * (1-t) + parseInt(b.slice(i,i+2),16) * t).toString(16).padStart(2,'0');
+  return '#' + c(1) + c(3) + c(5);
+}
+function inkOn(bg) {            // testo per uno sfondo pieno
+  if (!_HEX6.test(bg || '')) return '#f4f1eb';
+  return _cr(bg, '#ffffff') >= _cr(bg, '#1a1814') ? '#ffffff' : '#1a1814';
+}
+function catInk(col) {          // testo del colore categoria, scurito se serve, su sfondo chiaro
+  if (!_HEX6.test(col || '')) return col;
+  for (let t = 0; t <= .9; t += .1) { const c = _mixHex(col, '#1a1814', t); if (_cr(c, '#ffffff') >= 5.6) return c; }
+  return '#1a1814';
+}
 function codiceBadge(codice, colore) {
   if (!codice) return '<span class="badge-codice">—</span>';
   const bg = colore || 'var(--ink)';
-  return `<span class="badge-codice" style="background:${bg}">${h(codice)}</span>`;
+  return `<span class="badge-codice" style="background:${bg};color:${inkOn(colore)}">${h(codice)}</span>`;
 }
 
 function nowRoma() {
@@ -2341,6 +2430,12 @@ function fmtDt(str) {
   return d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'})
        + ' ' + d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
 }
+function fmtDtS(str) {   // data compatta (anno a 2 cifre)
+  if (!str) return '—';
+  const d = new Date(str.replace(' ','T'));
+  return d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'2-digit'})
+       + ' ' + d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+}
 function toast(msg, err=false) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.className = 'show'+(err?' err':'');
@@ -2348,7 +2443,7 @@ function toast(msg, err=false) {
 }
 function catPill(cat) {
   if (!cat) return '<span class="badge badge-gray">—</span>';
-  return `<span class="cat-pill" style="background:${cat.colore}18;color:${cat.colore};border:1px solid ${cat.colore}40">${h(cat.nome)}</span>`;
+  return `<span class="cat-pill" style="--cc:${cat.colore};background:${cat.colore}18;color:${catInk(cat.colore)};border:1px solid ${cat.colore}40">${h(cat.nome)}</span>`;
 }
 
 // ─── NAV ───
@@ -3152,29 +3247,24 @@ function artGruppoRows(g) {
       <td style="text-align:right;white-space:nowrap">${isAdmin ? `<button class="btn btn-orange btn-xs" onclick="event.stopPropagation();mandaANonAssegnati(${a.id})">→ Cestino</button> <button class="btn btn-danger btn-xs" onclick="event.stopPropagation();delArtDirect(${a.id})" title="Elimina">🗑</button>` : ''}</td>
     </tr>`).join('');
   return `<tr onclick="toggleGrp(this,'${key}')" style="cursor:pointer">
-      <td style="padding:4px 2px 4px 10px"><button class="art-expand-btn" onclick="event.stopPropagation();toggleGrp(this.closest('tr'),'${key}')" title="Vedi pezzi">${open ? '▲' : '▼'}</button></td>
+      <td class="c-exp" style="padding:4px 2px 4px 10px"><button class="art-expand-btn" onclick="event.stopPropagation();toggleGrp(this.closest('tr'),'${key}')" title="Vedi pezzi">${open ? '▲' : '▼'}</button></td>
       <td>${codiceBadge(g.pezzi[0].codice, cat?.colore)}</td>
-      <td class="wrap"><strong>${h(m.nome)}</strong> <span class="var-chip var-chip-n">×${g.pezzi.length}</span> ${varSummary(g.pezzi)}</td>
-      <td style="font-family:Verdana,sans-serif;font-size:15px;font-weight:700;white-space:nowrap">${tot}<span style="font-size:10px;color:var(--ink3);font-weight:400;margin-left:2px">pz</span></td>
-      <td class="wrap" style="font-size:12px;color:var(--ink3)">${h(m.note) || '—'}</td>
-      <td class="col-depositi wrap"><div class="stock-inline">${(pills + virt) || '<span style="font-size:11px;color:var(--ink3)">—</span>'}</div></td>
-      <td>${catPill(cat)}</td>
-      <td style="text-align:right;white-space:nowrap">${isAdmin ? `<button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();modificaVarianti(${m.id})">Varianti</button> <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();caricaModello(${m.id})">↓ Carica</button>` : ''}</td>
+      <td class="name"><strong>${h(m.nome)}</strong>${catPill(cat)} <span class="var-chip var-chip-n">×${g.pezzi.length}</span> ${varSummary(g.pezzi)}${m.note?`<span class="nm-note">${h(m.note)}</span>`:''}</td>
+      <td><span class="q-n">${tot}</span><span class="q-u">pz</span></td>
+      <td class="col-depositi"><div class="stock-inline">${(pills + virt) || '<span style="font-size:11px;color:var(--ink3)">—</span>'}</div></td>
+      <td class="act">${isAdmin ? `<button class="btn btn-ghost btn-xs ib" onclick="event.stopPropagation();modificaVarianti(${m.id})" title="Varianti">⚙</button><button class="btn btn-teal btn-xs ib" onclick="event.stopPropagation();caricaModello(${m.id})" title="Carica pezzi">↓</button>` : ''}</td>
     </tr>
-    <tr class="art-expand-row${open ? ' open' : ''}"><td colspan="8" class="art-expand-cell"><table class="pezzi-tab"><tbody>${pezzi}</tbody></table></td></tr>`;
+    <tr class="art-expand-row${open ? ' open' : ''}"><td colspan="6" class="art-expand-cell"><table class="pezzi-tab"><tbody>${pezzi}</tbody></table></td></tr>`;
 }
 function stockGruppoRow(r) {
   const m = r.modello, cat = getCat(m.cat_id), key = 'stk:' + m.id + '-' + r.m.id, open = _openGrp.has(key);
   const pezzi = r.pezzi.map(a => `<tr><td style="width:70px">${codiceBadge(a.codice, getCat(a.cat_id)?.colore)}</td><td><strong>${h(a.nome)}</strong></td><td>${varSelect(a)}</td></tr>`).join('');
   return `<tr${r.m.virtuale ? ' class="stock-virt-row"' : ''} onclick="toggleGrp(this,'${key}')" style="cursor:pointer">
       <td>${codiceBadge(r.pezzi[0].codice, cat?.colore)}</td>
-      <td><strong>${h(m.nome)}</strong> <span class="var-chip var-chip-n">×${r.pezzi.length}</span> ${varSummary(r.pezzi)}${r.pezzi.some(a => getStock(a.id, r.m.id) === 0) ? ` <span class="var-chip">${r.pezzi.filter(a => getStock(a.id, r.m.id) === 0).length} nei case</span>` : ''}</td>
-      <td>${catPill(cat)}</td>
-      <td>${h(r.m.nome)}</td>
-      <td><span style="font-family:'Fraunces',serif;font-size:22px;font-weight:700">${r.qty}</span></td>
-      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--ink3)">pz</td>
-      <td class="wrap" style="font-size:12px;color:var(--ink3)">${h(m.note) || '—'}</td>
-    </tr><tr class="art-expand-row${open ? ' open' : ''}"><td colspan="7" class="art-expand-cell"><table class="pezzi-tab"><tbody>${pezzi}</tbody></table></td></tr>`;
+      <td class="name"><strong>${h(m.nome)}</strong>${catPill(cat)} <span class="var-chip var-chip-n">×${r.pezzi.length}</span> ${varSummary(r.pezzi)}${r.pezzi.some(a => getStock(a.id, r.m.id) === 0) ? ` <span class="var-chip">${r.pezzi.filter(a => getStock(a.id, r.m.id) === 0).length} nei case</span>` : ''}${m.note?`<span class="nm-note">${h(m.note)}</span>`:''}</td>
+      <td><span class="stock-pill mp">${h(r.m.nome)}</span></td>
+      <td class="r"><span class="q-n">${r.qty}</span><span class="q-u">pz</span></td>
+    </tr><tr class="art-expand-row${open ? ' open' : ''}"><td colspan="4" class="art-expand-cell"><table class="pezzi-tab"><tbody>${pezzi}</tbody></table></td></tr>`;
 }
 function magGruppoRows(g) {
   const m = g.modello, cat = getCat(m.cat_id), key = 'mag:' + m.id, open = _openGrp.has(key);
@@ -3579,6 +3669,7 @@ function renderArticoli() {
   if(s)  listStock=listStock.filter(a=>a.nome.toLowerCase().includes(s)||a.codice.toLowerCase().includes(s));
   if(cf) listStock=listStock.filter(a=>a.cat_id==cf);
   if(mf) listStock=listStock.filter(a=>getTot(a.id,+mf)>0);
+  { const c=document.getElementById('cntArt'); if(c) c.textContent=`${listStock.length} articoli · ${listStock.reduce((t,a)=>t+totalArtReale(a.id),0)} pz`; }
   listStock=raggruppaPezzi(sortBauliFirst(listStock));
 
   document.getElementById('tbArt').innerHTML = listStock.length ? listStock.map(a=>{
@@ -3615,33 +3706,24 @@ function renderArticoli() {
     if (isFLCK) specialExpand = `<div style="margin-top:6px">${flckContenutoHtml(kDef)}</div>`;
     const rowClick = (isBau || isFLC || isFLCK) ? ` onclick="toggleArtExpand(this.querySelector('.art-expand-btn'));${isBau?`loadBauVociInArt(${a.id})`:''}" style="cursor:pointer"` : '';
     return `<tr${rowClick}>
-      <td style="padding:4px 2px 4px 10px"><button class="art-expand-btn" onclick="event.stopPropagation();toggleArtExpand(this)${isBau?`;loadBauVociInArt(${a.id})`:''}" title="Vedi depositi">▼</button></td>
+      <td class="c-exp" style="padding:4px 2px 4px 10px"><button class="art-expand-btn" onclick="event.stopPropagation();toggleArtExpand(this)${isBau?`;loadBauVociInArt(${a.id})`:''}" title="Vedi dettagli">▼</button></td>
       <td>${codiceBadge(a.codice, getCat(a.cat_id)?.colore)}</td>
-      <td><strong>${h(a.nome)}</strong>${varChip(a)}${specialPill}</td>
-      <td style="font-family:Verdana,sans-serif;font-size:15px;font-weight:700;white-space:nowrap">
-        ${totReale}<span style="font-size:10px;color:var(--ink3);font-weight:400;margin-left:2px">${h(a.um)}</span>
-      </td>
-      <td class="wrap" style="font-size:12px;color:var(--ink3)">${h(a.note)||'—'}</td>
-      <td class="col-depositi wrap">
+      <td class="name" title="${h(a.nome)}"><strong>${h(a.nome)}</strong>${catPill(cat)}${varChip(a)}${specialPill}${a.note?`<span class="nm-note">${h(a.note)}</span>`:''}</td>
+      <td><span class="q-n">${totReale}</span><span class="q-u">${h(a.um)}</span></td>
+      <td class="col-depositi">
         <div class="stock-inline">${allPills||'<span style="font-size:11px;color:var(--ink3)">—</span>'}</div>
       </td>
-      <td>${catPill(cat)}</td>
-      <td style="text-align:right;white-space:nowrap">
-        ${isAdmin && !isBau && !isFLC && !isFLCK ?`
-        <button class="btn btn-ghost btn-xs" data-action="editArt" data-id="${a.id}">Modifica</button>
-        <button class="btn btn-orange btn-xs" data-action="mandaNonAss" data-id="${a.id}">→ Cestino</button>
-        <button class="btn btn-danger btn-xs" data-action="delArtDirect" data-id="${a.id}" title="Elimina">🗑</button>`:''}
-      </td>
+      <td class="act">${isAdmin && !isBau && !isFLC && !isFLCK ?`<button class="btn btn-ghost btn-xs ib" data-action="editArt" data-id="${a.id}" title="Modifica">✎</button><button class="btn btn-orange btn-xs ib" data-action="mandaNonAss" data-id="${a.id}" title="Manda nel cestino">🗑</button><button class="btn btn-danger btn-xs ib" data-action="delArtDirect" data-id="${a.id}" title="Elimina">✕</button>`:''}</td>
     </tr>
     <tr class="art-expand-row">
-      <td colspan="8" class="art-expand-cell">
-        <div style="font-size:10px;color:var(--ink3);margin-bottom:4px;font-family:'DM Mono',monospace;letter-spacing:.5px">${cat?.nome||''}</div>
-        <div class="stock-inline">${expandPills||'<span style="font-size:11px;color:var(--ink3)">—</span>'}</div>
+      <td colspan="6" class="art-expand-cell">
+        ${a.note?`<div style="font-size:11px;color:var(--ink3);margin-bottom:4px">${h(a.note)}</div>`:''}
+        <div class="stock-inline" style="flex-wrap:wrap">${expandPills||'<span style="font-size:11px;color:var(--ink3)">—</span>'}</div>
         ${caseLines(a.id)}
         ${specialExpand}
       </td>
     </tr>`;
-  }).join('') : '<tr><td colspan="8" class="empty">Nessun articolo con stock disponibile</td></tr>';
+  }).join('') : '<tr><td colspan="6" class="empty">Nessun articolo con stock disponibile</td></tr>';
 
   // Tab 2: senza stock (nessuno stock in nessun magazzino, nemmeno virtuale)
   const listNoStock=D.articoli.filter(a=>{
@@ -3868,7 +3950,7 @@ function renderCat() {
   document.getElementById('tbCat').innerHTML = D.categorie.length ? D.categorie.map(c=>{
     const n=D.articoli.filter(a=>a.cat_id==c.id).length;
     return `<tr>
-      <td><span class="badge-codice" style="background:${c.colore}">${h(c.prefisso)}</span></td>
+      <td><span class="badge-codice" style="background:${c.colore};color:${inkOn(c.colore)}">${h(c.prefisso)}</span></td>
       <td><strong style="color:${c.colore}">${h(c.nome)}</strong></td>
       <td style="text-align:right;white-space:nowrap">
         <button class="btn btn-ghost btn-xs" onclick="editCat(${c.id})">Modifica</button>
@@ -3992,6 +4074,10 @@ function renderStorico() {
   const cv=selMag.value;
   selMag.innerHTML='<option value="">Tutti i magazzini</option>'+
     D.magazzini.map(m=>`<option value="${m.id}"${cv==m.id?' selected':''}>${h(m.nome)}</option>`).join('');
+  const selCat=document.getElementById('filterCatSto');
+  const ccv=selCat.value;
+  selCat.innerHTML='<option value="">Tutte le categorie</option>'+
+    D.categorie.map(c=>`<option value="${c.id}"${ccv==c.id?' selected':''}>[${h(c.prefisso)}] ${h(c.nome)}</option>`).join('');
   const selUt=document.getElementById('filterUtenteSto');
   const cuv=selUt.value;
   const utentiInSto=[...new Map(D.spostamenti.filter(x=>x.user_nome).map(x=>[x.user_id,x.user_nome])).entries()];
@@ -4006,10 +4092,15 @@ function renderStorico() {
   if(tf) list=list.filter(x=>x.tipo===tf);
   if(mf) list=list.filter(x=>x.mag_from==mf||x.mag_to==mf);
   if(uf) list=list.filter(x=>x.user_id==uf);
+  if(selCat.value) list=list.filter(x=>getArt(x.art_id)?.cat_id==selCat.value);
   list=[...list].sort((a,b)=>b.data.localeCompare(a.data));
   // Raggruppa per batch_id
+  const isAdm = currentUser?.ruolo==='admin';
   const rows = [];
   const batchSeen = new Set();
+  const magP = m => m ? `<span class="stock-pill mp">${h(m.nome)}</span>` : '<span class="cnt-dash">—</span>';
+  const flow = (da, av) => `<div class="flow">${da?magP(da)+'<i>→</i>':'<i>→</i>'}${av?magP(av):''}${!da&&!av?'<span class="cnt-dash">—</span>':''}</div>`;
+  const dataCell = x => `<td><span class="sto-dt">${fmtDtS(x.data)}${isAdm && x.user_nome ? `<small>${h(x.user_nome)}</small>` : ''}</span></td>`;
   for (const x of list) {
     if (x.batch_id) {
       if (batchSeen.has(x.batch_id)) continue;
@@ -4020,37 +4111,29 @@ function renderStorico() {
       const inner = gruppo.map(r => {
         const ar = getArt(r.art_id);
         return `<tr style="background:var(--bg2)">
-          <td style="padding-left:28px;font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3)">#${r.id}</td>
-          <td style="font-size:11px;font-family:'DM Mono',monospace;color:var(--ink2);white-space:nowrap">${fmtDt(r.data)}</td>
+          <td><span class="sto-dt">${fmtDtS(r.data)}</span></td>
           <td><span class="badge tipo-spostamento">sposta</span></td>
-          <td>${codiceBadge(ar?.codice, ar ? getCat(ar.cat_id)?.colore : null)}</td>
-          <td><strong>${ar?h(ar.nome):'—'}</strong></td>
-          <td style="font-family:'DM Mono',monospace;font-weight:700">${r.qty}</td>
-          <td style="font-size:12px;color:var(--ink2)">${da?h(da.nome):'—'}</td>
-          <td style="font-size:12px;color:var(--ink2)">${av?h(av.nome):'—'}</td>
-          <td colspan="${currentUser?.ruolo==='admin'?3:1}"></td>
+          <td class="name">${codiceBadge(ar?.codice, ar ? getCat(ar.cat_id)?.colore : null)} <strong>${ar?h(ar.nome):'—'}</strong></td>
+          <td>${flow(getMag(r.mag_from), getMag(r.mag_to))}</td>
+          <td class="r"><span class="q-n">${r.qty}</span></td>
+          <td></td>
         </tr>`;
       }).join('');
+      const titolo = (x.note||'').startsWith('Lista:') ? 'lista '+(h(x.note).slice(7)) : (h(x.note)||'Operazione di massa');
       rows.push(`<tr class="sto-batch-row" onclick="toggleBatch(this)" style="cursor:pointer">
-        <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3)">
-          <span class="batch-arrow" style="margin-right:4px;font-size:10px">▶</span>${gruppo.length} movimenti
-        </td>
-        <td style="font-size:11px;font-family:'DM Mono',monospace;color:var(--ink2);white-space:nowrap">${fmtDt(x.data)}</td>
-        <td><span class="badge" style="background:var(--teal-bg);color:var(--teal-dark);border:1px solid var(--teal-border)">${(x.note||'').startsWith('Lista:')?'spostamento lista':'operazione'}</span></td>
-        <td colspan="2" style="font-weight:600;font-size:13px">${(x.note||'').startsWith('Lista:')?'lista '+(h(x.note).slice(7)):h(x.note)||'Operazione di massa'}</td>
-        <td style="font-family:'DM Mono',monospace;font-weight:700">${totPz} pz</td>
-        <td style="font-size:12px;color:var(--ink2)">${da?h(da.nome):'—'}</td>
-        <td style="font-size:12px;color:var(--ink2)">${av?h(av.nome):'—'}</td>
-        <td></td>
-        ${currentUser?.ruolo==='admin'?`<td style="font-size:11px;color:var(--ink3);font-family:'DM Mono',monospace">${x.user_nome?h(x.user_nome):'—'}</td>
-        <td><button class="btn btn-danger btn-xs" onclick="undoBatch('${x.batch_id}')">↩ Annulla</button></td>`:''}
+        ${dataCell(x)}
+        <td><span class="badge" style="background:var(--teal-bg);color:var(--teal-dark);border:1px solid var(--teal-border)">${(x.note||'').startsWith('Lista:')?'lista':'operazione'}</span></td>
+        <td class="name"><span class="batch-arrow" style="margin-right:6px;font-size:10px;color:var(--ink3)">▶</span><strong>${titolo}</strong><span class="nm-note">${gruppo.length} movimenti</span></td>
+        <td>${flow(da, av)}</td>
+        <td class="r"><span class="q-n">${totPz}</span><span class="q-u">pz</span></td>
+        <td class="act">${isAdm?`<button class="btn btn-danger btn-xs ib" onclick="event.stopPropagation();undoBatch('${x.batch_id}')" title="Annulla l'operazione">↩</button>`:''}</td>
       </tr>
-      <tr class="sto-batch-detail" style="display:none"><td colspan="${currentUser?.ruolo==='admin'?11:9}" style="padding:0">
-        <table style="width:100%;table-layout:fixed">${inner}</table>
+      <tr class="sto-batch-detail" style="display:none"><td colspan="6" style="padding:0">
+        <table class="sto-inner" style="width:100%;table-layout:fixed"><colgroup><col style="width:158px"><col style="width:112px"><col><col style="width:230px"><col style="width:62px"><col style="width:62px"></colgroup><tbody>${inner}</tbody></table>
       </td></tr>`);
     } else {
       const a=getArt(x.art_id), da=getMag(x.mag_from), a2=getMag(x.mag_to);
-      const canUndo = currentUser?.ruolo==='admin'
+      const canUndo = isAdm
         && !((x.note||'').startsWith('[ANNULLATO]'))
         && !isSpecialArt(x.art_id);
       const isBau = isBauleArt(x.art_id);
@@ -4067,37 +4150,30 @@ function renderStorico() {
       const stoClick = isSpec ? ` onclick="toggleStoExpand(this)" style="cursor:pointer"` : '';
       let stoExpandRow = '';
       if (isBau) {
-        stoExpandRow = `<tr class="sto-batch-detail" style="display:none"><td colspan="${currentUser?.ruolo==='admin'?11:9}" style="padding:6px 12px 8px 24px">
+        stoExpandRow = `<tr class="sto-batch-detail" style="display:none"><td colspan="6" style="padding:6px 12px 8px 24px">
           <div id="sto-bau-${x.art_id}" style="font-size:11px;color:#92400e"><span style="color:var(--ink3)">Caricamento…</span></div></td></tr>`;
       } else if (isFLC) {
         const fcDef = getFlightcaseDef(x.art_id);
         if (fcDef) {
-          const pct = fcDef.qty_max ? Math.round(fcDef.qty_caricata / fcDef.qty_max * 100) : 0;
-          stoExpandRow = `<tr class="sto-batch-detail" style="display:none"><td colspan="${currentUser?.ruolo==='admin'?11:9}" style="padding:6px 12px 8px 24px;font-size:11px;color:#6b4c6e">
+          stoExpandRow = `<tr class="sto-batch-detail" style="display:none"><td colspan="6" style="padding:6px 12px 8px 24px;font-size:11px;color:#6b4c6e">
             Contiene: <strong>${h(fcDef.art_contenuto_nome||'—')}</strong> — ${fcDef.qty_caricata}/${fcDef.qty_max} caricati
           </td></tr>`;
         }
       }
-      if (isFLCK) stoExpandRow = `<tr class="sto-batch-detail" style="display:none"><td colspan="${currentUser?.ruolo==='admin'?11:9}" style="padding:6px 12px 8px 24px">${flckContenutoHtml(kDef)}</td></tr>`;
+      if (isFLCK) stoExpandRow = `<tr class="sto-batch-detail" style="display:none"><td colspan="6" style="padding:6px 12px 8px 24px">${flckContenutoHtml(kDef)}</td></tr>`;
       rows.push(`<tr${stoClick}>
-        <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3)">${isSpec?'<span class="batch-arrow" style="margin-right:2px;font-size:10px">▶</span>':''}#${x.id}</td>
-        <td style="font-size:11px;font-family:'DM Mono',monospace;color:var(--ink2);white-space:nowrap">${fmtDt(x.data)}</td>
+        ${dataCell(x)}
         <td><span class="badge tipo-${x.tipo}">${x.tipo}</span></td>
-        <td>${codiceBadge(a?.codice, a ? getCat(a.cat_id)?.colore : null)}</td>
-        <td><strong>${a?h(a.nome):'—'}</strong>${stoSpecial}</td>
-        <td style="font-family:'DM Mono',monospace;font-weight:700">${x.qty}</td>
-        <td style="font-size:12px;color:var(--ink2)">${da?h(da.nome):'—'}</td>
-        <td style="font-size:12px;color:var(--ink2)">${a2?h(a2.nome):'—'}</td>
-        <td style="font-size:12px;color:var(--ink3)">${h(x.note)||'—'}</td>
-        <td class="admin-only" style="font-size:11px;color:var(--ink3);font-family:'DM Mono',monospace;display:${currentUser?.ruolo==='admin'?'':'none'}">${x.user_nome ? h(x.user_nome) : '—'}</td>
-        <td class="admin-only" style="display:${currentUser?.ruolo==='admin'?'':'none'}">
-          ${canUndo?`<button class="btn btn-danger btn-xs" onclick="event.stopPropagation();undoStorico(${x.id})">↩ Annulla</button>`:'<span style="font-size:10px;color:var(--ink3)">—</span>'}
-        </td>
+        <td class="name" title="${a?h(a.nome):''}">${isSpec?'<span class="batch-arrow" style="margin-right:6px;font-size:10px;color:var(--ink3)">▶</span>':''}${codiceBadge(a?.codice, a ? getCat(a.cat_id)?.colore : null)} <strong>${a?h(a.nome):'—'}</strong>${stoSpecial}${x.note?`<span class="nm-note">${h(x.note)}</span>`:''}</td>
+        <td>${flow(da, a2)}</td>
+        <td class="r"><span class="q-n">${x.qty}</span><span class="q-u">${a?h(a.um):''}</span></td>
+        <td class="act">${canUndo?`<button class="btn btn-danger btn-xs ib" onclick="event.stopPropagation();undoStorico(${x.id})" title="Annulla il movimento">↩</button>`:''}</td>
       </tr>${stoExpandRow}`);
     }
   }
   document.getElementById('tbSto').innerHTML = rows.length ? rows.join('') :
-    (currentUser?.ruolo==='admin'?'<tr><td colspan="11" class="empty">Nessun movimento</td></tr>':'<tr><td colspan="9" class="empty">Nessun movimento</td></tr>');
+    '<tr><td colspan="6" class="empty">Nessun movimento</td></tr>';
+  { const c=document.getElementById('cntSto'); if(c) c.textContent=`${list.length} movimenti`; }
   const lmBtn = document.getElementById('storicoLoadMore');
   const lmCnt = document.getElementById('storicoCount');
   if (lmBtn) {
@@ -4245,27 +4321,25 @@ function renderStock() {
     const rowClick = isSpecial ? ` onclick="toggleStockExpand(this)" style="cursor:pointer"` : '';
     let expandRow = '';
     if (isBau) {
-      expandRow = `<tr class="art-expand-row"><td colspan="7" class="art-expand-cell"><div id="stock-bau-${a.id}-${m.id}" style="font-size:11px;color:#92400e"><span style="color:var(--ink3)">Caricamento…</span></div></td></tr>`;
+      expandRow = `<tr class="art-expand-row"><td colspan="4" class="art-expand-cell"><div id="stock-bau-${a.id}-${m.id}" style="font-size:11px;color:#92400e"><span style="color:var(--ink3)">Caricamento…</span></div></td></tr>`;
     } else if (isFLC && fcDef) {
       const pct = fcDef.qty_max ? Math.round(fcDef.qty_caricata / fcDef.qty_max * 100) : 0;
       const barCol = pct >= 100 ? '#22c55e' : pct > 0 ? '#6b4c6e' : 'var(--ink4)';
-      expandRow = `<tr class="art-expand-row"><td colspan="7" class="art-expand-cell"><div style="font-size:11px;color:#6b4c6e">
+      expandRow = `<tr class="art-expand-row"><td colspan="4" class="art-expand-cell"><div style="font-size:11px;color:#6b4c6e">
         Contiene: <strong>${h(fcDef.art_contenuto_nome||'—')}</strong> — ${fcDef.qty_caricata}/${fcDef.qty_max} caricati
         <div style="margin-top:4px;height:5px;background:var(--ink4);border-radius:3px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${barCol};border-radius:3px"></div></div>
       </div></td></tr>`;
     }
-    if (isFLCK) expandRow = `<tr class="art-expand-row"><td colspan="7" class="art-expand-cell">${flckContenutoBox(kDef)}</td></tr>`;
-    if (hasCase) expandRow = `<tr class="art-expand-row"><td colspan="7" class="art-expand-cell">${caseBreakdown(r.lib, cs)}</td></tr>`;
+    if (isFLCK) expandRow = `<tr class="art-expand-row"><td colspan="4" class="art-expand-cell">${flckContenutoBox(kDef)}</td></tr>`;
+    if (hasCase) expandRow = `<tr class="art-expand-row"><td colspan="4" class="art-expand-cell">${caseBreakdown(r.lib, cs)}</td></tr>`;
     return `<tr${m.virtuale?' class="stock-virt-row"':''}${rowClick}>
       <td>${codiceBadge(a.codice, getCat(a.cat_id)?.colore)}</td>
-      <td><strong>${h(a.nome)}</strong>${varChip(a)}${specialTag}${hasCase?caseChips(r.lib,cs):''}</td>
-      <td>${catPill(cat)}</td>
-      <td>${h(m.nome)}${m.virtuale?' <span class="badge badge-orange" style="font-size:10px">virtuale</span>':''}</td>
-      <td><span style="font-family:'Fraunces',serif;font-size:22px;font-weight:700">${qty}</span></td>
-      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--ink3)">${h(a.um)}</td>
-      <td class="wrap" style="font-size:12px;color:var(--ink3)">${h(a.note)||'—'}</td>
+      <td class="name" title="${h(a.nome)}"><strong>${h(a.nome)}</strong>${catPill(cat)}${varChip(a)}${specialTag}${hasCase?caseChips(r.lib,cs):''}${a.note?`<span class="nm-note">${h(a.note)}</span>`:''}</td>
+      <td><span class="stock-pill mp">${h(m.nome)}</span>${m.virtuale?' <span class="badge badge-orange" style="font-size:10px">virtuale</span>':''}</td>
+      <td class="r"><span class="q-n">${qty}</span><span class="q-u">${h(a.um)}</span></td>
     </tr>${expandRow}`;
-  }).join(''):'<tr><td colspan="7" class="empty">Nessuno stock trovato</td></tr>';
+  }).join(''):'<tr><td colspan="4" class="empty">Nessuno stock trovato</td></tr>';
+  { const c=document.getElementById('cntStock'); if(c) c.textContent=`${rows.length} righe · ${rows.reduce((t,r)=>t+r.qty,0)} pz`; }
 
   const noMag=D.articoli.filter(a=>totalArtAny(a.id)===0);
   const badge=document.getElementById('stockNoMagBadge');
@@ -4952,7 +5026,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 8;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 9;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
@@ -5387,7 +5461,7 @@ async function apriBaule(id) {
   document.getElementById('bauliGrid').style.display = 'none';
   document.getElementById('bauleDettaglio').style.display = '';
   document.getElementById('bauleDetNome').textContent = b.nome;
-  document.getElementById('bauleDetCodice').innerHTML = `<span class="badge-codice" style="background:#92400e">${h(b.codice)}</span>`;
+  document.getElementById('bauleDetCodice').innerHTML = `<span class="badge-codice" style="background:#92400e;color:#ffffff">${h(b.codice)}</span>`;
 
   await caricaVociBaule();
 }
