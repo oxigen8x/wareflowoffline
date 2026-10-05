@@ -1330,6 +1330,7 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
 .u-btn-icon{width:32px;height:32px;font-size:18px;}
 
 /* ── Menu laterale riducibile (solo da 769px in su; sotto resta il cassetto mobile) ── */
+#tbStock .stock-inline{max-height:none;}
 .aside-toggle{display:none;}
 @media(min-width:769px){
   aside{transition:width .2s ease;}
@@ -1950,8 +1951,8 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
       <div class="card tbl-compact tbl-uni">
         <div class="tbl-wrap">
           <table>
-            <colgroup><col style="width:76px"><col><col style="width:200px"><col style="width:90px"></colgroup>
-<thead><tr><th>Codice</th><th>Articolo</th><th>Magazzino</th><th class="r">Qtà</th></tr></thead>
+            <colgroup><col style="width:76px"><col><col style="width:260px"><col style="width:90px"></colgroup>
+<thead><tr><th>Codice</th><th>Articolo</th><th>Magazzini</th><th class="r">Qtà</th></tr></thead>
             <tbody id="tbStock"></tbody>
           </table>
         </div>
@@ -3616,14 +3617,20 @@ function raggruppaPezzi(list) {            // lista di articoli → un elemento 
   }
   return out;
 }
-function raggruppaPezziStock(rows) {       // righe {a,m,qty} → un elemento per modello e magazzino
+function stockPills(mags) {                // pill per magazzino con quantità
+  return `<div class="stock-inline">${mags.map(x => `<span class="stock-pill"><strong>${x.qty}</strong> ${h(x.m.nome)}</span>`).join('')}</div>`;
+}
+function raggruppaPezziStock(items) {      // items {a,mags,qty} → un elemento per modello (pezzi dello stesso modello insieme)
   const seen = new Map(), out = [];
-  for (const r of rows) {
-    if (!r.a.modello_id) { out.push(r); continue; }
-    const k = r.a.modello_id + '|' + r.m.id;
-    let g = seen.get(k);
-    if (!g) { g = { g: true, modello: modelloDi(r.a), m: r.m, pezzi: [], qty: 0 }; seen.set(k, g); out.push(g); }
-    g.pezzi.push(r.a); g.qty += r.qty;
+  for (const it of items) {
+    if (!it.a.modello_id) { out.push(it); continue; }
+    let g = seen.get(it.a.modello_id);
+    if (!g) { g = { g: true, modello: modelloDi(it.a), pezzi: [], items: [], mags: [], qty: 0 }; seen.set(it.a.modello_id, g); out.push(g); }
+    g.pezzi.push(it.a); g.items.push(it); g.qty += it.qty;
+    for (const x of it.mags) {
+      const e = g.mags.find(y => y.m.id === x.m.id);
+      if (e) e.qty += x.qty; else g.mags.push({ m: x.m, qty: x.qty });
+    }
   }
   return out;
 }
@@ -3681,12 +3688,13 @@ function artGruppoRows(g) {
     <tr class="art-expand-row${open ? ' open' : ''}"><td colspan="6" class="art-expand-cell"><table class="pezzi-tab"><tbody>${pezzi}</tbody></table></td></tr>`;
 }
 function stockGruppoRow(r) {
-  const m = r.modello, cat = getCat(m.cat_id), key = 'stk:' + m.id + '-' + r.m.id, open = _openGrp.has(key);
-  const pezzi = r.pezzi.map(a => `<tr><td style="width:70px">${codiceBadge(a.codice, getCat(a.cat_id)?.colore)}</td><td><strong>${h(a.nome)}</strong></td><td>${varSelect(a)}</td></tr>`).join('');
-  return `<tr${r.m.virtuale ? ' class="stock-virt-row"' : ''} onclick="toggleGrp(this,'${key}')" style="cursor:pointer">
+  const m = r.modello, cat = getCat(m.cat_id), key = 'stk:' + m.id, open = _openGrp.has(key);
+  const nCase = r.items.reduce((n, it) => n + it.mags.reduce((k, x) => k + caseTot(x.cs), 0), 0);
+  const pezzi = r.items.map(it => `<tr><td style="width:70px">${codiceBadge(it.a.codice, getCat(it.a.cat_id)?.colore)}</td><td><strong>${h(it.a.nome)}</strong></td><td>${varSelect(it.a)}</td><td>${stockPills(it.mags)}</td></tr>`).join('');
+  return `<tr onclick="toggleGrp(this,'${key}')" style="cursor:pointer">
       <td>${codiceBadge(r.pezzi[0].codice, cat?.colore)}</td>
-      <td class="name"><strong>${h(m.nome)}</strong>${catPill(cat)} <span class="var-chip var-chip-n">×${r.pezzi.length}</span> ${varSummary(r.pezzi)}${r.pezzi.some(a => getStock(a.id, r.m.id) === 0) ? ` <span class="var-chip">${r.pezzi.filter(a => getStock(a.id, r.m.id) === 0).length} nei case</span>` : ''}${m.note?`<span class="nm-note">${h(m.note)}</span>`:''}</td>
-      <td><span class="stock-pill mp">${h(r.m.nome)}</span></td>
+      <td class="name"><strong>${h(m.nome)}</strong>${catPill(cat)} <span class="var-chip var-chip-n">×${r.pezzi.length}</span> ${varSummary(r.pezzi)}${nCase ? ` <span class="var-chip">${nCase} nei case</span>` : ''}${m.note?`<span class="nm-note">${h(m.note)}</span>`:''}</td>
+      <td>${stockPills(r.mags)}</td>
       <td class="r"><span class="q-n">${r.qty}</span><span class="q-u">pz</span></td>
     </tr><tr class="art-expand-row${open ? ' open' : ''}"><td colspan="4" class="art-expand-cell"><table class="pezzi-tab"><tbody>${pezzi}</tbody></table></td></tr>`;
 }
@@ -4714,56 +4722,39 @@ function renderStock() {
   sc.innerHTML='<option value="">Tutte le categorie</option>'+
     D.categorie.map(c=>`<option value="${c.id}"${ccv==c.id?' selected':''}>[${h(c.prefisso)}] ${h(c.nome)}</option>`).join('');
   const s=document.getElementById('searchStock').value.toLowerCase();
-  const rows=[];
+  const rows=[];   // una voce per articolo, con i magazzini in cui è presente
   D.articoli.forEach(a=>{
     if(s&&!a.nome.toLowerCase().includes(s)&&!a.codice.toLowerCase().includes(s)) return;
     if(sc.value&&a.cat_id!=sc.value) return;
     if(isSpecialArt(a.id)) return;   // nello stock solo gli articoli, non i contenitori
+    const mags=[];
     D.magazzini.forEach(m=>{
       if(m.virtuale) return;
       if(sm.value&&m.id!=sm.value) return;
       const lib=getStock(a.id,m.id), cs=D._contMap?.[a.id]?.[m.id];
       const qty=lib+(cs?cs.tot:0);
-      if(qty>0) rows.push({a,m,qty,lib,cs:cs?cs.case:[]});
+      if(qty>0) mags.push({m,qty,lib,cs:cs?cs.case:[]});
     });
+    if(mags.length) rows.push({a,mags,qty:mags.reduce((t,x)=>t+x.qty,0)});
   });
-  const rowsSorted = raggruppaPezziStock(sortBauliFirst(rows, r => r.a.id));
+  const rowsSorted = raggruppaPezziStock(rows);
   document.getElementById('tbStock').innerHTML=rowsSorted.length?rowsSorted.map(r=>{
     if (r.g) return stockGruppoRow(r);
-    const {a,m,qty}=r, cs=r.cs||[], hasCase=cs.length>0;
+    const {a,mags,qty}=r;
     const cat=getCat(a.cat_id);
-    const isBau = isBauleArt(a.id);
-    const isFLC = isFlightcaseArt(a.id);
-    const isFLCK = isFlckArt(a.id), kDef = isFLCK ? getFlck(a.id) : null;
-    const fcDef = isFLC ? getFlightcaseDef(a.id) : null;
-    const specialTag = isFLCK ? flckPillSm(kDef) : isBau
-      ? ' <span style="font-size:9px;background:#92400e15;color:#92400e;border:1px solid #92400e33;padding:1px 5px;border-radius:3px;font-family:\'DM Mono\',monospace">baule</span>'
-      : isFLC && fcDef
-      ? ` <span style="font-size:9px;background:#6b4c6e15;color:#6b4c6e;border:1px solid #6b4c6e33;padding:1px 5px;border-radius:3px;font-family:'DM Mono',monospace">case · ${h(fcDef.art_contenuto_nome)} ${fcDef.qty_caricata}/${fcDef.qty_max}</span>`
-      : '';
-    const isSpecial = isBau || isFLC || isFLCK || hasCase;
-    const rowClick = isSpecial ? ` onclick="toggleStockExpand(this)" style="cursor:pointer"` : '';
+    const nCase=mags.reduce((n,x)=>n+caseTot(x.cs),0);
+    const hasCase=nCase>0;
+    const rowClick = hasCase ? ` onclick="toggleStockExpand(this)" style="cursor:pointer"` : '';
     let expandRow = '';
-    if (isBau) {
-      expandRow = `<tr class="art-expand-row"><td colspan="4" class="art-expand-cell"><div id="stock-bau-${a.id}-${m.id}" style="font-size:11px;color:#92400e"><span style="color:var(--ink3)">Caricamento…</span></div></td></tr>`;
-    } else if (isFLC && fcDef) {
-      const pct = fcDef.qty_max ? Math.round(fcDef.qty_caricata / fcDef.qty_max * 100) : 0;
-      const barCol = pct >= 100 ? '#22c55e' : pct > 0 ? '#6b4c6e' : 'var(--ink4)';
-      expandRow = `<tr class="art-expand-row"><td colspan="4" class="art-expand-cell"><div style="font-size:11px;color:#6b4c6e">
-        Contiene: <strong>${h(fcDef.art_contenuto_nome||'—')}</strong> — ${fcDef.qty_caricata}/${fcDef.qty_max} caricati
-        <div style="margin-top:4px;height:5px;background:var(--ink4);border-radius:3px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${barCol};border-radius:3px"></div></div>
-      </div></td></tr>`;
-    }
-    if (isFLCK) expandRow = `<tr class="art-expand-row"><td colspan="4" class="art-expand-cell">${flckContenutoBox(kDef)}</td></tr>`;
-    if (hasCase) expandRow = `<tr class="art-expand-row"><td colspan="4" class="art-expand-cell">${caseBreakdown(r.lib, cs)}</td></tr>`;
-    return `<tr${m.virtuale?' class="stock-virt-row"':''}${rowClick}>
+    if (hasCase) expandRow = `<tr class="art-expand-row"><td colspan="4" class="art-expand-cell">${mags.map(x=>(mags.length>1?`<div style="font-size:11px;font-weight:700;margin-top:4px">${h(x.m.nome)}</div>`:'')+caseBreakdown(x.lib,x.cs)).join('')}</td></tr>`;
+    return `<tr${rowClick}>
       <td>${codiceBadge(a.codice, getCat(a.cat_id)?.colore)}</td>
-      <td class="name" title="${h(a.nome)}"><strong>${h(a.nome)}</strong>${catPill(cat)}${varChip(a)}${specialTag}${hasCase?caseChips(r.lib,cs):''}${a.note?`<span class="nm-note">${h(a.note)}</span>`:''}</td>
-      <td><span class="stock-pill mp">${h(m.nome)}</span>${m.virtuale?' <span class="badge badge-orange" style="font-size:10px">virtuale</span>':''}</td>
+      <td class="name" title="${h(a.nome)}"><strong>${h(a.nome)}</strong>${catPill(cat)}${varChip(a)}${hasCase?` <span class="var-chip">${nCase} nei case</span>`:''}${a.note?`<span class="nm-note">${h(a.note)}</span>`:''}</td>
+      <td>${stockPills(mags)}</td>
       <td class="r"><span class="q-n">${qty}</span><span class="q-u">${h(a.um)}</span></td>
     </tr>${expandRow}`;
   }).join(''):'<tr><td colspan="4" class="empty">Nessuno stock trovato</td></tr>';
-  { const c=document.getElementById('cntStock'); if(c) c.textContent=`${rows.length} righe · ${rows.reduce((t,r)=>t+r.qty,0)} pz`; }
+  { const c=document.getElementById('cntStock'); if(c) c.textContent=`${rows.length} articoli · ${rows.reduce((t,r)=>t+r.qty,0)} pz`; }
 
   const noMag=D.articoli.filter(a=>totalArtAny(a.id)===0);
   const badge=document.getElementById('stockNoMagBadge');
@@ -5969,7 +5960,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 10;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 11;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
@@ -6933,6 +6924,23 @@ function toggleAside(force) {
   playLoginSound();
 })();
 </script>
-<script>if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').then(r=>r.update()).catch(()=>{});</script>
+<div id="updBanner" style="display:none;position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:99999;background:#1a1814;color:#fff;border:1px solid #1D9E75;border-radius:12px;padding:10px 12px 10px 16px;font:600 13px 'DM Sans',sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.35);align-items:center;gap:12px">
+  <span>Aggiornamento disponibile</span>
+  <button onclick="location.reload()" style="background:#1D9E75;color:#04241c;border:0;border-radius:8px;padding:8px 14px;font:700 13px 'DM Sans',sans-serif;cursor:pointer">Aggiorna</button>
+</div>
+<script>
+if ('serviceWorker' in navigator) {
+  // il banner compare solo se esisteva già una versione attiva e ne è stata installata una nuova; si ricarica solo premendo "Aggiorna"
+  const hadCtl = !!navigator.serviceWorker.controller;
+  const showUpd = () => { const b = document.getElementById('updBanner'); if (b) b.style.display = 'flex'; };
+  navigator.serviceWorker.register('sw.js').then(r => {
+    const watch = w => w && w.addEventListener('statechange', () => { if (w.state === 'installed' && navigator.serviceWorker.controller) showUpd(); });
+    if (r.waiting && navigator.serviceWorker.controller) showUpd();
+    r.addEventListener('updatefound', () => watch(r.installing));
+    r.update().catch(() => {});
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') r.update().catch(() => {}); });
+  }).catch(() => {});
+}
+</script>
 </body>
 </html>
