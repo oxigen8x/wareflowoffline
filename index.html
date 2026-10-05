@@ -425,6 +425,9 @@ tbody tr:hover td{background:rgba(29,158,117,.1);}
 body.dark .badge-virt{background:#2d1404;color:#fb923c;border-color:#7c2d12;}
 body.dark .badge-orange{background:#2d1404;color:#fb923c;border-color:#7c2d12;}
 .badge-codice{background:var(--ink);color:#f4f1eb;font-size:11px;padding:2px 7px;border-radius:4px;font-family:'DM Mono',monospace;letter-spacing:.5px;}
+.mag-cat-sub{margin-top:3px;line-height:1.2}
+.mag-cat-sub .cat-pill{font-size:10px;padding:1px 6px}
+#modalMagDetail td.wrap .cat-pill{display:inline-block;max-width:100%;white-space:normal;line-height:1.25;word-break:break-word}
 .cat-pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:2px 8px;border-radius:4px;}
 
 .form-grid{display:grid;gap:14px;}
@@ -3185,10 +3188,10 @@ function magGruppoRows(g) {
     </tr>`).join('');
   return `<tr class="mag-bau-row" onclick="toggleGrp(this,'${key}')">
       <td>${codiceBadge(g.pezzi[0].codice, cat?.colore)}</td>
-      <td class="wrap"><strong><span class="mag-bau-arrow" style="${open ? 'transform:rotate(90deg)' : ''}">▶</span>${h(m.nome)} <span class="var-chip var-chip-n">×${g.pezzi.length}</span> ${varSummary(g.pezzi)}${g.pezzi.some(a => getStock(a.id, _detailMagId) === 0) ? ` <span class="var-chip">${g.pezzi.filter(a => getStock(a.id, _detailMagId) === 0).length} nei case</span>` : ''}</strong>${noteBtn(g.pezzi[0].id)}</td>
+      <td class="wrap"><strong><span class="mag-bau-arrow" style="${open ? 'transform:rotate(90deg)' : ''}">▶</span>${h(m.nome)} <span class="var-chip var-chip-n">×${g.pezzi.length}</span> ${varSummary(g.pezzi)}${g.pezzi.some(a => getStock(a.id, _detailMagId) === 0) ? ` <span class="var-chip">${g.pezzi.filter(a => getStock(a.id, _detailMagId) === 0).length} nei case</span>` : ''}</strong>${noteBtn(g.pezzi[0].id)}${_magCompact() ? `<div class="mag-cat-sub">${catPill(cat)}</div>` : ''}</td>
       <td style="text-align:right"><span style="font-family:'Fraunces',serif;font-size:20px;font-weight:700">${g.qty}</span></td>
       ${_magCompact() ? '' : `<td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--ink3)">pz</td>
-      <td>${catPill(cat)}</td>`}
+      <td class="wrap">${catPill(cat)}</td>`}
       <td></td>
     </tr>
     <tr class="art-expand-row${open ? ' open' : ''}"><td colspan="${_magCompact()?4:6}" class="art-expand-cell"><div class="pezzi-box">
@@ -3348,14 +3351,14 @@ function renderMagDetailTable() {
   if(isAdmin) {
     colsMagDetail.innerHTML = _magCompact()
       ? '<col style="width:78px"><col style="width:auto"><col style="width:46px"><col style="width:50px">'
-      : '<col style="width:88px"><col style="width:auto"><col style="width:60px"><col style="width:58px"><col style="width:130px"><col style="width:92px">';
+      : '<col style="width:88px"><col style="width:auto"><col style="width:60px"><col style="width:58px"><col style="width:150px"><col style="width:84px">';
     headMagDetail.innerHTML = _magCompact()
       ? '<tr><th>Codice</th><th>Articolo</th><th style="text-align:right">Qtà</th><th></th></tr>'
       : '<tr><th>Codice</th><th>Articolo</th><th style="text-align:right">Qtà</th><th>U.M.</th><th>Categoria</th><th></th></tr>';
   } else {
     colsMagDetail.innerHTML = _magCompact()
       ? '<col style="width:78px"><col style="width:auto"><col style="width:46px"><col style="width:50px">'
-      : '<col style="width:88px"><col style="width:auto"><col style="width:60px"><col style="width:58px"><col style="width:130px"><col style="width:92px">';
+      : '<col style="width:88px"><col style="width:auto"><col style="width:60px"><col style="width:58px"><col style="width:150px"><col style="width:84px">';
     headMagDetail.innerHTML = _magCompact()
       ? '<tr><th>Codice</th><th>Articolo</th><th style="text-align:right">Qtà</th><th></th></tr>'
       : '<tr><th>Codice</th><th>Articolo</th><th style="text-align:right">Qtà</th><th>U.M.</th><th>Categoria</th><th></th></tr>';
@@ -3393,10 +3396,10 @@ function renderMagDetailTable() {
       : `<strong>${a?h(a.nome):'—'}</strong>${noteBtn(s.art_id)}`;
     const mainRow = `<tr class="${isSpecial?'mag-bau-row':''}" ${isSpecial?`onclick="toggleBauleInMag(${s.art_id})"`:''}>
       <td>${codiceBadge(a?.codice, a ? getCat(a.cat_id)?.colore : null)}</td>
-      <td class="wrap">${nomeCell}</td>
+      <td class="wrap">${nomeCell}${_magCompact() && cat ? `<div class="mag-cat-sub">${catPill(cat)}</div>` : ''}</td>
       <td style="text-align:right"><span style="${qtyStyle}">${s.qty}</span></td>
       ${_magCompact() ? '' : `<td style="${monoStyle}">${h(a?.um)||'pz'}</td>
-      <td>${catPill(cat)}</td>`}
+      <td class="wrap">${catPill(cat)}</td>`}
       <td style="text-align:right;overflow:visible;padding-left:4px;padding-right:12px;white-space:nowrap">${!isSpecial ? `<button class="btn btn-ghost btn-xs" title="Togli da questo magazzino" onclick="event.stopPropagation();togliDaMagazzino(${s.art_id},${magId})">✕</button>` : ''}</td>
     </tr>`;
     const expandRow = hasCase
@@ -4949,7 +4952,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 7;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 8;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
