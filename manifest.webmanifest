@@ -1,5 +1,5 @@
 {
-  "name": "WareFlow Offline", "short_name": "WareFlow",
+  "name": "Zio Bancale - Inventario", "short_name": "Zio Bancale - Inventario",
   "start_url": "./", "scope": "./", "display": "standalone", "orientation": "any",
   "background_color": "#0d1f1a", "theme_color": "#0d1f1a",
   "icons": [
