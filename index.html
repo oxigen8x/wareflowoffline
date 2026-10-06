@@ -2028,13 +2028,11 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
           <div class="card-head"><span class="card-title">◻ Articoli</span></div>
           <div class="card-body" style="font-size:14px;line-height:1.7;color:var(--ink2);display:flex;flex-direction:column;gap:8px">
             <p style="margin:0">Elenco completo degli articoli del catalogo con le rispettive giacenze per ogni magazzino.</p>
-            <p style="margin:0">Su smartphone tocca il tasto <strong>▼</strong> a sinistra del nome per espandere la riga e vedere le quantità per deposito. Usa i filtri in alto per cercare per codice, nome, categoria o magazzino.</p>
-            <p style="margin:0"><strong>Articoli con varianti (pezzi univoci)</strong> — per materiale in cui ogni pezzo va tenuto distinto (es. microfoni, casse con numeri di serie). Nel modulo di creazione, o in <strong>Carica → Crea articolo</strong>, spunta <strong>Articolo con varianti</strong> e scrivi le varianti separate da virgola (es. <em>cp60, cp61, cp62</em>): viene creato solo l'articolo generico.</p>
+            <p style="margin:0">Usa i filtri in alto per cercare per codice, nome, categoria o magazzino.</p>
+            <p style="margin:0">Gli articoli con varianti si usano per materiale in cui ogni pezzo può avere più varianti (es. Parcan64 → varie lampade).</p>
             <ol style="padding-left:18px;margin:0;display:flex;flex-direction:column;gap:4px">
-              <li>I <strong>pezzi nascono al carico</strong> (tasto <strong>↓ Carica</strong>): scegli quanti pezzi e di quale variante. Ogni pezzo ha un codice proprio (es. LU3-1, LU3-2…) e i numeri non vengono mai riusati.</li>
-              <li>In Articoli e in Stock i pezzi dello stesso modello compaiono come <strong>una sola riga</strong> con il numero dei pezzi (×N) e le varianti: aprila per vedere i singoli pezzi.</li>
-              <li>Nel contenuto di un magazzino spunta i pezzi e usa <strong>Sposta i selezionati in…</strong> per spostarli insieme.</li>
-              <li>Gli admin possono modificare le varianti del modello con il tasto <strong>⚙</strong>. Nei Flightcase K i pezzi si aggiungono con <strong>Aggiungi contenuto → Pezzi con varianti</strong>.</li>
+              <li>La variante di un articolo con varianti può essere modificata. Es.: si cambia una lampada di un Par in un flightcase; dal modulo di quel flightcase si può impostare la lampada di ognuno dei Par contenuti nel case.</li>
+              <li>Si può cambiare variante anche dalla sezione Articoli.</li>
             </ol>
           </div>
         </div>
@@ -3724,9 +3722,7 @@ function stockGruppoRow(r) {
 }
 function magGruppoRows(g) {
   const m = g.modello, cat = getCat(m.cat_id), key = 'mag:' + m.id, open = _openGrp.has(key);
-  const dests = (currentUser?.ruolo === 'admin' ? D.magazzini : getMagReali()).filter(x => x.id != _detailMagId);
   const pezzi = g.pezzi.map(a => `<tr>
-      <td style="width:40px;padding-left:6px;padding-right:2px"><input type="checkbox" class="pz-chk" ${getStock(a.id, _detailMagId) > 0 ? '' : 'disabled'} ${_selPezzi.has(a.id) ? 'checked' : ''} onclick="event.stopPropagation()" onchange="selPezzo(${a.id}, this.checked)"></td>
       <td style="width:70px">${codiceBadge(a.codice, getCat(a.cat_id)?.colore)}</td>
       <td><strong>${h(a.nome)}</strong>${getStock(a.id, _detailMagId) > 0 ? '' : ` <span class="var-chip">in ${h(D._contMap?.[a.id]?.[_detailMagId]?.case[0]?.nome || 'case')}</span>`}</td>
       <td>${varSelect(a)}</td>
@@ -3742,11 +3738,6 @@ function magGruppoRows(g) {
     </tr>
     <tr class="art-expand-row${open ? ' open' : ''}"><td colspan="${_magCompact()?4:6}" class="art-expand-cell"><div class="pezzi-box">
       <table class="pezzi-tab"><tbody>${pezzi}</tbody></table>
-      <div class="pezzi-bar">
-        <label style="font-size:12px;cursor:pointer"><input type="checkbox" onchange="selTuttiPezzi(${m.id}, this.checked)"> Tutti</label>
-        <select class="var-sel" id="grp-dest-${m.id}" onclick="event.stopPropagation()"><option value="">Sposta i selezionati in…</option>${dests.map(x => `<option value="${x.id}">${h(x.nome)}${x.virtuale ? ' 🗑' : ''}</option>`).join('')}</select>
-        <button class="btn btn-dark btn-xs" onclick="event.stopPropagation();spostaPezziSel(${m.id})">Sposta</button>
-      </div>
     </div></td></tr>`;
 }
 function selPezzo(id, on) { if (on) _selPezzi.add(id); else _selPezzi.delete(id); }
@@ -6001,7 +5992,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 15;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 16;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
@@ -6197,6 +6188,10 @@ function _catGroups(items, artIdFn) {
   return [...by].map(([cid, arr]) => ({ cat: getCat(cid), items: arr.sort((x, y) => String(getArt(artIdFn(x))?.codice || '').localeCompare(String(getArt(artIdFn(y))?.codice || ''), 'it', { numeric: true })) }))
     .sort((x, y) => rank(x.cat) - rank(y.cat));
 }
+// Badge del FLC/FLCK che contiene l'articolo (per le stampe): cs = [{nome,codice,qty,tipo}]
+function _printCaseBadge(cs, conQty) {
+  return (cs || []).map(e => ` <span style="font-size:9px;background:#6b4c6e22;color:#6b4c6e;border:1px solid #6b4c6e44;padding:1px 5px;border-radius:3px;font-family:monospace;white-space:nowrap">${e.tipo === 'FLCK' ? 'FLCK' : 'FLC'} · ${h(e.nome)}${e.codice ? ' ' + h(e.codice) : ''}${conQty ? ' ×' + e.qty : ''}</span>`).join('');
+}
 const _printCatRow = (cat, n, cols) => `<tr class="catrow"><td colspan="${cols}">${h(cat?.nome || 'Senza categoria')}<span>${n} pz</span></td></tr>`;
 function _printInFrame(htmlContent) {
   const frame = document.getElementById('printFrame');
@@ -6214,7 +6209,11 @@ function stampaTesto(zoneId) {
       const m = getMag(f.mag_id);
       return '<span style="font-size:11px;background:#f4f1eb;padding:1px 6px;border-radius:3px;margin-right:4px">' + h(m?.nome||'?') + ' <strong>' + f.qty_presa + '</strong></span>';
     }).join('');
-    return '<tr><td style="font-family:monospace;font-weight:700">' + h(r.art_codice||'\u2014') + '</td><td>' + h(r.art_nome||'\u2014') + '</td><td style="text-align:right;font-weight:700;font-size:15px">' + r.qty_richiesta + '</td><td>' + h(r.art_um||'pz') + '</td><td>' + (flags||'\u2014') + '</td></tr>';
+    const _mm = (r.flags||[]).filter(f => f.qty_presa > 0).map(f => String(f.mag_id));
+    const _cm = D._contMap?.[r.art_id] || {};
+    const _cs = [], _seen = new Set();
+    (_mm.length ? _mm : Object.keys(_cm)).forEach(mid => (_cm[mid]?.case || []).forEach(e => { if (!_seen.has(e.id)) { _seen.add(e.id); _cs.push(e); } }));
+    return '<tr><td style="font-family:monospace;font-weight:700">' + h(r.art_codice||'\u2014') + '</td><td>' + h(r.art_nome||'\u2014') + _printCaseBadge(_cs, false) + '</td><td style="text-align:right;font-weight:700;font-size:15px">' + r.qty_richiesta + '</td><td>' + h(r.art_um||'pz') + '</td><td>' + (flags||'\u2014') + '</td></tr>';
   };
   const rows = _catGroups(righe, r => r.art_id).map(g => _printCatRow(g.cat, g.items.reduce((n, r) => n + (+r.qty_richiesta || 0), 0), 5) + g.items.map(_mkL).join('')).join('');
   const now = new Date();
@@ -6250,7 +6249,7 @@ async function stampaMagDetail() {
       : '';
     const mainRow = `<tr${isSpec?' style="background:#fdf8f0"':''}>
       <td style="font-family:monospace;font-weight:700">${h(a?.codice)||'—'}</td>
-      <td>${h(a?.nome)||'—'}${pillHtml}</td>
+      <td>${h(a?.nome)||'—'}${pillHtml}${(isSpec ? '' : _printCaseBadge(s._case, true))}</td>
       <td>${h(cat?.nome)||'—'}</td>
       <td style="text-align:right;font-weight:700;font-size:16px">${s.qty}</td>
       <td>${h(a?.um)||'pz'}</td>
