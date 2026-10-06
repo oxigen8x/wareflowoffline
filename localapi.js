@@ -75,7 +75,7 @@ async function localFetch(method, url, body) {
   return out;
 }
 window.localFetch = localFetch;
-window.LOCALAPI_BUILD = 13;   // deve coincidere con APP_BUILD in index.html
+window.LOCALAPI_BUILD = 14;   // deve coincidere con APP_BUILD in index.html
 
 function isValidColore(c) {
   return !c || /^#[0-9a-fA-F]{3,6}$/.test(c);
@@ -1106,12 +1106,47 @@ window.eliminaDb = async () => {
 // ── Backup: esporta / importa il file .db ──
 window.exportaDb = async () => {
   await window.localReady;
-  const name = 'wareflow-' + new Date().toISOString().slice(0, 10) + '.db';
-  const file = new File([snapshot()], name, { type: 'application/octet-stream' });
-  try { if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: name }); return; } }
-  catch (e) { if (e.name === 'AbortError') return; }
-  const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = name;
-  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  if (document.getElementById('expDbOv')) return;
+  const base = 'wareflow-' + new Date().toISOString().slice(0, 10);
+  const ov = document.createElement('div');
+  ov.id = 'expDbOv';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:100000;background:rgba(26,24,20,.55);display:flex;align-items:center;justify-content:center;padding:20px;font-family:"DM Sans",system-ui,sans-serif';
+  ov.innerHTML = '<div style="background:#fff;color:#1a1814;border-radius:14px;padding:20px;width:100%;max-width:360px;box-shadow:0 12px 40px rgba(0,0,0,.35)">' +
+    '<div style="font-size:17px;font-weight:700;margin-bottom:12px">Esporta database</div>' +
+    '<label style="font-size:12px;color:#6b6358;display:block;margin-bottom:6px">Nome del file</label>' +
+    '<div style="display:flex;align-items:center;gap:6px"><input id="expDbName" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1;min-width:0;font-size:16px;padding:10px 12px;border:1px solid #cfc8ba;border-radius:8px"><span style="font-size:14px;color:#6b6358">.db</span></div>' +
+    '<div id="expDbMsg" style="font-size:12px;color:#b45309;margin-top:10px;display:none"></div>' +
+    '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">' +
+    '<button id="expDbNo" type="button" style="padding:10px 16px;border-radius:8px;border:1px solid #cfc8ba;background:#fff;font-size:14px;font-weight:600">Annulla</button>' +
+    '<button id="expDbOk" type="button" style="padding:10px 18px;border-radius:8px;border:0;background:#1a1814;color:#fff;font-size:14px;font-weight:700">Salva</button></div></div>';
+  document.body.appendChild(ov);
+  const inp = ov.querySelector('#expDbName'), msg = ov.querySelector('#expDbMsg'), ok = ov.querySelector('#expDbOk');
+  inp.value = base; inp.focus(); inp.select();
+  const close = () => ov.remove();
+  const scarica = file => {
+    const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = file.name;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  };
+  const nomeFile = () => {
+    let n = inp.value.replace(/\.(db|sqlite3?)$/i, '').replace(/[\\/:*?"<>|\u0000-\u001f]/g, '').trim();
+    return (n || base) + '.db';
+  };
+  ov.querySelector('#expDbNo').onclick = close;
+  ov.addEventListener('click', e => { if (e.target === ov) close(); });
+  let modoScarica = false;
+  ok.onclick = async () => {
+    const file = new File([snapshot()], nomeFile(), { type: 'application/octet-stream' });
+    if (modoScarica) { scarica(file); close(); return; }
+    let canShare = false;
+    try { canShare = !!(navigator.canShare && navigator.canShare({ files: [file] })); } catch (e) {}
+    if (!canShare) { scarica(file); close(); return; }          // nessuna condivisione disponibile: un solo download
+    try { await navigator.share({ files: [file], title: file.name }); close(); }
+    catch (e) {
+      if (e && e.name === 'AbortError') { close(); return; }      // annullato dall'utente
+      msg.textContent = 'La condivisione non è riuscita. Premi "Scarica" per salvare il file.';   // niente download automatico: un solo file
+      msg.style.display = 'block'; ok.textContent = 'Scarica'; modoScarica = true;
+    }
+  };
 };
 window.importaDb = async inp => {
   const f = inp.files[0]; inp.value = ''; if (!f) return;

@@ -790,6 +790,7 @@ body.dark #sBoxA.filled .spos-sel-label,body.dark #sBoxA.filled .spos-sel-val{co
 
 #toast{position:fixed;bottom:20px;right:20px;z-index:999;background:#1D9E75;color:#E1F5EE;padding:11px 16px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;transform:translateY(8px);transition:all .22s;box-shadow:0 4px 16px rgba(29,158,117,.35);max-width:360px;border:1px solid #0F6E56;}
 #toast.show{opacity:1;transform:translateY(0);}
+#toast{pointer-events:none;}
 #toast.err{background:#7f1d1d;color:#fecaca;border-color:#991b1b;box-shadow:0 4px 16px rgba(127,29,29,.35);}
 body.dark #toast{background:#0F6E56;border-color:#085041;}
 body.dark #toast.err{background:#7f1d1d;border-color:#991b1b;}
@@ -5993,7 +5994,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 13;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 14;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
