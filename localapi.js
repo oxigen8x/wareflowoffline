@@ -75,7 +75,7 @@ async function localFetch(method, url, body) {
   return out;
 }
 window.localFetch = localFetch;
-window.LOCALAPI_BUILD = 14;   // deve coincidere con APP_BUILD in index.html
+window.LOCALAPI_BUILD = 15;   // deve coincidere con APP_BUILD in index.html
 
 function isValidColore(c) {
   return !c || /^#[0-9a-fA-F]{3,6}$/.test(c);
@@ -1140,7 +1140,8 @@ window.exportaDb = async () => {
     let canShare = false;
     try { canShare = !!(navigator.canShare && navigator.canShare({ files: [file] })); } catch (e) {}
     if (!canShare) { scarica(file); close(); return; }          // nessuna condivisione disponibile: un solo download
-    try { await navigator.share({ files: [file], title: file.name }); close(); }
+    // solo il file: con title/text iOS crea anche un file "Testo"
+    try { await navigator.share({ files: [file] }); close(); }
     catch (e) {
       if (e && e.name === 'AbortError') { close(); return; }      // annullato dall'utente
       msg.textContent = 'La condivisione non è riuscita. Premi "Scarica" per salvare il file.';   // niente download automatico: un solo file

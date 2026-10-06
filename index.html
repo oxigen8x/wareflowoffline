@@ -2029,6 +2029,13 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
           <div class="card-body" style="font-size:14px;line-height:1.7;color:var(--ink2);display:flex;flex-direction:column;gap:8px">
             <p style="margin:0">Elenco completo degli articoli del catalogo con le rispettive giacenze per ogni magazzino.</p>
             <p style="margin:0">Su smartphone tocca il tasto <strong>▼</strong> a sinistra del nome per espandere la riga e vedere le quantità per deposito. Usa i filtri in alto per cercare per codice, nome, categoria o magazzino.</p>
+            <p style="margin:0"><strong>Articoli con varianti (pezzi univoci)</strong> — per materiale in cui ogni pezzo va tenuto distinto (es. microfoni, casse con numeri di serie). Nel modulo di creazione, o in <strong>Carica → Crea articolo</strong>, spunta <strong>Articolo con varianti</strong> e scrivi le varianti separate da virgola (es. <em>cp60, cp61, cp62</em>): viene creato solo l'articolo generico.</p>
+            <ol style="padding-left:18px;margin:0;display:flex;flex-direction:column;gap:4px">
+              <li>I <strong>pezzi nascono al carico</strong> (tasto <strong>↓ Carica</strong>): scegli quanti pezzi e di quale variante. Ogni pezzo ha un codice proprio (es. LU3-1, LU3-2…) e i numeri non vengono mai riusati.</li>
+              <li>In Articoli e in Stock i pezzi dello stesso modello compaiono come <strong>una sola riga</strong> con il numero dei pezzi (×N) e le varianti: aprila per vedere i singoli pezzi.</li>
+              <li>Nel contenuto di un magazzino spunta i pezzi e usa <strong>Sposta i selezionati in…</strong> per spostarli insieme.</li>
+              <li>Gli admin possono modificare le varianti del modello con il tasto <strong>⚙</strong>. Nei Flightcase K i pezzi si aggiungono con <strong>Aggiungi contenuto → Pezzi con varianti</strong>.</li>
+            </ol>
           </div>
         </div>
 
@@ -5994,7 +6001,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 14;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 15;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
