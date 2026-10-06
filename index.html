@@ -242,11 +242,12 @@ body.dark[data-theme="red"]{background:linear-gradient(160deg,#141414 0%,#0f0f0f
 .bt-card{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:border-color .15s;}
 .bt-card:hover{border-color:var(--border2);}
 .bt-band{position:relative;height:92px;display:flex;align-items:center;justify-content:center;background:var(--surface2);background:color-mix(in srgb,var(--bc) 18%,var(--surface));border-bottom:3px solid var(--bc);color:var(--ink2);color:color-mix(in srgb,var(--bc) 70%,var(--ink));}
-.bt-foot{padding:12px 16px 14px;display:flex;align-items:center;gap:10px;}
-.bt-txt{flex:1;min-width:0;}
+.bt-foot{padding:12px 16px 14px;}
+.bt-r2{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px;}
 .bt-nome{font-size:17px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.bt-cod{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bt-cod{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .bt-chip{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;padding:3px 9px;border-radius:5px;white-space:nowrap;flex-shrink:0;}
+.bt-card .bt-chip{font-size:9px;letter-spacing:.6px;padding:2px 7px;}
 .bt-chip.ok{background:var(--surface2);border:1px solid var(--teal);color:var(--ink);}
 .bt-chip.no{border:1px dashed var(--amber);color:var(--amber);}
 .bt-del{width:28px;height:28px;padding:0;border-radius:8px;border:1px solid rgba(220,38,38,.3);background:var(--bg);color:var(--red);font-size:12px;cursor:pointer;flex-shrink:0;}
@@ -6000,7 +6001,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 23;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 24;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
@@ -6706,7 +6707,7 @@ function _btRender(grid, items, vuoto) {
   grid.className = list ? 'bt-list' : 'bt-grid';
   grid.innerHTML = items.map(i => list
     ? (p => `<div class="bt-row" style="--bc:${i.col}" onclick="${i.onOpen}"><i class="bt-dot"></i><span class="bt-rn"><span>${h(i.nome)}</span>${p ? `<span class="bt-rl">📍 ${p.nome}</span>` : ''}</span><span class="bt-rc">${cod(i)}</span>${p ? `<span class="bt-pos2" style="--mc:${p.col}">${p.ic} ${p.nome}</span>` : ''}${chip(i)}${dup(i)}${del(i)}</div>`)(pos(i))
-    : (p => `<div class="bt-card" style="--bc:${i.col}" onclick="${i.onOpen}">${dup(i)}${del(i)}<div class="bt-band">${p ? `<span class="bt-pos">${p.ic} ${p.nome}</span>` : ''}${_BT_SVG}</div><div class="bt-foot"><div class="bt-txt"><div class="bt-nome">${h(i.nome)}</div><div class="bt-cod">${cod(i)}</div></div>${chip(i)}</div></div>`)(pos(i))
+    : (p => `<div class="bt-card" style="--bc:${i.col}" onclick="${i.onOpen}">${dup(i)}${del(i)}<div class="bt-band">${p ? `<span class="bt-pos">${p.ic} ${p.nome}</span>` : ''}${_BT_SVG}</div><div class="bt-foot"><div class="bt-nome">${h(i.nome)}</div><div class="bt-r2"><span class="bt-cod">${cod(i)}</span>${chip(i)}</div></div></div>`)(pos(i))
   ).join('');
 }
 
