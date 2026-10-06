@@ -252,6 +252,10 @@ body.dark[data-theme="red"]{background:linear-gradient(160deg,#141414 0%,#0f0f0f
 .bt-del{width:28px;height:28px;padding:0;border-radius:8px;border:1px solid rgba(220,38,38,.3);background:var(--bg);color:var(--red);font-size:12px;cursor:pointer;flex-shrink:0;}
 .bt-card .bt-del{position:absolute;top:10px;right:10px;}
 .bt-del.off{opacity:.3;cursor:default;}
+.bt-dup{width:28px;height:28px;padding:0;border-radius:8px;border:1px solid var(--border2);background:var(--bg);color:var(--ink2);font-size:14px;cursor:pointer;flex-shrink:0;}
+.bt-dup:hover{border-color:var(--ink);}
+.bt-dup.off{opacity:.3;cursor:default;}
+.bt-card .bt-dup{position:absolute;top:10px;right:44px;}
 .bt-list{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
 .bt-row{display:flex;align-items:center;gap:12px;padding:0 14px;height:46px;border-top:1px solid var(--border);cursor:pointer;box-sizing:border-box;}
 .bt-row:first-child{border-top:0;}
@@ -2066,7 +2070,8 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
           <div class="card-head"><span class="card-title">📦 Bauli</span></div>
           <div class="card-body" style="font-size:14px;line-height:1.7;color:var(--ink2);display:flex;flex-direction:column;gap:8px">
             <p style="margin:0">I bauli sono contenitori fisici per materiale non catalogato come articolo (attrezzi, minuteria, consumabili). Ogni baule è un articolo speciale della categoria <strong>BAU</strong> e viene gestito nella sezione <strong>Bauli e FLC</strong>.</p>
-            <p style="margin:0">Nella sezione <strong>Bauli e FLC</strong> ogni elemento è un <strong>riquadro</strong> con una fascia del <strong>colore della sua categoria</strong>: clicca sul riquadro per aprirlo, usa la <strong>✕</strong> in alto a destra per eliminarlo e il tasto vista per passare a una <strong>lista compatta</strong> (utile quando sono molti). Le tre schede sono Bauli, Flight Case e Flightcase K.</p>
+            <p style="margin:0">Nella sezione <strong>Bauli e FLC</strong> ogni elemento è un <strong>riquadro</strong> con una fascia del <strong>colore della sua categoria</strong>: clicca sul riquadro per aprirlo, usa la <strong>✕</strong> in alto a destra per eliminarlo (solo admin), la <strong>⧉</strong> accanto per <strong>duplicarlo</strong> e il tasto vista per passare a una <strong>lista compatta</strong> (utile quando sono molti). Le tre schede sono Bauli, Flight Case e Flightcase K.</p>
+            <p style="margin:8px 0 0"><strong>Duplica</strong> (solo admin): crea una copia nello stesso magazzino con il <strong>codice successivo</strong> e il nome con un numero progressivo (es. «Regia» → «Regia 2»). Il baule si duplica anche se pieno, ma <strong>senza il contenuto</strong>; Flight Case e Flightcase K solo se <strong>vuoti</strong> (del Flightcase K si copiano le voci previste, tranne i pezzi univoci con varianti).</p>
             <p style="margin:0">All'interno di ogni baule puoi definire una <strong>lista di voci</strong> libere (nome + quantità) che descrivono il contenuto reale. Le voci non sono articoli del catalogo — sono semplici righe di testo.</p>
             <p style="margin:0">I bauli si spostano come qualsiasi articolo nella sezione Spostamento, e compaiono nelle liste di carico. Nella sezione Articoli sono visibili con un badge <span style="background:#92400e22;color:#92400e;border:1px solid #92400e44;padding:0 4px;border-radius:3px;font-size:11px">baule</span> accanto al nome.</p>
           </div>
@@ -5990,7 +5995,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 20;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 21;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
@@ -6467,7 +6472,7 @@ function renderBauli() {
   _btRender(grid, D.bauli.map(b => ({
     nome: b.nome, cod: b.codice, sub: '', col: _btCol('BAU', '#92400e'),
     chip: b.n_voci > 0 ? `${b.n_voci} VOCI` : 'VUOTO', ok: b.n_voci > 0,
-    onOpen: `apriBaule(${b.id})`, delOk: true, onDel: `eliminaBaule(${b.id})`
+    id: b.id, dupOk: true, onOpen: `apriBaule(${b.id})`, delOk: true, onDel: `eliminaBaule(${b.id})`
   })), '');
 }
 
@@ -6590,6 +6595,16 @@ async function salvaBaule() {
   } catch(e) { toast(e.message || 'Errore', true); }
 }
 
+// Duplica baule / flight case / flightcase K (solo admin; le regole le controlla il server)
+async function duplicaBt(id) {
+  try {
+    const r = await apiFetch('POST', `/duplica/${id}`);
+    await Promise.all([loadPartial('spostamenti'), _aggiornaBauliD()]);
+    ({ bauli: renderBauli, flc: renderFlc, flck: renderFlck })[_bauliTab]();
+    toast(`Creato "${r.nome}" (${r.codice}) ✓` + (r.saltate ? ` · ${r.saltate} pezzi univoci non copiati` : ''));
+  } catch (e) {}
+}
+
 async function eliminaBaule(id) {
   const b = D.bauli.find(x => x.id === id) || D.flightcase.find(x => x.id === id);
   if (!b) { toast('Elemento non trovato', true); return; }
@@ -6677,12 +6692,15 @@ function _btRender(grid, items, vuoto) {
   const del = i => !admin ? '' : i.delOk
     ? `<button class="bt-del" title="Elimina" aria-label="Elimina" onclick="event.stopPropagation();${i.onDel}">✕</button>`
     : `<button class="bt-del off" title="Sposta nel cestino prima di eliminare" aria-label="Elimina non disponibile" onclick="event.stopPropagation()">✕</button>`;
+  const dup = i => !admin ? '' : i.dupOk
+    ? `<button class="bt-dup" title="Duplica" aria-label="Duplica" onclick="event.stopPropagation();duplicaBt(${i.id})">⧉</button>`
+    : `<button class="bt-dup off" title="Svuota prima il case per duplicarlo" aria-label="Duplica non disponibile" onclick="event.stopPropagation()">⧉</button>`;
   const chip = i => `<span class="bt-chip ${i.ok ? 'ok' : 'no'}">${h(i.chip)}</span>`;
   const cod = i => h(i.cod) + (i.sub ? ' · ' + h(i.sub) : '');
   grid.className = list ? 'bt-list' : 'bt-grid';
   grid.innerHTML = items.map(i => list
-    ? `<div class="bt-row" style="--bc:${i.col}" onclick="${i.onOpen}"><i class="bt-dot"></i><span class="bt-rn">${h(i.nome)}</span><span class="bt-rc">${cod(i)}</span>${chip(i)}${del(i)}</div>`
-    : `<div class="bt-card" style="--bc:${i.col}" onclick="${i.onOpen}">${del(i)}<div class="bt-band">${_BT_SVG}</div><div class="bt-foot"><div class="bt-txt"><div class="bt-nome">${h(i.nome)}</div><div class="bt-cod">${cod(i)}</div></div>${chip(i)}</div></div>`
+    ? `<div class="bt-row" style="--bc:${i.col}" onclick="${i.onOpen}"><i class="bt-dot"></i><span class="bt-rn">${h(i.nome)}</span><span class="bt-rc">${cod(i)}</span>${chip(i)}${dup(i)}${del(i)}</div>`
+    : `<div class="bt-card" style="--bc:${i.col}" onclick="${i.onOpen}">${dup(i)}${del(i)}<div class="bt-band">${_BT_SVG}</div><div class="bt-foot"><div class="bt-txt"><div class="bt-nome">${h(i.nome)}</div><div class="bt-cod">${cod(i)}</div></div>${chip(i)}</div></div>`
   ).join('');
 }
 
@@ -6692,7 +6710,7 @@ function renderFlc() {
   _btRender(grid, D.flightcase.map(fc => ({
     nome: fc.nome, cod: fc.codice, sub: fc.art_contenuto_nome || '', col: _btCol('FLC', '#6b4c6e'),
     chip: `${fc.qty_caricata || 0}/${fc.qty_max}`, ok: fc.qty_caricata > 0,
-    onOpen: `apriFlc(${fc.id})`, delOk: true, onDel: `eliminaBaule(${fc.id})`
+    id: fc.id, dupOk: !(fc.qty_caricata > 0), onOpen: `apriFlc(${fc.id})`, delOk: true, onDel: `eliminaBaule(${fc.id})`
   })), 'Nessun flight case — clicca "+ Flight Case" per crearne uno');
 }
 
@@ -6849,7 +6867,7 @@ function renderFlck() {
   _btRender(grid, (D.flck || []).map(k => ({
     nome: k.nome, cod: k.codice, sub: '', col: _btCol('FLCK', FLCK_COL),
     chip: k.voci.length ? `${k.voci.length} VOCI · ${flckTot(k)}/${flckMax(k)}` : 'VUOTO', ok: k.voci.length > 0,
-    onOpen: `apriFlck(${k.id})`, delOk: !!window.localFetch || totalArtReale(k.id) === 0, onDel: `eliminaFlck(${k.id})`
+    id: k.id, dupOk: !k.voci.some(v => v.qty_caricata > 0), onOpen: `apriFlck(${k.id})`, delOk: !!window.localFetch || totalArtReale(k.id) === 0, onDel: `eliminaFlck(${k.id})`
   })), 'Nessun flightcase K — clicca "+ Flightcase K" per crearne uno');
 }
 function apriFlck(id) {

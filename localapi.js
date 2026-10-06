@@ -75,7 +75,7 @@ async function localFetch(method, url, body) {
   return out;
 }
 window.localFetch = localFetch;
-window.LOCALAPI_BUILD = 20;   // deve coincidere con APP_BUILD in index.html
+window.LOCALAPI_BUILD = 21;   // deve coincidere con APP_BUILD in index.html
 
 function isValidColore(c) {
   return !c || /^#[0-9a-fA-F]{3,6}$/.test(c);
@@ -757,6 +757,44 @@ app.delete('/api/bauli/:id', (req, res) => {
     console.error('Errore eliminazione baule/FLC:', e.message);
     res.status(500).json({ error: safeErr(e, 'DELETE bauli') });
   }
+});
+
+// ─── DUPLICA baule / flight case / flightcase K (solo admin) ───
+// Il duplicato prende il codice successivo della categoria e il nome con numero progressivo ("Regia" → "Regia 2").
+// Baule: copiato senza voci (anche se pieno). FLC e FLCK: solo se vuoti; del FLCK si copiano le voci come struttura vuota (esclusi i pezzi univoci).
+app.post('/api/duplica/:id', (req, res) => {
+  touch();
+  const src = db.prepare('SELECT a.id, a.codice, a.nome, a.note, a.cat_id, c.prefisso FROM articoli a JOIN categorie c ON c.id=a.cat_id WHERE a.id=?').get(req.params.id);
+  if (!src || !['BAU', 'FLC', 'FLCK'].includes(src.prefisso)) return res.status(404).json({ error: 'Baule o case non trovato' });
+  const magId = db.prepare('SELECT s.mag_id FROM stock s JOIN magazzini m ON m.id=s.mag_id WHERE s.art_id=? AND s.qty>0 AND m.virtuale=0').get(src.id)?.mag_id;
+  if (!magId) return res.status(400).json({ error: 'Sposta prima in un magazzino per poter duplicare' });
+  const def = src.prefisso === 'FLC' ? db.prepare('SELECT * FROM flightcase_def WHERE art_id=?').get(src.id) : null;
+  const voci = src.prefisso === 'FLCK' ? db.prepare('SELECT v.art_id, v.qty_max, v.qty_caricata, a.modello_id FROM flck_voci v JOIN articoli a ON a.id=v.art_id WHERE v.flck_art_id=?').all(src.id) : [];
+  if ((def && def.qty_caricata > 0) || voci.some(v => v.qty_caricata > 0))
+    return res.status(400).json({ error: 'Svuota prima il case: si può duplicare solo se vuoto' });
+  // nome: base senza numero finale + primo progressivo libero (la base sola vale 1)
+  const base = src.nome.replace(/\s+\d+$/, '').trim() || src.nome;
+  let max = 1;
+  for (const { nome } of db.prepare('SELECT nome FROM articoli WHERE cat_id=?').all(src.cat_id)) {
+    const m = nome.match(/^(.*\S)\s+(\d+)$/);
+    if (m && m[1] === base) max = Math.max(max, +m[2]);
+  }
+  const nome = `${base} ${max + 1}`;
+  const codice = src.prefisso + prossimoNumero(src.prefisso);
+  const strutt = voci.filter(v => !v.modello_id);
+  try {
+    const uid = req.session.user.id, data = new Date().toISOString();
+    let id;
+    db.transaction(() => {
+      id = Number(db.prepare('INSERT INTO articoli (codice,nome,cat_id,um,note) VALUES (?,?,?,?,?)').run(codice, nome, src.cat_id, 'pz', src.note || '').lastInsertRowid);
+      if (def) db.prepare('INSERT INTO flightcase_def (art_id, art_id_contenuto, qty_max, qty_caricata) VALUES (?,?,?,0)').run(id, def.art_id_contenuto, def.qty_max);
+      for (const v of strutt) db.prepare('INSERT INTO flck_voci (flck_art_id,art_id,qty_max,qty_caricata) VALUES (?,?,?,0)').run(id, v.art_id, v.qty_max);
+      db.prepare('INSERT INTO stock (art_id,mag_id,qty) VALUES (?,?,1)').run(id, magId);
+      db.prepare('INSERT INTO spostamenti (art_id,mag_from,mag_to,qty,tipo,note,data,user_id) VALUES (?,NULL,?,?,?,?,?,?)')
+        .run(id, magId, 1, 'carico', `Duplicato da: ${src.nome} (${src.codice})`, data, uid);
+    })();
+    res.json({ ok: true, id, codice, nome, saltate: voci.length - strutt.length });
+  } catch (e) { res.status(400).json({ error: safeErr(e, 'POST duplica') }); }
 });
 
 // ─── FLIGHT CASE ───
