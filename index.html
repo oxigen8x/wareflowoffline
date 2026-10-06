@@ -251,7 +251,7 @@ body.dark[data-theme="red"]{background:linear-gradient(160deg,#141414 0%,#0f0f0f
 .bt-chip.no{border:1px dashed var(--amber);color:var(--amber);}
 .bt-del{width:28px;height:28px;padding:0;border-radius:8px;border:1px solid rgba(220,38,38,.3);background:var(--bg);color:var(--red);font-size:12px;cursor:pointer;flex-shrink:0;}
 .bt-card .bt-del{position:absolute;top:10px;right:10px;z-index:2;}
-.bt-pos{position:absolute;left:10px;top:10px;max-width:calc(100% - 90px);font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:7px;background:var(--surface);border:1px solid var(--mc);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bt-pos{position:absolute;left:12px;bottom:7px;max-width:calc(100% - 24px);font-size:10.5px;font-weight:500;color:color-mix(in srgb,var(--bc) 55%,var(--ink3));opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .bt-pos2{font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:7px;border:1px solid var(--mc);color:var(--ink);white-space:nowrap;max-width:30%;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;}
 .bt-rl{display:none;font-size:11.5px;font-weight:400;color:var(--ink3);overflow:hidden;text-overflow:ellipsis;}
 .bt-del.off{opacity:.3;cursor:default;}
@@ -6000,7 +6000,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 22;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 23;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
@@ -6706,7 +6706,7 @@ function _btRender(grid, items, vuoto) {
   grid.className = list ? 'bt-list' : 'bt-grid';
   grid.innerHTML = items.map(i => list
     ? (p => `<div class="bt-row" style="--bc:${i.col}" onclick="${i.onOpen}"><i class="bt-dot"></i><span class="bt-rn"><span>${h(i.nome)}</span>${p ? `<span class="bt-rl">📍 ${p.nome}</span>` : ''}</span><span class="bt-rc">${cod(i)}</span>${p ? `<span class="bt-pos2" style="--mc:${p.col}">${p.ic} ${p.nome}</span>` : ''}${chip(i)}${dup(i)}${del(i)}</div>`)(pos(i))
-    : (p => `<div class="bt-card" style="--bc:${i.col}" onclick="${i.onOpen}">${dup(i)}${del(i)}<div class="bt-band">${p ? `<span class="bt-pos" style="--mc:${p.col}">${p.ic} ${p.nome}</span>` : ''}${_BT_SVG}</div><div class="bt-foot"><div class="bt-txt"><div class="bt-nome">${h(i.nome)}</div><div class="bt-cod">${cod(i)}</div></div>${chip(i)}</div></div>`)(pos(i))
+    : (p => `<div class="bt-card" style="--bc:${i.col}" onclick="${i.onOpen}">${dup(i)}${del(i)}<div class="bt-band">${p ? `<span class="bt-pos">${p.ic} ${p.nome}</span>` : ''}${_BT_SVG}</div><div class="bt-foot"><div class="bt-txt"><div class="bt-nome">${h(i.nome)}</div><div class="bt-cod">${cod(i)}</div></div>${chip(i)}</div></div>`)(pos(i))
   ).join('');
 }
 
