@@ -674,9 +674,22 @@ textarea.finput{resize:vertical;min-height:60px;}
 .print-sl .tk.on{color:var(--teal-dark);}
 .print-hint{font-size:11.5px;color:var(--ink3);margin:6px 2px 0;}
 @media(max-width:768px){.print-sl{width:180px;}}
-.flck-voce{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 4px;border-bottom:0.5px solid var(--border)}
-.flck-voce-nome{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px}
-.flck-voce-az{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+/* Riga di contenuto di FLC/FLCK: codice + nome, barra di riempimento, disponibilità, azioni */
+.cr{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:6px 4px;border-bottom:0.5px solid var(--border)}
+.cr:last-child{border-bottom:0}
+.cr-main{flex:1;min-width:190px}
+.cr-top{display:flex;align-items:center;gap:8px;font-size:13px;line-height:1.3}
+.cr-sub{display:flex;align-items:center;gap:8px;margin-top:2px;font-size:11px;color:var(--ink3)}
+.cr-bar{flex:0 1 150px;height:4px;border-radius:99px;background:var(--bg2);overflow:hidden}
+.cr-bar i{display:block;height:100%;border-radius:99px;transition:width .3s}
+.cr-bar i.full{background:var(--green)}
+.cr-bar i.part{background:var(--amber)}
+.cr-n{font-family:'DM Mono',monospace;color:var(--ink2)}
+.cr-az{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.cr-stp{display:inline-flex;border:1px solid var(--border2);border-radius:8px;overflow:hidden;background:var(--surface)}
+.cr-stp button{width:26px;border:0;background:var(--surface2);color:var(--ink2);font-size:15px;cursor:pointer}
+.cr-stp input{width:38px;border:0;text-align:center;font:600 13px 'DM Sans',sans-serif;color:var(--ink);background:transparent;-moz-appearance:textfield}
+.cr-stp input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .flck-pz{display:flex;align-items:center;gap:8px;padding:7px 4px;border-bottom:0.5px solid var(--border);cursor:pointer;font-size:13px}
 
 .cv-tiles{display:flex;flex-wrap:wrap;gap:8px}
@@ -1794,16 +1807,10 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
             <span id="flcDetCodice"></span>
             <span id="flcDetBadge" class="baule-badge" style="margin-left:auto"></span>
           </div>
-          <div class="card" style="max-width:680px">
+          <div class="card" style="max-width:760px">
             <div class="card-head"><span class="card-title">Contenuto</span></div>
             <div class="card-body" style="padding-bottom:4px">
-              <div id="flcContInfo" style="margin-bottom:12px"></div>
-              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-                <span style="font-size:12px;color:var(--ink2)">Quantità da caricare/scaricare:</span>
-                <input type="number" class="finput" id="flcQtyAction" min="1" value="1" style="width:72px" autocomplete="off">
-                <button class="btn btn-dark" onclick="caricaFlc()">↓ Carica</button>
-                <button class="btn btn-ghost" onclick="scaricaFlc()">↑ Scarica</button>
-              </div>
+              <div id="flcContInfo"></div>
               <div id="flcStockInfo" style="margin-top:10px;font-size:11px;color:var(--ink3)"></div>
             </div>
           </div>
@@ -6006,7 +6013,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 25;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 26;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
@@ -6728,6 +6735,23 @@ function renderFlc() {
 
 let _flcCorrente = null;
 
+// Riga di contenuto (FLC e FLCK): max assente = nessuna barra (pezzi univoci); disp assente = nessuna disponibilità
+function _contRiga({ cod, colore, nome, qty, max, disp, azioni }) {
+  const pct = max > 0 ? Math.round(qty / max * 100) : 0;
+  const stato = pct >= 100 ? 'full' : pct > 0 ? 'part' : '';
+  const sub = (max ? `<div class="cr-bar"><i class="${stato}" style="width:${pct}%"></i></div><span class="cr-n">${qty}/${max}</span>` : '')
+    + (disp != null ? `<span>${disp} disp.</span>` : '');
+  return `<div class="cr"><div class="cr-main"><div class="cr-top">${codiceBadge(cod, colore)} ${nome}</div>${sub ? `<div class="cr-sub">${sub}</div>` : ''}</div><div class="cr-az">${azioni}</div></div>`;
+}
+// Quantità con − / + (l'input resta leggibile da caricaFlc / caricaVoceFlck)
+function _contQty(id) {
+  return `<div class="cr-stp"><button type="button" onclick="_stepQty('${id}',-1)">−</button><input type="number" id="${id}" min="1" value="1" autocomplete="off"><button type="button" onclick="_stepQty('${id}',1)">+</button></div>`;
+}
+function _stepQty(id, d) {
+  const i = document.getElementById(id);
+  i.value = Math.max(1, (parseInt(i.value) || 1) + d);
+}
+
 function apriFlc(id) {
   const fc = D.flightcase.find(x => x.id === id);
   if (!fc) return;
@@ -6747,32 +6771,21 @@ function renderFlcDettaglio() {
     : `<span class="baule-badge vuoto">vuoto</span>`;
   document.getElementById('flcDetBadge').innerHTML = badge;
 
-  const barPct = fc.qty_max > 0 ? Math.round((fc.qty_caricata / fc.qty_max) * 100) : 0;
-  const barColor = barPct >= 100 ? 'var(--green)' : barPct > 0 ? 'var(--amber)' : 'var(--border)';
-  document.getElementById('flcContInfo').innerHTML = `
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-      <span style="font-size:13px;font-weight:600;color:var(--ink)">Articolo:</span>
-      <span style="font-size:13px">${fc.art_contenuto_codice ? `<span style="font-family:'DM Mono',monospace;font-size:11px;background:${fc.art_contenuto_cat_colore||'#999'}22;color:${fc.art_contenuto_cat_colore||'#999'};padding:2px 6px;border-radius:4px;margin-right:6px">${h(fc.art_contenuto_codice)}</span>` : ''}${h(fc.art_contenuto_nome||'—')}${noteBtn(fc.art_id_contenuto)}</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
-      <span style="font-size:12px;color:var(--ink2)">Caricati: <strong>${fc.qty_caricata}</strong> / ${fc.qty_max}</span>
-    </div>
-    <div style="background:var(--surface2);border-radius:4px;height:8px;overflow:hidden;max-width:300px">
-      <div style="background:${barColor};height:100%;width:${barPct}%;border-radius:4px;transition:width .3s"></div>
-    </div>
-  `;
-
   const fcStockEntries = D.stock.filter(s => s.art_id === fc.id && s.qty > 0);
   const magReale = fcStockEntries.find(s => !getMag(s.mag_id)?.virtuale);
+  const artStockInMag = magReale ? getStock(fc.art_id_contenuto, magReale.mag_id) : 0;
+  document.getElementById('flcContInfo').innerHTML = _contRiga({
+    cod: fc.art_contenuto_codice, colore: fc.art_contenuto_cat_colore, nome: `<strong>${h(fc.art_contenuto_nome || '—')}</strong>`,
+    qty: fc.qty_caricata, max: fc.qty_max, disp: artStockInMag,
+    azioni: _contQty('flcQtyAction') + `<button class="btn btn-dark btn-xs" onclick="caricaFlc()">↓ Carica</button><button class="btn btn-ghost btn-xs" onclick="scaricaFlc()">↑ Scarica</button>`
+  });
+
   if (magReale) {
-    const artStockInMag = getStock(fc.art_id_contenuto, magReale.mag_id);
     const magNome = getMag(magReale.mag_id)?.nome || '—';
     document.getElementById('flcStockInfo').innerHTML = `📍 Il case è in <strong>${h(magNome)}</strong> — ${h(fc.art_contenuto_nome||'articolo')}: <strong>${artStockInMag}</strong> disponibili nello stesso magazzino`;
   } else {
     document.getElementById('flcStockInfo').innerHTML = `⚠️ Il flight case non è in nessun magazzino reale`;
   }
-  document.getElementById('flcQtyAction').value = '1';
-  document.getElementById('flcQtyAction').max = fc.qty_max;
 }
 
 function chiudiFlcDettaglio() {
@@ -6916,15 +6929,11 @@ function renderFlckDettaglio() {
       ? (v.qty_caricata > 0
           ? `<span class="var-chip">dentro</span> <button class="btn btn-ghost btn-xs" onclick="scaricaVoceFlck(${v.id},1)">↑ Scarica</button>`
           : `<span style="font-size:11px;color:var(--ink3)">${disp ? 'qui in magazzino' : 'fuori'}</span> <button class="btn btn-dark btn-xs" ${disp ? '' : 'disabled style="opacity:.4"'} onclick="caricaVoceFlck(${v.id},1)">↓ Carica</button>`)
-      : `<span style="font-family:'DM Mono',monospace;font-size:12px;margin-right:6px">${v.qty_caricata}/${v.qty_max}</span>
-         <input type="number" class="finput" id="flckQ-${v.id}" min="1" value="1" style="width:64px;padding:6px 8px" autocomplete="off">
-         <button class="btn btn-dark btn-xs" onclick="caricaVoceFlck(${v.id})">↓ Carica</button>
-         <button class="btn btn-ghost btn-xs" onclick="scaricaVoceFlck(${v.id})">↑ Scarica</button>
-         <span style="font-size:11px;color:var(--ink3)">(${disp} nel magazzino)</span>`;
-    const admin = `<button class="btn btn-ghost btn-xs" onclick="eliminaVoceFlck(${v.id})" title="Togli dalla definizione">✕</button>`
-      + (!pezzo ? ` <button class="btn btn-ghost btn-xs" onclick="modificaCapienzaFlck(${v.id})" title="Cambia capienza">✎</button>` : '');
-    return `<div class="flck-voce"><div class="flck-voce-nome">${codiceBadge(v.art_codice, v.art_cat_colore)} ${nome}</div>
-      <div class="flck-voce-az">${azioni} ${admin}</div></div>`;
+      : _contQty('flckQ-' + v.id)
+        + `<button class="btn btn-dark btn-xs" onclick="caricaVoceFlck(${v.id})">↓ Carica</button><button class="btn btn-ghost btn-xs" onclick="scaricaVoceFlck(${v.id})">↑ Scarica</button>`;
+    const admin = `<span style="white-space:nowrap"><button class="btn btn-ghost btn-xs" onclick="eliminaVoceFlck(${v.id})" title="Togli dalla definizione">✕</button>`
+      + (!pezzo ? ` <button class="btn btn-ghost btn-xs" onclick="modificaCapienzaFlck(${v.id})" title="Cambia capienza">✎</button>` : '') + '</span>';
+    return _contRiga({ cod: v.art_codice, colore: v.art_cat_colore, nome, qty: v.qty_caricata, max: pezzo ? null : v.qty_max, disp: pezzo ? null : disp, azioni: azioni + ' ' + admin });
   }).join('') : `<div class="empty" style="padding:18px">Nessun contenuto: aggiungi articoli o pezzi con "+ Contenuto"</div>`;
 }
 async function _flckRefresh() {
