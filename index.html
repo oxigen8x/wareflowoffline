@@ -1968,65 +1968,125 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
       <div style="max-width:720px;display:flex;flex-direction:column;gap:16px">
 
         <div class="card" style="border-top:5px solid var(--teal-dark)">
-          <div class="card-head"><span class="card-title">◈ Dashboard</span></div>
+          <div class="card-head"><span class="card-title">⬡ Magazzini</span></div>
           <div class="card-body" style="font-size:14px;line-height:1.7;color:var(--ink2);display:flex;flex-direction:column;gap:8px">
-            <p style="margin:0">Panoramica con i contatori e i <strong>tour attivi</strong>, con accesso rapido ai magazzini.</p>
+            <p style="margin:0">Visualizza tutti i magazzini con le loro giacenze. Clicca su una card per aprire il contenuto dettagliato del magazzino.</p>
+            <p style="margin:0">I magazzini hanno due tipi: <strong>Stabile</strong> (deposito fisso) e <strong>Tour</strong> (mezzo mobile). Per i magazzini di tipo Tour è disponibile una card dedicata nella sezione <strong>Spostamento</strong> che permette di trasferire tutto il contenuto in un'unica operazione.</p>
+            <p style="margin:0">Dal contenuto di un magazzino puoi usare il tasto <strong>⚡</strong> per aggiungere un articolo a una lista veloce.</p>
           </div>
         </div>
 
         <div class="card" style="border-top:5px solid var(--teal-dark)">
-          <div class="card-head"><span class="card-title">⬡ Magazzini</span></div>
-          <div class="card-body" style="font-size:14px;line-height:1.7;color:var(--ink2);display:flex;flex-direction:column;gap:8px">
-            <p style="margin:0">Ogni magazzino è un riquadro con il colore, la città e il totale dei pezzi, diviso in <strong>Stabili</strong> (depositi fissi) e <strong>Tour</strong> (mezzi mobili). Clicca sul riquadro per aprirne il contenuto.</p>
-            <ul style="padding-left:18px;margin:0;display:flex;flex-direction:column;gap:4px">
-              <li>Nel contenuto puoi filtrare per categoria, stampare l'elenco (diviso per categorie), togliere articoli dal magazzino con ✕ e, per i modelli con più pezzi, espandere la riga per vedere i singoli pezzi.</li>
-            </ul>
+          <div class="card-head"><span class="card-title">⇄ Spostamento</span></div>
+          <div class="card-body" style="font-size:14px;line-height:1.7;color:var(--ink2);display:flex;flex-direction:column;gap:10px">
+            <p style="margin:0">Sposta la merce da un magazzino a un altro.</p>
+            <ol style="padding-left:18px;margin:0;display:flex;flex-direction:column;gap:4px">
+              <li>Seleziona il magazzino di partenza (<strong>Da</strong>) e quello di destinazione (<strong>A</strong>) — tramite la mappa visiva o i menu a tendina. Non è possibile selezionare lo stesso magazzino come partenza e destinazione.</li>
+              <li>Filtra per magazzino o categoria per trovare l'articolo più velocemente.</li>
+              <li>Seleziona l'articolo — comparirà un riquadro di conferma con codice e nome.</li>
+              <li>Inserisci la quantità — usa <strong>MAX</strong> per spostare tutto il disponibile.</li>
+              <li>Clicca <strong>⇄ Registra spostamento</strong>.</li>
+            </ol>
+            <p style="margin:0;background:var(--teal-bg);border:1px solid var(--teal-border);border-radius:6px;padding:9px 13px;font-size:13px">
+              🚛 <strong>Trasferisci tutto</strong> — se sono presenti magazzini di tipo Tour, compare una card dedicata. Seleziona il magazzino Tour di partenza e la destinazione, poi premi il tasto per spostare l'intero contenuto in una sola operazione. Tutti gli spostamenti vengono raggruppati nello storico come una singola operazione annullabile.
+            </p>
           </div>
         </div>
 
+        <div class="card" style="border-top:5px solid var(--teal-dark)">
+          <div class="card-head"><span class="card-title">☰ Liste di carico</span></div>
+          <div class="card-body" style="font-size:14px;line-height:1.7;color:var(--ink2);display:flex;flex-direction:column;gap:10px">
+            <p style="margin:0">Le liste di carico permettono di pianificare il prelievo di articoli da uno o più magazzini verso una destinazione.</p>
+            <ol style="padding-left:18px;margin:0;display:flex;flex-direction:column;gap:4px">
+              <li>Crea una nuova lista con <strong>+ Nuova lista</strong>, scegli il tipo <strong>Normale</strong> e imposta il magazzino di destinazione.</li>
+              <li>Aggiungi articoli con il tasto <strong>+ articolo</strong> — scegli la quantità richiesta.</li>
+              <li>Apri la lista e per ogni articolo espandi la riga per vedere la distribuzione dello stock nei magazzini. Usa i tasti <strong>+</strong> e <strong>−</strong> per flaggare quanti pezzi stai prelevando da ogni magazzino.</li>
+              <li>Quando tutti gli articoli sono coperti la lista diventa <strong>completa</strong>. La pagina Liste le mostra divise per stato (in preparazione, pronte, eseguite) e, sulla Dashboard, quelle in preparazione hanno il tasto <strong>Continua</strong>.</li>
+              <li>Premi <strong>⇄ Esegui</strong> per registrare tutti gli spostamenti verso la destinazione.</li>
+              <li>Con <strong>🖨 stampa</strong> ottieni l'elenco della lista con gli articoli <strong>divisi per categoria</strong> (anche la stampa del contenuto di un magazzino è divisa per categoria).</li>
+            </ol>
+            <p style="margin:0;background:var(--teal-bg);border:1px solid var(--teal-border);border-radius:6px;padding:9px 13px;font-size:13px">
+              💡 Nello <strong>Storico</strong> gli spostamenti generati da una lista appaiono raggruppati in una riga espandibile con etichetta <em>spostamento lista</em>. Gli admin possono annullarli con il tasto <strong>↩ Annulla</strong>.
+            </p>
+          </div>
+        </div>
 
+        <div class="card" style="border-top:5px solid var(--teal-dark)">
+          <div class="card-head"><span class="card-title">⚡ Liste veloci</span></div>
+          <div class="card-body" style="font-size:14px;line-height:1.7;color:var(--ink2);display:flex;flex-direction:column;gap:10px">
+            <p style="margin:0">Le liste veloci sono liste temporanee pensate per preparazioni rapide. Si comportano come le liste normali, con due differenze:</p>
+            <ol style="padding-left:18px;margin:0;display:flex;flex-direction:column;gap:4px">
+              <li>Gli articoli si aggiungono <strong>solo</strong> dal tasto <strong>⚡</strong> nel contenuto di un magazzino (il numero sul tasto indica quanti pezzi di quell'articolo sono già in lista) — non dal tasto "+ articolo" interno.</li>
+              <li>Dopo l'esecuzione degli spostamenti la lista viene <strong>eliminata automaticamente</strong> — non rimane nello storico delle liste.</li>
+            </ol>
+            <p style="margin:0">Per creare una lista veloce usa <strong>+ Nuova lista</strong> e seleziona il tipo <strong>Veloce</strong>.</p>
+          </div>
+        </div>
 
         <div class="card" style="border-top:5px solid var(--teal-dark)">
           <div class="card-head"><span class="card-title">◻ Articoli</span></div>
           <div class="card-body" style="font-size:14px;line-height:1.7;color:var(--ink2);display:flex;flex-direction:column;gap:8px">
-            <p style="margin:0">Catalogo con le giacenze per magazzino. Filtra per codice, nome, categoria o magazzino. Su smartphone tocca ▼ per espandere la riga. I modelli con varianti (es. taglie, colori) compaiono come un solo gruppo con i singoli pezzi.</p>
+            <p style="margin:0">Elenco completo degli articoli del catalogo con le rispettive giacenze per ogni magazzino.</p>
+            <p style="margin:0">Su smartphone tocca il tasto <strong>▼</strong> a sinistra del nome per espandere la riga e vedere le quantità per deposito. Usa i filtri in alto per cercare per codice, nome, categoria o magazzino.</p>
           </div>
         </div>
 
+        <div class="card" style="border-top:5px solid var(--teal-dark)">
+          <div class="card-head"><span class="card-title">≡ Storico</span></div>
+          <div class="card-body" style="font-size:14px;line-height:1.7;color:var(--ink2);display:flex;flex-direction:column;gap:8px">
+            <p style="margin:0">Registro completo di tutti i movimenti effettuati. Filtra per tipo di operazione, magazzino o utente, oppure cerca un articolo specifico.</p>
+            <p style="margin:0">Le operazioni di massa — svuotamento Tour, trasferimento Tour e liste di carico — appaiono come <strong>righe raggruppate espandibili</strong>. Gli admin possono annullare un'intera operazione con il tasto <strong>↩ Annulla</strong>.</p>
+          </div>
+        </div>
 
         <div class="card" style="border-top:5px solid var(--teal-dark)">
           <div class="card-head"><span class="card-title">▦ Stock</span></div>
           <div class="card-body" style="font-size:14px;line-height:1.7;color:var(--ink2);display:flex;flex-direction:column;gap:8px">
-            <p style="margin:0">Una riga per articolo: le <strong>pill</strong> indicano quanti pezzi ci sono in ogni magazzino, a destra il totale. Se parte dei pezzi è dentro baule o case, espandi la riga per il dettaglio. Filtra per categoria o magazzino.</p>
+            <p style="margin:0">Panoramica completa delle giacenze: per ogni articolo puoi vedere quanti pezzi sono presenti in ogni magazzino.</p>
+            <p style="margin:0">Usa i filtri per <strong>categoria</strong> e <strong>magazzino</strong> per restringere la visualizzazione e trovare rapidamente quello che cerchi.</p>
           </div>
         </div>
 
-        <div class="card" style="border-top:5px solid var(--teal-dark)">
-          <div class="card-head"><span class="card-title">📦 Bauli, Flight Case e Flightcase K</span></div>
+        <div class="card" style="border-top:5px solid #92400e">
+          <div class="card-head"><span class="card-title">📦 Bauli</span></div>
           <div class="card-body" style="font-size:14px;line-height:1.7;color:var(--ink2);display:flex;flex-direction:column;gap:8px">
-            <p style="margin:0">Tre schede nella sezione <strong>Bauli e FLC</strong>. Ogni elemento è un riquadro con una fascia del <strong>colore della sua categoria</strong>; clicca per aprirlo, <strong>✕</strong> in alto a destra per eliminarlo. Con il tasto vista passi dai riquadri a una lista compatta (comoda se sono tanti).</p>
-            <ul style="padding-left:18px;margin:0;display:flex;flex-direction:column;gap:4px">
-              <li><strong>Baule</strong>: contenitore con voci libere (nome + quantità) per materiale non catalogato.</li>
-              <li><strong>Flight Case (FLC)</strong>: dedicato a un articolo, con capienza massima. Caricare/scaricare sposta i pezzi tra magazzino e case; nella finestra di creazione puoi <strong>cercare</strong> l'articolo.</li>
-              <li><strong>Flightcase K</strong>: contiene più voci, a quantità o pezzi con varianti; anche qui «Aggiungi contenuto» ha la ricerca.</li>
-              <li>Si spostano come gli altri articoli e spostando un case si spostano anche i pezzi contenuti.</li>
-            </ul>
+            <p style="margin:0">I bauli sono contenitori fisici per materiale non catalogato come articolo (attrezzi, minuteria, consumabili). Ogni baule è un articolo speciale della categoria <strong>BAU</strong> e viene gestito nella sezione <strong>Bauli e FLC</strong>.</p>
+            <p style="margin:0">Nella sezione <strong>Bauli e FLC</strong> ogni elemento è un <strong>riquadro</strong> con una fascia del <strong>colore della sua categoria</strong>: clicca sul riquadro per aprirlo, usa la <strong>✕</strong> in alto a destra per eliminarlo e il tasto vista per passare a una <strong>lista compatta</strong> (utile quando sono molti). Le tre schede sono Bauli, Flight Case e Flightcase K.</p>
+            <p style="margin:0">All'interno di ogni baule puoi definire una <strong>lista di voci</strong> libere (nome + quantità) che descrivono il contenuto reale. Le voci non sono articoli del catalogo — sono semplici righe di testo.</p>
+            <p style="margin:0">I bauli si spostano come qualsiasi articolo nella sezione Spostamento, e compaiono nelle liste di carico. Nella sezione Articoli sono visibili con un badge <span style="background:#92400e22;color:#92400e;border:1px solid #92400e44;padding:0 4px;border-radius:3px;font-size:11px">baule</span> accanto al nome.</p>
           </div>
         </div>
 
-        <div class="card" style="border-top:5px solid var(--teal-dark)">
-          <div class="card-head"><span class="card-title">🧭 Uso dell'app</span></div>
-          <div class="card-body" style="font-size:14px;line-height:1.7;color:var(--ink2);display:flex;flex-direction:column;gap:8px">
-            <ul style="padding-left:18px;margin:0;display:flex;flex-direction:column;gap:4px">
-              <li>Il tasto <strong>«</strong> in alto nel menu riduce la barra laterale alle sole icone (su desktop e tablet/telefono in orizzontale); <strong>»</strong> la riapre. La scelta viene ricordata.</li>
-              <li>Il tasto <strong>indietro</strong> del browser o del mouse torna alla schermata precedente (chiude prima finestre e dettagli aperti) senza uscire dall'app.</li>
-              <li>Tema e modalità chiara/scura si cambiano dal menu.</li>
-            </ul>
+        <div class="card" style="border-top:5px solid #6b4c6e">
+          <div class="card-head"><span class="card-title">🔒 Flight Case</span></div>
+          <div class="card-body" style="font-size:14px;line-height:1.7;color:var(--ink2);display:flex;flex-direction:column;gap:10px">
+            <p style="margin:0">I Flight Case (FLC) sono contenitori rigidi dedicati a un <strong>tipo specifico di articolo</strong> del catalogo. A differenza dei bauli, un FLC ha una capienza massima e traccia quanti pezzi dell'articolo associato sono stati fisicamente caricati al suo interno.</p>
+            <ol style="padding-left:18px;margin:0;display:flex;flex-direction:column;gap:4px">
+              <li><strong>Crea</strong> un FLC nella sezione Bauli e FLC → tab Flight Case → <strong>+ Flight Case</strong>.</li>
+              <li>Scegli il <strong>magazzino</strong> di appartenenza, l'<strong>articolo contenuto</strong> e la <strong>capienza massima</strong>. Per trovare l'articolo usa il filtro <strong>categoria</strong> e il campo di <strong>ricerca</strong> sopra il menu.</li>
+              <li>Apri il dettaglio del FLC per <strong>caricare</strong> o <strong>scaricare</strong> pezzi — il caricamento scala lo stock dell'articolo nel magazzino, lo scaricamento lo ripristina.</li>
+              <li>Quando sposti un FLC caricato in un altro magazzino, il sistema registra automaticamente anche lo spostamento degli articoli contenuti.</li>
+            </ol>
+            <p style="margin:0;background:#6b4c6e12;border:1px solid #6b4c6e33;border-radius:6px;padding:9px 13px;font-size:13px">
+              📋 Nella sezione Articoli i FLC sono visibili con un badge <span style="background:#6b4c6e22;color:#6b4c6e;border:1px solid #6b4c6e44;padding:0 4px;border-radius:3px;font-size:11px">case</span> che mostra l'articolo contenuto e il rapporto caricati/capienza. I bauli e i FLC non possono essere creati o caricati dalla sezione Articoli — si gestiscono esclusivamente dalla loro sezione dedicata.
+            </p>
           </div>
         </div>
+
+        <div class="card" style="border-top:5px solid #6b4c6e">
+          <div class="card-head"><span class="card-title">🧰 Flightcase K</span></div>
+          <div class="card-body" style="font-size:14px;line-height:1.7;color:var(--ink2);display:flex;flex-direction:column;gap:10px">
+            <p style="margin:0">Il Flightcase K (FLCK) è un contenitore che può ospitare <strong>più voci diverse</strong>, non un solo articolo. Si gestisce dalla scheda <strong>Flightcase K</strong> della sezione Bauli e FLC.</p>
+            <ol style="padding-left:18px;margin:0;display:flex;flex-direction:column;gap:4px">
+              <li>Crea il flightcase con <strong>+ Flightcase K</strong> e aprilo cliccando sul riquadro.</li>
+              <li>Con <strong>Aggiungi contenuto</strong> scegli il tipo: <strong>articolo a quantità</strong> (con capienza massima) oppure <strong>pezzi con varianti</strong> di un modello. In entrambi i casi puoi restringere la scelta con il filtro <strong>categoria</strong> e il campo di <strong>ricerca</strong>.</li>
+              <li>Carica e scarica i pezzi di ogni voce come per i Flight Case: lo stock del magazzino si aggiorna di conseguenza.</li>
+            </ol>
+          </div>
+        </div>
+
       </div>
     </div>
-
     <div class="page" id="page-admin">
       <div class="page-head">
         <div><div class="page-title">Utenti</div><div class="page-sub">Gestione accessi e ruoli</div></div>
@@ -2231,7 +2291,7 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
       </div>
       <div class="fgroup">
         <label>Articolo contenuto <span style="color:var(--red)">*</span></label>
-        <input type="text" class="finput sel-search" id="flcArtSearch" placeholder="🔍 Cerca codice o nome…" autocomplete="off" oninput="filtraSelect('flcArtContenuto',this.value)" style="margin-bottom:6px">
+        <div style="display:flex;gap:6px;margin-bottom:6px"><select class="finput" id="flcArtCat" onchange="filtraSelect('flcArtContenuto')" style="flex:0 0 42%"></select><input type="text" class="finput sel-search" id="flcArtSearch" placeholder="🔍 Cerca codice o nome…" autocomplete="off" oninput="filtraSelect('flcArtContenuto')" style="flex:1;min-width:0"></div>
         <select class="finput" id="flcArtContenuto">
           <option value="">— Seleziona articolo —</option>
         </select>
@@ -2534,11 +2594,11 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
       <div class="fgroup"><label>Tipo</label>
         <select class="finput" id="flckVoceTipo" onchange="onFlckVoceTipo()"><option value="q">Articolo a quantità</option><option value="p">Pezzi con varianti</option></select></div>
       <div id="flckVoceQ">
-        <div class="fgroup"><label>Articolo</label><input type="text" class="finput sel-search" id="flckVoceArtSearch" placeholder="🔍 Cerca codice o nome…" autocomplete="off" oninput="filtraSelect('flckVoceArt',this.value)" style="margin-bottom:6px"><select class="finput" id="flckVoceArt"></select></div>
+        <div class="fgroup"><label>Articolo</label><div style="display:flex;gap:6px;margin-bottom:6px"><select class="finput" id="flckVoceArtCat" onchange="filtraSelect('flckVoceArt')" style="flex:0 0 42%"></select><input type="text" class="finput sel-search" id="flckVoceArtSearch" placeholder="🔍 Cerca codice o nome…" autocomplete="off" oninput="filtraSelect('flckVoceArt')" style="flex:1;min-width:0"></div><select class="finput" id="flckVoceArt"></select></div>
         <div class="fgroup"><label>Capienza massima</label><input type="number" class="finput" id="flckVoceQtyMax" min="1" value="1" autocomplete="off"></div>
       </div>
       <div id="flckVoceP" style="display:none">
-        <div class="fgroup"><label>Modello</label><input type="text" class="finput sel-search" id="flckVoceModSearch" placeholder="🔍 Cerca modello…" autocomplete="off" oninput="filtraSelect('flckVoceMod',this.value)" style="margin-bottom:6px"><select class="finput" id="flckVoceMod" onchange="onFlckVoceMod()"></select></div>
+        <div class="fgroup"><label>Modello</label><div style="display:flex;gap:6px;margin-bottom:6px"><select class="finput" id="flckVoceModCat" onchange="filtraSelect('flckVoceMod')" style="flex:0 0 42%"></select><input type="text" class="finput sel-search" id="flckVoceModSearch" placeholder="🔍 Cerca modello…" autocomplete="off" oninput="filtraSelect('flckVoceMod')" style="flex:1;min-width:0"></div><select class="finput" id="flckVoceMod" onchange="onFlckVoceMod()"></select></div>
         <div id="flckVocePezzi" style="max-height:260px;overflow-y:auto"></div>
       </div>
     </div>
@@ -4742,15 +4802,26 @@ function renderStock() {
 }
 
 // ─── MODALS ───
-// Ricerca dentro un menu a tendina: nasconde le voci che non corrispondono; se resta una sola voce la seleziona
-function filtraSelect(selId, q) {
+// Ricerca + filtro categoria dentro un menu a tendina: nasconde le voci che non corrispondono; se resta una sola voce la seleziona
+const _SEL_FILTRI = { flcArtContenuto: ['flcArtCat', 'flcArtSearch'], flckVoceArt: ['flckVoceArtCat', 'flckVoceArtSearch'], flckVoceMod: ['flckVoceModCat', 'flckVoceModSearch'] };
+function _riempiCatSel(catId, selId) {   // categorie presenti nelle voci del menu
+  const c = document.getElementById(catId), sel = document.getElementById(selId); if (!c || !sel) return;
+  const ids = new Set([...sel.options].map(o => o.dataset.cat).filter(Boolean));
+  c.innerHTML = '<option value="">Tutte le categorie</option>' + D.categorie.filter(x => ids.has(String(x.id))).map(x => `<option value="${x.id}">${h(x.nome)}</option>`).join('');
+  const t = document.getElementById(_SEL_FILTRI[selId][1]); if (t) t.value = '';
+}
+function filtraSelect(selId) {
   const sel = document.getElementById(selId); if (!sel) return;
-  q = (q || '').trim().toLowerCase();
-  const opts = [...sel.options].filter(o => o.value !== '');
-  let vis = [];
-  opts.forEach(o => { const ok = !q || o.textContent.toLowerCase().includes(q); o.hidden = !ok; o.disabled = !ok; if (ok) vis.push(o); });
+  const [catId, txtId] = _SEL_FILTRI[selId];
+  const cat = document.getElementById(catId)?.value || '';
+  const q = (document.getElementById(txtId)?.value || '').trim().toLowerCase();
+  const vis = [];
+  [...sel.options].filter(o => o.value !== '').forEach(o => {
+    const ok = (!q || o.textContent.toLowerCase().includes(q)) && (!cat || o.dataset.cat === cat);
+    o.hidden = !ok; o.disabled = !ok; if (ok) vis.push(o);
+  });
   if (sel.selectedOptions[0] && sel.selectedOptions[0].disabled) sel.value = '';
-  if (q && vis.length === 1) sel.value = vis[0].value;
+  if ((q || cat) && vis.length === 1) sel.value = vis[0].value;
   if (sel.onchange) sel.onchange();
 }
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
@@ -5922,7 +5993,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 12;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 13;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
@@ -6660,8 +6731,8 @@ function openModalFlcNew() {
   const artFiltrati = D.articoli.filter(a => a.cat_id !== catBAU?.id && a.cat_id !== catFLC?.id && a.cat_id !== catFLCK?.id && !a.modello_id);
   const selArt = document.getElementById('flcArtContenuto');
   selArt.innerHTML = '<option value="">— Seleziona articolo —</option>' +
-    artFiltrati.map(a => `<option value="${a.id}">[${h(a.codice)}] ${h(a.nome)}${a.variante?' · '+h(a.variante):''}</option>`).join('');
-  const _fs=document.getElementById('flcArtSearch'); if(_fs) _fs.value='';
+    artFiltrati.map(a => `<option value="${a.id}" data-cat="${a.cat_id}">[${h(a.codice)}] ${h(a.nome)}${a.variante?' · '+h(a.variante):''}</option>`).join('');
+  _riempiCatSel('flcArtCat', 'flcArtContenuto');
   openModal('modalFlc');
 }
 
@@ -6831,11 +6902,12 @@ function openModalFlckVoce() {
   const giaQ = new Set(k.voci.map(v => v.art_id));
   document.getElementById('flckVoceArt').innerHTML = '<option value="">— Seleziona articolo —</option>' +
     getArtNormali().filter(a => !a.modello_id && !giaQ.has(a.id))
-      .map(a => `<option value="${a.id}">[${h(a.codice)}] ${h(a.nome)}</option>`).join('');
+      .map(a => `<option value="${a.id}" data-cat="${a.cat_id}">[${h(a.codice)}] ${h(a.nome)}</option>`).join('');
+  _riempiCatSel('flckVoceArtCat', 'flckVoceArt');
   document.getElementById('flckVoceMod').innerHTML = '<option value="">— Seleziona modello —</option>' +
-    (D.modelli || []).map(m => `<option value="${m.id}">${h(m.nome)}</option>`).join('');
+    (D.modelli || []).map(m => `<option value="${m.id}" data-cat="${m.cat_id}">${h(m.nome)}</option>`).join('');
+  _riempiCatSel('flckVoceModCat', 'flckVoceMod');
   document.getElementById('flckVocePezzi').innerHTML = '';
-  ['flckVoceArtSearch','flckVoceModSearch'].forEach(i=>{const e=document.getElementById(i); if(e) e.value='';});
   onFlckVoceTipo();
   openModal('modalFlckVoce');
 }
