@@ -6063,7 +6063,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 27;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 29;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
@@ -6253,7 +6253,7 @@ async function salvaCambiaPwd() {
 // ─── STAMPA ───
 // ─── STAMPE ───
 // Helper condivisi dalle stampe della lista di carico e del contenuto di un magazzino.
-const _PRINT_CSS = 'body{font-family:"Helvetica Neue",Arial,sans-serif;padding:32px;color:#1a1814;}h1{font-size:22px;margin-bottom:4px;}.sub{font-size:13px;color:#9a9287;margin-bottom:24px;}table{width:100%;border-collapse:collapse;font-size:12px;}th{background:#f4f1eb;padding:4px 8px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:#5a5449;border-bottom:1px solid #ddd9cf;}td{padding:4px 8px;border-bottom:0.5px solid #ede9e0;vertical-align:middle;}.foot{margin-top:32px;font-size:11px;color:#9a9287;border-top:1px solid #ede9e0;padding-top:12px;}tr.catrow td{background:#e9e4d8;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;padding:6px 8px;border-bottom:1px solid #ccc6b6;}tr.catrow span{float:right;font-family:monospace;}tr.catrow{break-after:avoid;}tr{break-inside:avoid;}@media print{body{padding:16px;}}';
+const _PRINT_CSS = 'body{font-family:"Helvetica Neue",Arial,sans-serif;padding:32px;color:#1a1814;}h1{font-size:22px;margin-bottom:4px;}.sub{font-size:13px;color:#9a9287;margin-bottom:24px;}table{width:100%;border-collapse:collapse;font-size:12px;}th{background:#f4f1eb;padding:4px 8px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:#5a5449;border-bottom:1px solid #ddd9cf;}td{padding:4px 8px;border-bottom:0.5px solid #ede9e0;vertical-align:middle;}.foot{margin-top:32px;font-size:11px;color:#9a9287;border-top:1px solid #ede9e0;padding-top:12px;}tr.catrow td{background:#e9e4d8;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;padding:6px 8px;border-bottom:1px solid #ccc6b6;}tr.catrow span{float:right;font-family:monospace;}tr.catrow{break-after:avoid;}tr{break-inside:avoid;}.bx{display:inline-block;width:11px;height:11px;border:1px solid #9a9287;border-radius:2px;vertical-align:middle}.q{text-align:right;white-space:nowrap;font-weight:700;width:60px}.q .um{font-weight:400;color:#9a9287;font-size:11px}.nm{font-size:14px}.cod{font-family:monospace;font-size:10px;font-weight:400;color:#8a8275}@media print{body{padding:16px;}}';
 const _cmpCodice = (x, y) => String(x || '').localeCompare(String(y || ''), 'it', { numeric: true });
 
 // Raggruppa i pezzi con varianti che hanno stesso modello e stessa variante (extra = chiave aggiuntiva, es. il case)
@@ -6303,14 +6303,20 @@ function _printTipoPill(artId) {
 }
 
 // Contenuto di baule / FLC / FLCK, in righe rientrate sotto il contenitore.
-// layout = ordine delle colonne della tabella: 'lista' (cod, nome, qtà, u.m., prelevato da) | 'mag' (cod, nome, categoria, qtà, u.m.)
-const _SUB_COLS = { lista: ['cod', 'nome', 'qty', 'um', ''], mag: ['cod', 'nome', '', 'qty', 'um'] };
-const _SUB_STILI = { cod: 'padding-left:22px;font-family:monospace;font-size:11px;color:#6b4c6e', nome: 'font-size:11px;color:#5a5449', qty: 'text-align:right;font-size:11px;font-weight:700', um: 'font-size:11px;color:#9a9287' };
+// layout = ordine delle colonne della tabella: 'lista' (casella, qtà, nome, prelevato da, cod) | 'mag' (casella, qtà, nome, cod)
+const _SUB_COLS = { lista: ['', 'qty', 'nome', '', 'cod'], mag: ['', 'qty', 'nome', 'cod'] };
+const _SUB_STILE = {
+  qty: 'font-size:12px;font-weight:600', nome: 'padding-left:14px;font-size:12px;color:#5a5449',
+  cod: 'text-align:right;font-family:monospace;font-size:10px;color:#8a8275'
+};
 function _printSubRow(layout, cod, nome, qty, um) {
-  const v = { cod: '↳ ' + h(cod || ''), nome, qty, um: h(um || 'pz') };
-  return '<tr style="background:#faf8f3">' + _SUB_COLS[layout].map(c => c ? `<td style="${_SUB_STILI[c]}">${v[c]}</td>` : '<td></td>').join('') + '</tr>';
+  const v = { qty: qty + (um ? ' <span class="um">' + h(um) + '</span>' : ''), nome: '↳ ' + nome, cod: h(cod || '') };
+  return '<tr style="background:#faf8f3">' + _SUB_COLS[layout].map(c => c ? `<td${c === 'qty' ? ' class="q"' : ''} style="${_SUB_STILE[c]}">${v[c]}</td>` : '<td></td>').join('') + '</tr>';
 }
-const _printSubNote = (layout, testo) => `<tr style="background:#faf8f3"><td></td><td colspan="${_SUB_COLS[layout].length - 1}" style="font-size:11px;color:#9a9287;font-style:italic;padding-left:22px">↳ ${testo}</td></tr>`;
+function _printSubNote(layout, testo) {
+  const cols = _SUB_COLS[layout], i = cols.indexOf('nome');
+  return `<tr style="background:#faf8f3">${'<td></td>'.repeat(i)}<td colspan="${cols.length - i}" style="font-size:11px;color:#9a9287;font-style:italic;padding-left:14px">↳ ${testo}</td></tr>`;
+}
 async function _printBauVoci(artIds) {     // voci dei bauli indicati: { artId: [voci] }
   const map = {};
   await Promise.all(artIds.filter(isBauleArt).map(async id => {
@@ -6354,7 +6360,7 @@ async function stampaTesto() {
     const its = r._items || [r];                       // nei gruppi di pezzi: righe e flag sommati
     const prese = new Map();                           // magazzino -> quantità da prelevare
     its.forEach(it => (it.flags || []).forEach(f => prese.set(f.mag_id, (prese.get(f.mag_id) || 0) + (+f.qty_presa || 0))));
-    const flags = [...prese].map(([mid, q]) => '<span style="font-size:11px;background:#f4f1eb;padding:1px 6px;border-radius:3px;margin-right:4px">' + h(getMag(mid)?.nome || '?') + ' <strong>' + q + '</strong></span>').join('');
+    const flags = [...prese].map(([mid, q]) => '<span style="font-size:11px;background:#f4f1eb;padding:1px 6px;border-radius:3px;margin-right:4px;white-space:nowrap;display:inline-block">' + h(getMag(mid)?.nome || '?') + ' <strong>' + q + '</strong></span>').join('');
     const magPresa = [...prese].filter(([, q]) => q > 0).map(([mid]) => String(mid));
     const case_ = new Map();                           // FLC/FLCK che contengono l'articolo (nei magazzini di prelievo, o in tutti se non ancora scelti)
     its.forEach(it => {
@@ -6362,13 +6368,13 @@ async function stampaTesto() {
       (magPresa.length ? magPresa : Object.keys(perMag)).forEach(mid => (perMag[mid]?.case || []).forEach(e => case_.set(e.id, e)));
     });
     const codice = r._grp ? modelloDi(getArt(r.art_id)).codice || r.art_codice : r.art_codice;
-    return '<tr><td style="font-family:monospace;font-weight:700">' + h(codice || '—') + '</td><td>' + (r._grp ? _grpNome(r) : h(r.art_nome || '—')) + _printCaseBadge([...case_.values()], false) + '</td><td style="text-align:right;font-weight:700;font-size:15px">' + r.qty_richiesta + '</td><td>' + h(r.art_um || 'pz') + '</td><td>' + (flags || '—') + '</td></tr>' + _printContenuto(r.art_id, bauVoci, 'lista');
+    return '<tr><td style="width:22px;padding-right:0"><span class="bx"></span></td><td class="q" style="font-size:16px">' + r.qty_richiesta + ' <span class="um">' + h(r.art_um || 'pz') + '</span></td><td class="nm">' + (r._grp ? _grpNome(r) : h(r.art_nome || '—')) + _printCaseBadge([...case_.values()], false) + '</td><td>' + (flags || '—') + '</td><td class="cod" style="text-align:right">' + h(codice || '—') + '</td></tr>' + _printContenuto(r.art_id, bauVoci, 'lista');
   };
   const righeGrp = _groupVar(righe, r => +r.qty_richiesta || 0, null);      // pezzi con varianti: una riga per modello+variante
   righeGrp.forEach(g => { if (g._grp) g.qty_richiesta = g._qty; });
   const rows = _catGroups(righeGrp, r => r.art_id).map(g => _printCatRow(g.cat, g.items.reduce((n, r) => n + (+r.qty_richiesta || 0), 0), 5) + g.items.map(rigaLista).join('')).join('');
   const now = new Date();
-  _printInFrame('<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><title>Lista — ' + h(lista.nome) + '</title><style>' + _PRINT_CSS + '</style></head><body><h1>' + h(lista.nome) + '</h1><div class="sub">' + righe.length + ' articoli' + dest + (lista.note ? ' · ' + h(lista.note) : '') + '</div><table><thead><tr><th>Codice</th><th>Articolo</th><th style="text-align:right">Qtà</th><th>U.M.</th><th>Prelevato da</th></tr></thead><tbody>' + rows + '</tbody></table><div class="foot">Stampato il ' + now.toLocaleDateString('it-IT') + ' alle ' + now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) + ' · WareFlow</div></body></html>');
+  _printInFrame('<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><title>Lista — ' + h(lista.nome) + '</title><style>' + _PRINT_CSS + '</style></head><body><h1>' + h(lista.nome) + '</h1><div class="sub">' + righe.length + ' articoli' + dest + (lista.note ? ' · ' + h(lista.note) : '') + '</div><table><thead><tr><th></th><th style="text-align:right">Qtà</th><th>Articolo</th><th>Prelevato da</th><th style="text-align:right">Codice</th></tr></thead><tbody>' + rows + '</tbody></table><div class="foot">Stampato il ' + now.toLocaleDateString('it-IT') + ' alle ' + now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) + ' · WareFlow</div></body></html>');
 }
 
 // Modalità di stampa del magazzino (cursore nel modale): tutto | articoli | contenitori
@@ -6401,17 +6407,16 @@ async function stampaMagDetail() {
     const a = getArt(s.art_id), special = isSpecialArt(s.art_id);
     const codice = s._grp ? modelloDi(a).codice || a?.codice : a?.codice;
     return `<tr${special ? ' style="background:#fdf8f0"' : ''}>
-      <td style="font-family:monospace;font-weight:700">${h(codice) || '—'}</td>
-      <td>${s._grp ? _grpNome(s) : (h(a?.nome) || '—')}${special ? _printTipoPill(s.art_id) : _printCaseBadge(_caseSum(s), true)}</td>
-      <td>${h(getCat(a?.cat_id)?.nome) || '—'}</td>
-      <td style="text-align:right;font-weight:700;font-size:16px">${s.qty}</td>
-      <td>${h(a?.um) || 'pz'}</td>
+      <td style="width:22px;padding-right:0"><span class="bx"></span></td>
+      <td class="q" style="font-size:16px">${s.qty} <span class="um">${h(a?.um) || 'pz'}</span></td>
+      <td class="nm">${s._grp ? _grpNome(s) : (h(a?.nome) || '—')}${special ? _printTipoPill(s.art_id) : _printCaseBadge(_caseSum(s), true)}</td>
+      <td class="cod" style="text-align:right">${h(codice) || '—'}</td>
     </tr>` + _printContenuto(s.art_id, bauVoci, 'mag');
   };
   // pezzi con varianti: una riga per modello+variante, separati tra liberi e dentro ciascun FLC/FLCK
   const righeGrp = _groupVar(righe, s => s.qty, s => (s._case || []).map(e => e.tipo + e.id).sort().join(','));
   righeGrp.forEach(g => { if (g._grp) g.qty = g._qty; });
-  const rows = _catGroups(righeGrp, s => s.art_id).map(g => _printCatRow(g.cat, g.items.reduce((n, s) => n + s.qty, 0), 5) + g.items.map(rigaMag).join('')).join('');
+  const rows = _catGroups(righeGrp, s => s.art_id).map(g => _printCatRow(g.cat, g.items.reduce((n, s) => n + s.qty, 0), 4) + g.items.map(rigaMag).join('')).join('');
   _printInFrame(`<!DOCTYPE html><html lang="it"><head>
     <meta charset="UTF-8">
     <title>Contenuto — ${h(m.nome)}</title>
@@ -6420,7 +6425,7 @@ async function stampaMagDetail() {
     <h1>${h(m.nome)}</h1>
     <div class="sub">${m.citta ? h(m.citta) + ' · ' : ''}${soloCont ? righe.length + ' contenitori' : totale + ' pezzi totali'}${soloArt ? ' · solo articoli' : ''}${soloCont ? ' · solo contenitori' : ''}${cf ? ' · filtro categoria attivo' : ''}</div>
     <table>
-      <thead><tr><th>Codice</th><th>Articolo</th><th>Categoria</th><th style="text-align:right">Qtà</th><th>U.M.</th></tr></thead>
+      <thead><tr><th></th><th style="text-align:right">Qtà</th><th>Articolo</th><th style="text-align:right">Codice</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
     <div class="totale">Totale: ${soloCont ? `<strong>${righe.length} contenitori</strong>` : `<strong>${totale} pezzi</strong> in ${righe.length} articoli`}</div>
