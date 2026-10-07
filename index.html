@@ -519,6 +519,7 @@ main{flex:1;padding:0;overflow-y:auto;}
 .btn-ghost{background:transparent;color:var(--ink2);border-color:transparent;}
 .btn-ghost:hover{background:var(--bg2);}
 .btn-danger{background:transparent;color:var(--red);border-color:rgba(220,38,38,.25);}
+.dlg-danger{background:var(--red);color:#fff;border-color:var(--red);}
 .btn-danger:hover{background:rgba(220,38,38,.06);}
 .btn-orange{background:transparent;color:var(--orange);border-color:rgba(234,88,12,.25);}
 .btn-orange:hover{background:rgba(234,88,12,.06);}
@@ -2189,6 +2190,18 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
 </div>
 
 <!-- iframe stampa nascosto -->
+<!-- Dialogo di conferma / richiesta di testo (al posto di confirm / prompt del browser) -->
+<div class="overlay" id="modalDialog" style="z-index:600" data-onclose="_dlgClosed">
+  <div class="modal modal-sm">
+    <div class="modal-title" id="dlgTitle"></div>
+    <div id="dlgMsg" style="font-size:14px;line-height:1.5;color:var(--ink2);white-space:pre-line;margin-top:-8px"></div>
+    <input class="finput" id="dlgInput" style="margin-top:14px" autocomplete="off">
+    <div class="modal-foot">
+      <button class="btn btn-outline" id="dlgCancel" onclick="closeModal('modalDialog')">Annulla</button>
+      <button class="btn btn-dark" id="dlgOk" onclick="_dlgOk()">Conferma</button>
+    </div>
+  </div>
+</div>
 <iframe id="printFrame" style="display:none" title="Stampa"></iframe>
 
 <!-- MODAL: DESTINAZIONE LISTA VELOCE -->
@@ -2846,7 +2859,7 @@ function sortBauliFirst(arr, artIdFn) {
 }
 // Helper DELETE con conferma e toast
 async function deleteConfirm(url, msg, successMsg, reloadFn) {
-  if (!confirm(msg)) return;
+  if (!await askConfirm(msg, { ok: 'Elimina', danger: true })) return;
   try { await apiFetch('DELETE', url); if(reloadFn) await reloadFn(); toast(successMsg); }
   catch(e) { toast(e.message||'Errore', true); }
 }
@@ -3487,7 +3500,7 @@ async function delArtDirect(id) {
 Verrà tolto da tutti i magazzini. Operazione irreversibile.`
                    : `Eliminare definitivamente "${a?.nome}"?
 Questa operazione è irreversibile.`;
-  if (!confirm(msg)) return;
+  if (!await askConfirm(msg, { ok: 'Elimina', danger: true })) return;
   try {
     await apiFetch('DELETE', `/articoli/${id}`);
     await loadPartial('articoli'); renderArticoli();
@@ -3499,9 +3512,9 @@ Questa operazione è irreversibile.`;
 async function togliDaMagazzino(artId, magId) {
   const a = getArt(artId), m = getMag(magId), q = getStock(artId, magId);
   if (!q) return;
-  if (!confirm(`Togliere ${q} ${a?.um||'pz'} di "${a?.nome}" da "${m?.nome}"?
+  if (!await askConfirm(`Togliere ${q} ${a?.um||'pz'} di "${a?.nome}" da "${m?.nome}"?
 
-L'articolo resta nel database: se non ha stock altrove lo trovi in Articoli > senza stock, dove puoi eliminarlo.`)) return;
+L'articolo resta nel database: se non ha stock altrove lo trovi in Articoli > senza stock, dove puoi eliminarlo.`, { ok: 'Togli', danger: true })) return;
   try {
     await apiFetch('POST', '/stock/scarica', { art_id: artId, mag_id: magId, qty: q, note: 'Rimosso dal magazzino' });
     await loadPartial('stock'); renderMagDetailTable(); renderPage(curPage);
@@ -3532,8 +3545,8 @@ async function salvaTrasferisciTutto() {
   const righe = D.stock.filter(s=>s.mag_id===magDaId&&s.qty>0);
   if(!righe.length) { toast('Il magazzino è già vuoto',true); return; }
   const magDa = getMag(magDaId), magA = getMag(magAId);
-  if(!confirm(`Trasferire tutto il contenuto di "${magDa.nome}" in "${magA.nome}"?
-${righe.length} tipo/i, ${righe.reduce((n,s)=>n+s.qty,0)} pezzi totali`)) return;
+  if(!await askConfirm(`Trasferire tutto il contenuto di "${magDa.nome}" in "${magA.nome}"?
+${righe.length} tipo/i, ${righe.reduce((n,s)=>n+s.qty,0)} pezzi totali`, { ok: 'Trasferisci' })) return;
   try {
     await apiFetch('POST','/spostamenti/batch',{
       spostamenti: righe.map(s=>({art_id:s.art_id,mag_from:magDaId,mag_to:magAId,qty:s.qty})),
@@ -3807,7 +3820,7 @@ function caricaModello(mid) {
 }
 async function eliminaModello(mid) {
   const m = getModello(mid); if (!m) return;
-  if (!confirm(`Eliminare l'articolo "${m.nome}"?\nNon ha ancora pezzi creati.`)) return;
+  if (!await askConfirm(`Eliminare l'articolo "${m.nome}"?\nNon ha ancora pezzi creati.`, { ok: 'Elimina', danger: true })) return;
   try {
     await apiFetch('DELETE', `/modelli/${mid}`);
     await loadPartial('articoli'); rerenderVarianti();
@@ -3867,7 +3880,7 @@ function cvRender() {
 }
 async function modificaVarianti(mid) {
   const m = getModello(mid); if (!m) return;
-  const r = prompt(`Varianti di "${m.nome}" (separate da virgola).\nUna variante usata da un pezzo non si può togliere.`, m.varianti.join(', '));
+  const r = await askPrompt(`Varianti di "${m.nome}" (separate da virgola).\nUna variante usata da un pezzo non si può togliere.`, m.varianti.join(', '));
   if (r === null) return;
   try {
     await apiFetch('PUT', `/modelli/${mid}`, { varianti: r.split(/[,;\n]/).map(x => x.trim()).filter(Boolean) });
@@ -4027,7 +4040,7 @@ async function svuotaMag(magId) {
   const righe=D.stock.filter(s=>s.mag_id==magId&&s.qty>0);
   if (!righe.length) { toast('Il magazzino è già vuoto',true); return; }
   const totPz=righe.reduce((n,s)=>n+s.qty,0);
-  if (!confirm(`Spostare tutto il contenuto di "${mag.nome}" nel Cestino?\n${righe.length} tipo/i, ${totPz} pezzi totali`)) return;
+  if (!await askConfirm(`Spostare tutto il contenuto di "${mag.nome}" nel Cestino?\n${righe.length} tipo/i, ${totPz} pezzi totali`, { ok: 'Sposta nel Cestino', danger: true })) return;
   try {
     await apiFetch('POST','/spostamenti/batch',{
       spostamenti: righe.map(s=>({art_id:s.art_id,mag_from:magId,mag_to:magVirt.id,qty:s.qty})),
@@ -4103,7 +4116,7 @@ async function salvaMag() {
   } catch(e) { toast(e.message||'Errore imprevisto — riprova', true); }
 }
 async function delMag(id) {
-  if (!confirm('Eliminare questo magazzino?')) return;
+  if (!await askConfirm('Eliminare questo magazzino?', { ok: 'Elimina', danger: true })) return;
   try { await apiFetch('DELETE',`/magazzini/${id}`); await loadPartial('magazzini'); renderMag(); toast('Eliminato'); }
   catch(e) {}
 }
@@ -4305,7 +4318,7 @@ async function mandaANonAssegnati(artId) {
   const a=getArt(artId);
   const righe=D.stock.filter(s=>s.art_id==artId&&s.mag_id!=magVirt.id&&s.qty>0);
   if (!righe.length) { toast('Nessuno stock da spostare',true); return; }
-  if (!confirm(`Spostare tutto lo stock di "${a?.nome}" nel Cestino?`)) return;
+  if (!await askConfirm(`Spostare tutto lo stock di "${a?.nome}" nel Cestino?`, { ok: 'Sposta nel Cestino', danger: true })) return;
   try {
     for (const s of righe)
       await apiFetch('POST','/spostamenti',{art_id:artId, mag_from:s.mag_id, mag_to:magVirt.id, qty:s.qty, note:'Spostato nel cestino', data:nowRoma()});
@@ -4315,7 +4328,7 @@ async function mandaANonAssegnati(artId) {
 }
 async function eliminaArtDefinitivo(artId) {
   const a=getArt(artId);
-  if (!confirm(`Eliminare definitivamente "${a?.nome}"?\nQuesta operazione è irreversibile.`)) return;
+  if (!await askConfirm(`Eliminare definitivamente "${a?.nome}"?\nQuesta operazione è irreversibile.`, { ok: 'Elimina', danger: true })) return;
   try {
     await apiFetch('DELETE',`/articoli/${artId}`);
     await loadPartial('articoli'); renderNonAssegnati();
@@ -4399,7 +4412,7 @@ async function salvaArt() {
   } catch(e) { toast(e.message||'Errore imprevisto — riprova', true); }
 }
 async function delArt(id) {
-  if (!confirm('Eliminare questo articolo?')) return;
+  if (!await askConfirm('Eliminare questo articolo?', { ok: 'Elimina', danger: true })) return;
   try { await apiFetch('DELETE',`/articoli/${id}`); await loadPartial('articoli'); renderArticoli(); toast('Eliminato'); }
   catch(e) {}
 }
@@ -4501,7 +4514,7 @@ async function salvaCat() {
   } catch(e) { toast(e.message||'Errore imprevisto — riprova', true); }
 }
 async function delCat(id) {
-  if(!confirm('Eliminare questa categoria?')) return;
+  if(!await askConfirm('Eliminare questa categoria?', { ok: 'Elimina', danger: true })) return;
   try { await apiFetch('DELETE',`/categorie/${id}`); await loadPartial('categorie'); renderCat(); toast('Eliminata'); }
   catch(e) {}
 }
@@ -4691,8 +4704,8 @@ async function undoBatch(batchId) {
   }
   const x = gruppo[0];
   const da = getMag(x.mag_from), av = getMag(x.mag_to);
-  const desc = `Annullare ${gruppo.length} spostamenti${da?' da '+h(da.nome):''}${av?' verso '+h(av.nome):''}?`;
-  if (!confirm(desc)) return;
+  const desc = `Annullare ${gruppo.length} spostamenti${da?' da '+da.nome:''}${av?' verso '+av.nome:''}?`;
+  if (!await askConfirm(desc)) return;
   const data = nowRoma();
   const note = `[ANNULLATO] ${x.note||''}`.trim();
   try {
@@ -4723,7 +4736,7 @@ async function undoStorico(spostId) {
   else if(x.tipo==='carico')  desc = `Annullare il carico di ${x.qty} "${a?.nome}" in ${av?.nome||'—'}?`;
   else if(x.tipo==='scarico') desc = `Annullare lo scarico di ${x.qty} "${a?.nome}" da ${da?.nome||'—'}?`;
   else desc = `Annullare questa operazione?`;
-  if(!confirm(desc + '\nViene registrato un movimento inverso nello storico.')) return;
+  if(!await askConfirm(desc + '\nViene registrato un movimento inverso nello storico.')) return;
   const data = nowRoma();
   try {
     if(x.tipo==='spostamento') {
@@ -4740,8 +4753,8 @@ async function undoStorico(spostId) {
 
 async function delArtNoStock(artId) {
   const a = getArt(artId);
-  if (!confirm(`Eliminare l'articolo "${a?.nome}"?
-Questa azione è irreversibile.`)) return;
+  if (!await askConfirm(`Eliminare l'articolo "${a?.nome}"?
+Questa azione è irreversibile.`, { ok: 'Elimina', danger: true })) return;
   try {
     await apiFetch('DELETE', `/articoli/${artId}`);
     await loadPartial('articoli');
@@ -4852,6 +4865,43 @@ function closeModal(id) {
   const cb = el.dataset.onclose;
   if (cb && typeof window[cb] === 'function') window[cb]();
 }
+
+// ─── DIALOGHI (al posto di confirm / prompt del browser) ───
+// askConfirm(msg, {ok, danger}) → true/false · askPrompt(msg, valore, {ok, type}) → testo oppure null
+// La prima riga del messaggio (se breve) diventa il titolo, le altre il testo.
+let _dlgDone = null, _dlgCancelVal = false;
+function _dlg(msg, { ok = 'Conferma', danger = false, prompt = null } = {}) {
+  _dlgEnd(_dlgCancelVal);                                    // una sola finestra alla volta
+  const righe = String(msg).split('\n'), breve = righe[0].length <= 90;
+  document.getElementById('dlgTitle').textContent = breve ? righe[0] : 'Conferma';
+  const corpo = document.getElementById('dlgMsg');
+  corpo.textContent = (breve ? righe.slice(1) : righe).join('\n').trim();
+  corpo.style.display = corpo.textContent ? '' : 'none';
+  const inp = document.getElementById('dlgInput');
+  inp.style.display = prompt ? '' : 'none';
+  if (prompt) { inp.type = prompt.type || 'text'; inp.value = prompt.value ?? ''; }
+  const btn = document.getElementById('dlgOk');
+  btn.textContent = ok;
+  btn.className = 'btn ' + (danger ? 'dlg-danger' : 'btn-dark');
+  _dlgCancelVal = prompt ? null : false;
+  openModal('modalDialog');
+  setTimeout(() => prompt ? (inp.focus(), inp.select()) : btn.focus(), 50);
+  return new Promise(res => { _dlgDone = res; });
+}
+function askConfirm(msg, opts) { return _dlg(msg, opts); }
+function askPrompt(msg, valore, { ok = 'Salva', type } = {}) { return _dlg(msg, { ok, prompt: { value: valore, type } }); }
+function _dlgEnd(v) { const f = _dlgDone; _dlgDone = null; if (f) f(v); }
+function _dlgOk() {
+  const inp = document.getElementById('dlgInput');
+  _dlgEnd(inp.style.display === 'none' ? true : inp.value);
+  closeModal('modalDialog');
+}
+function _dlgClosed() { _dlgEnd(_dlgCancelVal); }            // chiuso con Annulla, ✕, fuori dal riquadro o tasto indietro
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('modalDialog').classList.contains('open')) return;
+  if (e.key === 'Escape') closeModal('modalDialog');
+  else if (e.key === 'Enter' && document.activeElement?.id !== 'dlgCancel') { e.preventDefault(); _dlgOk(); }
+});
 
 // Click sull'overlay (fuori dal modal) chiude
 document.addEventListener('click', e => {
@@ -5661,7 +5711,7 @@ async function salvaLista() {
 }
 
 async function eliminaLista(id) {
-  if (!confirm('Eliminare questa lista?')) return;
+  if (!await askConfirm('Eliminare questa lista?', { ok: 'Elimina', danger: true })) return;
   await apiFetch('DELETE', '/liste/' + id);
   await loadPartial('spostamenti');
   renderListe();
@@ -5745,7 +5795,7 @@ async function salvaAggArt() {
 }
 
 async function modificaRiga(rigaId, qtyAttuare, noteRiga) {
-  const nuovaQty = prompt('Quantità richiesta:', qtyAttuare);
+  const nuovaQty = await askPrompt('Quantità richiesta:', qtyAttuare, { type: 'number' });
   if (nuovaQty === null) return;
   const qty = +nuovaQty;
   if (!qty || qty < 1) { toast('Quantità non valida', true); return; }
@@ -5759,7 +5809,7 @@ async function modificaRiga(rigaId, qtyAttuare, noteRiga) {
 }
 
 async function eliminaRiga(rigaId) {
-  if (!confirm('Rimuovere questo articolo dalla lista?')) return;
+  if (!await askConfirm('Rimuovere questo articolo dalla lista?', { ok: 'Rimuovi', danger: true })) return;
   await apiFetch('DELETE', `/liste/righe/${rigaId}`);
   const l = await apiFetch('GET', '/liste/' + _listaCorrente.id);
   _listaCorrente = l; renderDettaglioRighe(l);
@@ -5774,7 +5824,7 @@ async function _eseguiVeloce(destId, destNome) {
   const totPz = (lista.righe||[]).reduce((s,r) => s + (r.flags||[]).reduce((n,f) => n + (f.qty_presa>0?f.qty_presa:0), 0), 0);
   const nRighe = (lista.righe||[]).filter(r => (r.flags||[]).some(f => f.qty_presa>0)).length;
   const src = _listaSorgenti(lista).map(s => s.nome).join(', ');
-  if (!confirm(`Spostare ${totPz} pz (${nRighe} articoli) da "${src}" a "${destNome}"?`)) return;
+  if (!await askConfirm(`Spostare ${totPz} pz (${nRighe} articoli) da "${src}" a "${destNome}"?`, { ok: 'Sposta' })) return;
   try {
     const r = await apiFetch('POST', `/liste/${lista.id}/esegui`, { mag_dest_id: destId });
     await loadPartial('spostamenti');
@@ -5845,7 +5895,7 @@ async function eseguiLista() {
   const totFlag = (_listaCorrente.righe||[]).reduce((s,r) =>
     s + (r.flags||[]).reduce((n,f) => n + (destId && f.mag_id === destId ? 0 : f.qty_presa), 0), 0);
   const dest = _listaCorrente.mag_dest_nome || 'destinazione';
-  if (!confirm(`Eseguire ${totFlag} spostamenti verso "${dest}"?`)) return;
+  if (!await askConfirm(`Eseguire ${totFlag} spostamenti verso "${dest}"?`, { ok: 'Esegui' })) return;
   try {
     const r = await apiFetch('POST', `/liste/${_listaCorrente.id}/esegui`);
     await loadPartial('spostamenti');
@@ -6013,7 +6063,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 26;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 27;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
@@ -6045,7 +6095,7 @@ async function doLogout() { }
 // ─── ADMIN UTENTI ───
 // ─── ADMIN ───
 async function seedTestDB() {
-  if (!confirm('Attenzione: tutti i dati attuali (articoli, magazzini, stock, storico) saranno sostituiti con dati di test. Gli utenti rimarranno invariati. Continuare?')) return;
+  if (!await askConfirm('Attenzione: tutti i dati attuali (articoli, magazzini, stock, storico) saranno sostituiti con dati di test. Gli utenti rimarranno invariati. Continuare?', { ok: 'Sostituisci', danger: true })) return;
   const msg = document.getElementById('seedMsg');
   msg.style.display = '';
   msg.style.color = 'var(--ink2)';
@@ -6064,7 +6114,7 @@ async function seedTestDB() {
 async function importaDbEsterno(inp) {
   const f = inp.files && inp.files[0]; inp.value = '';
   if (!f) return;
-  if (!confirm('Importare "' + f.name + '"?\nTutti i dati attuali (articoli, magazzini, stock, case, bauli, liste, storico) saranno sostituiti.\nGli utenti restano invariati. Nello storico i movimenti fatti da utenti che qui non esistono compariranno come "iPad".\nÈ un caricamento temporaneo: su Render gratuito i dati non vengono conservati.')) return;
+  if (!await askConfirm('Importare "' + f.name + '"?\nTutti i dati attuali (articoli, magazzini, stock, case, bauli, liste, storico) saranno sostituiti.\nGli utenti restano invariati. Nello storico i movimenti fatti da utenti che qui non esistono compariranno come "iPad".\nÈ un caricamento temporaneo: su Render gratuito i dati non vengono conservati.', { ok: 'Importa', danger: true })) return;
   const msg = document.getElementById('seedMsg');
   msg.style.display = ''; msg.style.color = 'var(--ink2)'; msg.textContent = 'Importazione in corso...';
   try {
@@ -6085,7 +6135,7 @@ async function importaDbEsterno(inp) {
 }
 
 async function resetDB() {
-  if (!confirm('Ripristina i dati demo minimali? Tutti i dati attuali andranno persi.')) return;
+  if (!await askConfirm('Ripristina i dati demo minimali? Tutti i dati attuali andranno persi.', { ok: 'Ripristina', danger: true })) return;
   const msg = document.getElementById('seedMsg');
   msg.style.display = '';
   msg.style.color = 'var(--ink2)';
@@ -6173,11 +6223,11 @@ async function salvaResetPwd() {
   try { await apiFetch('POST','/admin/utenti/'+id+'/reset-password',{password}); closeModal('modalResetPwd'); toast('Password aggiornata ✓'); } catch(e){}
 }
 async function toggleAttivo(id,attivo) {
-  if(!confirm(attivo?'Disabilitare questo utente?':'Riabilitare questo utente?')) return;
+  if(!await askConfirm(attivo?'Disabilitare questo utente?':'Riabilitare questo utente?')) return;
   try { await apiFetch('PUT','/admin/utenti/'+id,{attivo:attivo?0:1}); await renderAdmin(); toast('Aggiornato ✓'); } catch(e){ toast(e.message||'Errore', true); }
 }
 async function delUtente(id,username) {
-  if(!confirm('Eliminare "'+username+'"? I movimenti saranno conservati.')) return;
+  if(!await askConfirm('Eliminare "'+username+'"? I movimenti saranno conservati.', { ok: 'Elimina', danger: true })) return;
   try { await apiFetch('DELETE','/admin/utenti/'+id); await renderAdmin(); toast('Eliminato ✓'); } catch(e){ toast(e.message||'Errore', true); }
 }
 
@@ -6630,7 +6680,7 @@ async function eliminaBaule(id) {
   const dove = D.stock.filter(s => s.art_id==id && s.qty>0).map(s => getMag(s.mag_id)?.nome).filter(Boolean).join(', ');
   let extra = isB ? '\nLe voci del baule verranno cancellate.' : '';
   if (!isB) { const fc = getFlightcaseDef(id); if (fc && fc.qty_caricata > 0) extra = `\nI ${fc.qty_caricata} pz di "${fc.art_contenuto_nome||'articolo'}" contenuti tornano in stock${dove ? ` in "${dove}"` : ''}.`; }
-  if (!confirm(`Eliminare definitivamente "${b.nome}" (${tipo})${dove ? `, presente in: ${dove}` : ''}?${extra}\nOperazione irreversibile.`)) return;
+  if (!await askConfirm(`Eliminare definitivamente "${b.nome}" (${tipo})${dove ? `, presente in: ${dove}` : ''}?${extra}\nOperazione irreversibile.`, { ok: 'Elimina', danger: true })) return;
   try {
     await apiFetch('DELETE', `/bauli/${id}`);
     await Promise.all([loadPartial('spostamenti'), _aggiornaBauliD()]);
@@ -6951,19 +7001,19 @@ async function scaricaVoceFlck(vid, pezzo) {
   try { await apiFetch('POST', `/flck/voci/${vid}/scarica`, { qty }); await _flckRefresh(); toast('Scaricato dal case ✓'); } catch (e) {}
 }
 async function eliminaVoceFlck(vid) {
-  if (!confirm('Togliere questo articolo dal contenuto del flightcase K?')) return;
+  if (!await askConfirm('Togliere questo articolo dal contenuto del flightcase K?', { ok: 'Togli', danger: true })) return;
   try { await apiFetch('DELETE', `/flck/voci/${vid}`); await _flckRefresh(); toast('Rimosso ✓'); } catch (e) {}
 }
 async function modificaCapienzaFlck(vid) {
   const v = (getFlck(_flckCorrente)?.voci || []).find(x => x.id === vid); if (!v) return;
-  const r = parseInt(prompt(`Capienza massima di "${v.art_nome}" (attualmente caricati: ${v.qty_caricata})`, v.qty_max));
+  const r = parseInt(await askPrompt(`Capienza massima di "${v.art_nome}" (attualmente caricati: ${v.qty_caricata})`, v.qty_max, { type: 'number' }));
   if (!r || r < 1) return;
   try { await apiFetch('PUT', `/flck/voci/${vid}`, { qty_max: r }); await _flckRefresh(); toast('Capienza aggiornata ✓'); } catch (e) {}
 }
 async function eliminaFlck(id) {
   const k = getFlck(id); if (!k) { toast('Elemento non trovato', true); return; }
   if (!window.localFetch && totalArtReale(id) > 0) { toast('Sposta prima nel cestino per poterlo eliminare', true); return; }
-  if (!confirm(`Eliminare definitivamente "${k.nome}" (flightcase K)?\nIl contenuto ancora dentro torna nello stock.\nOperazione irreversibile.`)) return;
+  if (!await askConfirm(`Eliminare definitivamente "${k.nome}" (flightcase K)?\nIl contenuto ancora dentro torna nello stock.\nOperazione irreversibile.`, { ok: 'Elimina', danger: true })) return;
   try {
     await apiFetch('DELETE', `/flck/${id}`);
     _flckCorrente = null;

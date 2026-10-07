@@ -75,7 +75,7 @@ async function localFetch(method, url, body) {
   return out;
 }
 window.localFetch = localFetch;
-window.LOCALAPI_BUILD = 26;   // deve coincidere con APP_BUILD in index.html
+window.LOCALAPI_BUILD = 27;   // deve coincidere con APP_BUILD in index.html
 
 function isValidColore(c) {
   return !c || /^#[0-9a-fA-F]{3,6}$/.test(c);
@@ -1132,12 +1132,12 @@ try {
 
 // ── Elimina il database corrente (ripartenza da zero) ──
 window.eliminaDb = async () => {
-  if (!confirm('Eliminare TUTTO il database di questo iPad?\n\nArticoli, magazzini, bauli e flight case verranno cancellati per sempre.\nSe non hai ancora esportato un backup, premi Annulla ed esporta prima.')) return;
-  const t = prompt('Per confermare scrivi ELIMINA');
-  if (t === null || t.trim().toUpperCase() !== 'ELIMINA') { alert('Annullato: il database non è stato toccato.'); return; }
+  if (!await askConfirm('Eliminare TUTTO il database di questo iPad?\n\nArticoli, magazzini, bauli e flight case verranno cancellati per sempre.\nSe non hai ancora esportato un backup, premi Annulla ed esporta prima.', { ok: 'Continua', danger: true })) return;
+  const t = await askPrompt('Per confermare scrivi ELIMINA', '', { ok: 'Elimina tutto' });
+  if (t === null || t.trim().toUpperCase() !== 'ELIMINA') { toast('Annullato: il database non è stato toccato'); return; }
   resetting = true; clearTimeout(timer); timer = null;
   try { await idbDel(DB_KEY); }
-  catch (e) { resetting = false; alert('Impossibile eliminare il database: ' + (e.message || e)); return; }
+  catch (e) { resetting = false; toast('Impossibile eliminare il database: ' + (e.message || e), true); return; }
   location.reload();
 };
 
@@ -1196,8 +1196,8 @@ window.importaDb = async inp => {
     const n = t.exec("SELECT name FROM sqlite_master WHERE type='table' AND name IN ('articoli','categorie','magazzini','stock')");
     t.close();
     if (!n.length || n[0].values.length !== 4) throw new Error('File non valido: non è un database WareFlow');
-    if (!confirm('Importare "' + f.name + '"?\nTutti i dati presenti su questo iPad verranno sostituiti.')) return;
+    if (!await askConfirm('Importare "' + f.name + '"?\nTutti i dati presenti su questo iPad verranno sostituiti.', { ok: 'Importa', danger: true })) return;
     await idbSet(DB_KEY, buf); location.reload();
-  } catch (e) { alert(e.message || 'Errore importazione'); }
+  } catch (e) { toast(e.message || 'Errore importazione', true); }
 };
 })();
