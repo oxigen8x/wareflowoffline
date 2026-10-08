@@ -6063,7 +6063,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 29;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 30;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
@@ -6253,7 +6253,7 @@ async function salvaCambiaPwd() {
 // ─── STAMPA ───
 // ─── STAMPE ───
 // Helper condivisi dalle stampe della lista di carico e del contenuto di un magazzino.
-const _PRINT_CSS = 'body{font-family:"Helvetica Neue",Arial,sans-serif;padding:32px;color:#1a1814;}h1{font-size:22px;margin-bottom:4px;}.sub{font-size:13px;color:#9a9287;margin-bottom:24px;}table{width:100%;border-collapse:collapse;font-size:12px;}th{background:#f4f1eb;padding:4px 8px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:#5a5449;border-bottom:1px solid #ddd9cf;}td{padding:4px 8px;border-bottom:0.5px solid #ede9e0;vertical-align:middle;}.foot{margin-top:32px;font-size:11px;color:#9a9287;border-top:1px solid #ede9e0;padding-top:12px;}tr.catrow td{background:#e9e4d8;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;padding:6px 8px;border-bottom:1px solid #ccc6b6;}tr.catrow span{float:right;font-family:monospace;}tr.catrow{break-after:avoid;}tr{break-inside:avoid;}.bx{display:inline-block;width:11px;height:11px;border:1px solid #9a9287;border-radius:2px;vertical-align:middle}.q{text-align:right;white-space:nowrap;font-weight:700;width:60px}.q .um{font-weight:400;color:#9a9287;font-size:11px}.nm{font-size:14px}.cod{font-family:monospace;font-size:10px;font-weight:400;color:#8a8275}@media print{body{padding:16px;}}';
+const _PRINT_CSS = 'body{font-family:"Helvetica Neue",Arial,sans-serif;padding:32px;color:#1a1814;}h1{font-size:22px;margin-bottom:4px;}.sub{font-size:13px;color:#9a9287;margin-bottom:24px;}table{width:100%;border-collapse:collapse;font-size:12px;}th{background:#f4f1eb;padding:4px 8px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:#5a5449;border-bottom:1px solid #ddd9cf;}td{padding:4px 8px;border-bottom:0.5px solid #ede9e0;vertical-align:middle;}.foot{margin-top:32px;font-size:11px;color:#9a9287;border-top:1px solid #ede9e0;padding-top:12px;}tr.catrow td{background:#e9e4d8;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;padding:6px 8px;border-bottom:1px solid #ccc6b6;}tr.catrow span{float:right;font-family:monospace;}tr.catrow{break-after:avoid;}tr{break-inside:avoid;}.bx{display:inline-block;width:11px;height:11px;border:1px solid #9a9287;border-radius:2px;vertical-align:middle}.q{text-align:right;white-space:nowrap;font-weight:700;width:60px}.q .um{font-weight:400;color:#9a9287;font-size:11px}.nm{font-size:14px}.cod{font-family:monospace;font-size:10px;font-weight:400;color:#8a8275;white-space:nowrap}table.fx{table-layout:fixed}@media print{body{padding:16px;}}';
 const _cmpCodice = (x, y) => String(x || '').localeCompare(String(y || ''), 'it', { numeric: true });
 
 // Raggruppa i pezzi con varianti che hanno stesso modello e stessa variante (extra = chiave aggiuntiva, es. il case)
@@ -6290,6 +6290,8 @@ function _catGroups(items, artIdFn) {
     .map(([cid, arr]) => ({ cat: getCat(cid), items: arr.sort((x, y) => _cmpCodice(getArt(artIdFn(x))?.codice, getArt(artIdFn(y))?.codice)) }))
     .sort((x, y) => rank(x.cat) - rank(y.cat));
 }
+// larghezze fisse (px) delle colonne: tutte tranne 'Articolo', che prende lo spazio rimasto
+const _printCols = w => '<colgroup>' + w.map(x => x ? `<col style="width:${x}px">` : '<col>').join('') + '</colgroup>';
 const _printCatRow = (cat, n, cols) => `<tr class="catrow"><td colspan="${cols}">${h(cat?.nome || 'Senza categoria')}<span>${n} pz</span></td></tr>`;
 // Badge del FLC/FLCK che contiene l'articolo: cs = [{nome, codice, qty, tipo}]
 function _printCaseBadge(cs, conQty) {
@@ -6374,7 +6376,7 @@ async function stampaTesto() {
   righeGrp.forEach(g => { if (g._grp) g.qty_richiesta = g._qty; });
   const rows = _catGroups(righeGrp, r => r.art_id).map(g => _printCatRow(g.cat, g.items.reduce((n, r) => n + (+r.qty_richiesta || 0), 0), 5) + g.items.map(rigaLista).join('')).join('');
   const now = new Date();
-  _printInFrame('<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><title>Lista — ' + h(lista.nome) + '</title><style>' + _PRINT_CSS + '</style></head><body><h1>' + h(lista.nome) + '</h1><div class="sub">' + righe.length + ' articoli' + dest + (lista.note ? ' · ' + h(lista.note) : '') + '</div><table><thead><tr><th></th><th style="text-align:right">Qtà</th><th>Articolo</th><th>Prelevato da</th><th style="text-align:right">Codice</th></tr></thead><tbody>' + rows + '</tbody></table><div class="foot">Stampato il ' + now.toLocaleDateString('it-IT') + ' alle ' + now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) + ' · WareFlow</div></body></html>');
+  _printInFrame('<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><title>Lista — ' + h(lista.nome) + '</title><style>' + _PRINT_CSS + '</style></head><body><h1>' + h(lista.nome) + '</h1><div class="sub">' + righe.length + ' articoli' + dest + (lista.note ? ' · ' + h(lista.note) : '') + '</div><table class="fx">' + _printCols([22, 64, 0, 270, 84]) + '<thead><tr><th></th><th style="text-align:right">Qtà</th><th>Articolo</th><th>Prelevato da</th><th style="text-align:right">Codice</th></tr></thead><tbody>' + rows + '</tbody></table><div class="foot">Stampato il ' + now.toLocaleDateString('it-IT') + ' alle ' + now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) + ' · WareFlow</div></body></html>');
 }
 
 // Modalità di stampa del magazzino (cursore nel modale): tutto | articoli | contenitori
@@ -6424,7 +6426,8 @@ async function stampaMagDetail() {
   </head><body>
     <h1>${h(m.nome)}</h1>
     <div class="sub">${m.citta ? h(m.citta) + ' · ' : ''}${soloCont ? righe.length + ' contenitori' : totale + ' pezzi totali'}${soloArt ? ' · solo articoli' : ''}${soloCont ? ' · solo contenitori' : ''}${cf ? ' · filtro categoria attivo' : ''}</div>
-    <table>
+    <table class="fx">
+      ${_printCols([22, 64, 0, 84])}
       <thead><tr><th></th><th style="text-align:right">Qtà</th><th>Articolo</th><th style="text-align:right">Codice</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
