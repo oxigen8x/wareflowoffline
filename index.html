@@ -260,6 +260,7 @@ body.dark[data-theme="red"]{background:linear-gradient(160deg,#141414 0%,#0f0f0f
 .bt-dup:hover{border-color:var(--ink);}
 .bt-dup.off{opacity:.3;cursor:default;}
 .bt-card .bt-dup{position:absolute;top:10px;right:44px;z-index:2;}
+.bt-card .bt-edt{right:78px;}
 .bt-list{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
 .bt-row{display:flex;align-items:center;gap:12px;padding:0 14px;height:46px;border-top:1px solid var(--border);cursor:pointer;box-sizing:border-box;}
 .bt-row:first-child{border-top:0;}
@@ -794,14 +795,20 @@ body.dark .stock-pill strong{color:var(--teal-light);}
 .stock-map-row.sel-da *{color:#1a1814!important;}
 .stock-map-row.sel-a{border-color:var(--green)!important;background:#f0fdf4!important;color:#1a1814!important;}
 .stock-map-row.sel-a *{color:#1a1814!important;}
-.stock-map-zero{opacity:.4;}
+.stock-map-row{padding:10px 14px;border-left:7px solid var(--mc,var(--border));}
+body.dark .stock-map-row,.stock-map-row.clickable:hover,body.dark .stock-map-row.clickable:hover{border-left-color:var(--mc,var(--border));}
+.stock-map-row.sel-da,.stock-map-row.sel-a{border-width:2px 2px 2px 7px;}
+.stock-map-row.sel-da,.stock-map-row.sel-a,body.dark .stock-map-row.sel-da,body.dark .stock-map-row.sel-a{border-left-color:var(--mc,var(--border))!important;}
+.sm-name{display:flex;align-items:center;font-size:16px;font-weight:700;color:var(--ink);}
+.sm-city{font-size:11px;color:var(--ink3);font-weight:400;margin-top:1px;}
+.stock-map-zero .stock-map-qty{opacity:.35;}
 .stock-map-qty{font-family:'Fraunces',serif;font-size:20px;font-weight:700;min-width:40px;text-align:right;}
 .stock-map-badges{display:flex;gap:4px;font-size:10px;margin-top:2px;}
 .stock-map-badge{padding:1px 5px;border-radius:3px;font-family:'DM Mono',monospace;font-weight:700;}
 .spos-sel-box{background:var(--bg2);border:1.5px dashed var(--border2);border-radius:8px;padding:10px 14px;min-height:54px;transition:all .15s;}
 .spos-sel-box.filled{background:var(--surface);border-style:solid;border-color:var(--ink);}
 .spos-sel-label{font-size:10px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);margin-bottom:4px;}
-.spos-sel-val{font-size:13px;font-weight:600;color:var(--ink2);}
+.spos-sel-val{font-size:19px;font-weight:700;color:var(--ink2);}
 .spos-sel-box.filled .spos-sel-val{color:var(--ink);}
 #sBoxDa.filled{background:#fff7ed!important;border-color:var(--orange)!important;border-style:solid!important;}
 #sBoxDa.filled .spos-sel-label{color:#92400e!important;}
@@ -1042,8 +1049,8 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
 .lista-det-top{display:flex;align-items:center;gap:8px;flex:1;min-width:0;}
 .lista-det-nome{font-size:24px;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
 .lista-stato-mobile{display:none!important;}
-.lista-back-btn{font-size:13px;font-weight:500;flex-shrink:0;background:#1a1a1a!important;color:#fff!important;border-color:#1a1a1a!important;border-radius:8px;padding:7px 14px!important;}
-.lista-back-btn:hover{background:#333!important;border-color:#333!important;}
+.lista-back-btn{font-size:16px;font-weight:700;flex-shrink:0;background:#0F6E56!important;color:#fff!important;border-color:#0F6E56!important;border-radius:10px;padding:10px 20px!important;}
+.lista-back-btn:hover{background:#0b5a47!important;border-color:#0b5a47!important;}
 .lista-det-actions{display:flex;gap:8px;flex-wrap:nowrap;align-items:center;flex-shrink:0;}
 .lista-group-label{font-size:9px;font-family:'DM Mono',monospace;font-weight:600;color:var(--ink3);letter-spacing:1px;text-transform:uppercase;padding:4px 0 6px;margin-top:10px;}
 .lista-group-label:first-child{margin-top:0;}
@@ -1411,20 +1418,20 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
     <button class="aside-toggle" id="asideToggle" onclick="toggleAside()" title="Riduci menu"><span class="ni">«</span></button>
     <nav class="aside-nav">
       <div class="nav-group-label">Principale</div>
-      <button class="nav-btn active" onclick="goTo('dashboard')"><span class="ni">◈</span><span>Dashboard</span></button>
-      <button class="nav-btn" onclick="goTo('magazzini')"><span class="ni">⬡</span><span>Magazzini</span></button>
-      <button class="nav-btn" onclick="goTo('bauli')"><span class="ni"><svg width="15" height="15" viewBox="0 0 48 48" fill="none" style="vertical-align:middle"><rect x="6" y="12" width="36" height="26" rx="2" stroke="currentColor" stroke-width="3" fill="none"/><path d="M6 12l3-3h30l3 3" stroke="currentColor" stroke-width="2.5" fill="none"/><rect x="6" y="12" width="4" height="4" rx="0.5" fill="currentColor" opacity=".5"/><rect x="38" y="12" width="4" height="4" rx="0.5" fill="currentColor" opacity=".5"/><rect x="6" y="34" width="4" height="4" rx="0.5" fill="currentColor" opacity=".5"/><rect x="38" y="34" width="4" height="4" rx="0.5" fill="currentColor" opacity=".5"/><line x1="6" y1="25" x2="42" y2="25" stroke="currentColor" stroke-width="2" opacity=".6"/><circle cx="16" cy="25" r="2" fill="currentColor" opacity=".5"/><circle cx="32" cy="25" r="2" fill="currentColor" opacity=".5"/></svg></span><span>Bauli e FLC</span></button>
-      <button class="nav-btn" onclick="goTo('spostamento')"><span class="ni">⇄</span><span>Spostamento</span></button>
+      <button class="nav-btn active" onclick="navTo('dashboard')"><span class="ni">◈</span><span>Dashboard</span></button>
+      <button class="nav-btn" onclick="navTo('magazzini')"><span class="ni">⬡</span><span>Magazzini</span></button>
+      <button class="nav-btn" onclick="navTo('bauli')"><span class="ni"><svg width="15" height="15" viewBox="0 0 48 48" fill="none" style="vertical-align:middle"><rect x="6" y="12" width="36" height="26" rx="2" stroke="currentColor" stroke-width="3" fill="none"/><path d="M6 12l3-3h30l3 3" stroke="currentColor" stroke-width="2.5" fill="none"/><rect x="6" y="12" width="4" height="4" rx="0.5" fill="currentColor" opacity=".5"/><rect x="38" y="12" width="4" height="4" rx="0.5" fill="currentColor" opacity=".5"/><rect x="6" y="34" width="4" height="4" rx="0.5" fill="currentColor" opacity=".5"/><rect x="38" y="34" width="4" height="4" rx="0.5" fill="currentColor" opacity=".5"/><line x1="6" y1="25" x2="42" y2="25" stroke="currentColor" stroke-width="2" opacity=".6"/><circle cx="16" cy="25" r="2" fill="currentColor" opacity=".5"/><circle cx="32" cy="25" r="2" fill="currentColor" opacity=".5"/></svg></span><span>Bauli e FLC</span></button>
+      <button class="nav-btn" onclick="navTo('spostamento')"><span class="ni">⇄</span><span>Spostamento</span></button>
       <div class="nav-group-label">Monitor</div>
-      <button class="nav-btn" onclick="goTo('articoli')"><span class="ni">◻</span><span>Articoli</span></button>
-      <button class="nav-btn" onclick="goTo('stock')"><span class="ni">▦</span><span>Stock</span></button>
+      <button class="nav-btn" onclick="navTo('articoli')"><span class="ni">◻</span><span>Articoli</span></button>
+      <button class="nav-btn" onclick="navTo('stock')"><span class="ni">▦</span><span>Stock</span></button>
       <div class="nav-group-label user-only" style="display:none">Guida</div>
-      <button class="nav-btn user-only" style="display:none" onclick="goTo('guida')"><span class="ni">?</span><span>Guida</span></button>
+      <button class="nav-btn user-only" style="display:none" onclick="navTo('guida')"><span class="ni">?</span><span>Guida</span></button>
       <div class="nav-group-label admin-only" style="display:none">Strumenti</div>
-      <button class="nav-btn admin-only" style="display:none" onclick="goTo('crea')"><span class="ni">✦</span><span>Crea</span></button>
-      <button class="nav-btn admin-only" style="display:none" onclick="goTo('caricoscarico')"><span class="ni">↕</span><span>Carica</span></button>
-      <button class="nav-btn admin-only" style="display:none" onclick="goTo('categorie')"><span class="ni">◈</span><span>Categorie</span></button>
-      <button class="nav-btn nav-orange admin-only" style="display:none" onclick="goTo('nonassegnati')">
+      <button class="nav-btn admin-only" style="display:none" onclick="navTo('crea')"><span class="ni">✦</span><span>Crea</span></button>
+      <button class="nav-btn admin-only" style="display:none" onclick="navTo('caricoscarico')"><span class="ni">↕</span><span>Carica</span></button>
+      <button class="nav-btn admin-only" style="display:none" onclick="navTo('categorie')"><span class="ni">◈</span><span>Categorie</span></button>
+      <button class="nav-btn nav-orange admin-only" style="display:none" onclick="navTo('nonassegnati')">
         <span class="ni">🗑</span><span>Cestino</span>
         <span class="nav-badge" id="navNonAssBadge" style="display:none">0</span>
       </button>
@@ -1668,8 +1675,9 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
 
       <!-- Articoli senza stock da caricare -->
       <div style="max-width:760px;margin:16px auto 0" id="caricoNoStockWrap">
-        <div style="font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.8px;color:var(--ink3);text-transform:uppercase;margin-bottom:8px;padding-left:2px">
-          Articoli senza stock — clicca per selezionare
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;padding-left:2px">
+          <span style="font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.8px;color:var(--ink3);text-transform:uppercase">Articoli senza stock — clicca per selezionare</span>
+          <select class="finput" id="cNoStockCat" onchange="renderCaricoNoStock()" style="width:auto;min-width:150px" autocomplete="off"></select>
         </div>
         <div class="card tbl-compact">
           <div class="tbl-wrap">
@@ -2170,7 +2178,7 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
       <div id="listaDettaglio" style="display:none">
         <div class="lista-det-header">
           <div class="lista-det-top">
-            <button class="btn lista-back-btn" onclick="chiudiDettaglioLista()">← Indietro</button>
+            <button class="btn lista-back-btn" onclick="chiudiDettaglioLista()">← Liste</button>
             <span id="listaDetNome" class="lista-det-nome"></span>
             <span id="listaDetTipoBadge" class="tipo-badge-prov" style="display:none">veloce</span>
             <span id="listaDetStato" class="lista-stato inattiva lista-stato-desktop">inattiva</span>
@@ -2293,13 +2301,13 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
     <input type="text" style="display:none" aria-hidden="true" tabindex="-1" autocomplete="username">
     <input type="password" style="display:none" aria-hidden="true" tabindex="-1" autocomplete="current-password">
     <button class="modal-close" onclick="closeModal('modalBaule')">✕</button>
-    <div class="modal-title">Nuovo baule</div>
+    <div class="modal-title" id="bauleTitle">Nuovo baule</div>
     <div class="modal-body">
       <div class="fgroup">
         <label>Nome baule <span style="color:var(--red)">*</span></label>
         <input type="text" class="finput" id="bauleNome" placeholder="es. Baule Luci A" autocomplete="off">
       </div>
-      <div class="fgroup">
+      <div class="fgroup" id="bauleMagGrp">
         <label>Magazzino <span style="color:var(--red)">*</span></label>
         <select class="finput" id="bauleMagId">
           <option value="">— Seleziona magazzino —</option>
@@ -2312,7 +2320,7 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
     </div>
     <div class="modal-foot">
       <button class="btn btn-ghost" onclick="closeModal('modalBaule')">Annulla</button>
-      <button class="btn btn-dark" onclick="salvaBaule()">Crea baule</button>
+      <button class="btn btn-dark" id="bauleSalvaBtn" onclick="salvaBaule()">Crea baule</button>
     </div>
   </div>
 </div>
@@ -2329,13 +2337,13 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
         <label>Nome flight case <span style="color:var(--red)">*</span></label>
         <input type="text" class="finput" id="flcNome" placeholder="es. Case PAR LED 6" autocomplete="off">
       </div>
-      <div class="fgroup">
+      <div class="fgroup" id="flcMagGrp">
         <label>Magazzino <span style="color:var(--red)">*</span></label>
         <select class="finput" id="flcMagId">
           <option value="">— Seleziona magazzino —</option>
         </select>
       </div>
-      <div class="fgroup">
+      <div class="fgroup" id="flcArtGrp">
         <label>Articolo contenuto <span style="color:var(--red)">*</span></label>
         <div style="display:flex;gap:6px;margin-bottom:6px"><select class="finput" id="flcArtCat" onchange="filtraSelect('flcArtContenuto')" style="flex:0 0 42%"></select><input type="text" class="finput sel-search" id="flcArtSearch" placeholder="🔍 Cerca codice o nome…" autocomplete="off" oninput="filtraSelect('flcArtContenuto')" style="flex:1;min-width:0"></div>
         <select class="finput" id="flcArtContenuto">
@@ -2353,7 +2361,7 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
     </div>
     <div class="modal-foot">
       <button class="btn btn-ghost" onclick="closeModal('modalFlc')">Annulla</button>
-      <button class="btn btn-dark" onclick="salvaFlc()">Crea flight case</button>
+      <button class="btn btn-dark" id="flcSalvaBtn" onclick="salvaFlc()">Crea flight case</button>
     </div>
   </div>
 </div>
@@ -2630,16 +2638,16 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
 <div class="overlay" id="modalFlckNew">
   <div class="modal modal-sm">
     <button class="modal-close" onclick="closeModal('modalFlckNew')">✕</button>
-    <div class="modal-title">Nuovo Flightcase K</div>
+    <div class="modal-title" id="flckTitle">Nuovo Flightcase K</div>
     <div class="modal-body">
       <div class="fgroup"><label>Nome <span style="color:var(--red)">*</span></label><input type="text" class="finput" id="flckNome" placeholder="es. Case radio 1" autocomplete="off"></div>
-      <div class="fgroup"><label>Magazzino <span style="color:var(--red)">*</span></label><select class="finput" id="flckMagId"><option value="">— Seleziona magazzino —</option></select></div>
+      <div class="fgroup" id="flckMagGrp"><label>Magazzino <span style="color:var(--red)">*</span></label><select class="finput" id="flckMagId"><option value="">— Seleziona magazzino —</option></select></div>
       <div class="fgroup"><label>Note</label><input type="text" class="finput" id="flckNote" placeholder="opzionale" autocomplete="off"></div>
-      <div style="font-size:11px;color:var(--ink3);line-height:1.5">Un flightcase K contiene articoli diversi (riceventi, trasmittenti, microfoni…). Il contenuto si definisce dopo averlo creato.</div>
+      <div id="flckInfoNew" style="font-size:11px;color:var(--ink3);line-height:1.5">Un flightcase K contiene articoli diversi (riceventi, trasmittenti, microfoni…). Il contenuto si definisce dopo averlo creato.</div>
     </div>
     <div class="modal-foot">
       <button class="btn btn-outline" onclick="closeModal('modalFlckNew')">Annulla</button>
-      <button class="btn btn-dark" onclick="salvaFlckNew()">Crea</button>
+      <button class="btn btn-dark" id="flckSalvaBtn" onclick="salvaFlckNew()">Crea</button>
     </div>
   </div>
 </div>
@@ -2947,6 +2955,21 @@ async function goTo(page, fromHist) {
   await load();
   renderPage(page);
 }
+// Clic su una voce della sidebar: se la sezione è già aperta, chiude il dettaglio e torna all'elenco principale
+function navTo(page) {
+  if (page === curPage) {
+    const aperto = id => { const el = document.getElementById(id); return el && el.style.display !== 'none'; };
+    if (page === 'liste' && aperto('listaDettaglio')) chiudiDettaglioLista();
+    else if (page === 'bauli') {
+      if (aperto('bauleDettaglio')) chiudiBauleDettaglio();
+      else if (aperto('flcDettaglio')) chiudiFlcDettaglio();
+      else if (aperto('flckDettaglio')) chiudiFlckDettaglio();
+    }
+    else if (page === 'magazzini' && document.getElementById('modalMagDetail').classList.contains('open')) closeModal('modalMagDetail');
+    window.scrollTo(0, 0);
+  }
+  goTo(page);
+}
 function renderPage(p) {
   ({ dashboard:renderDash, spostamento:renderSpos, caricoscarico:renderCaricaScarica, crea:renderCrea,
      magazzini:renderMag, articoli:renderArticoli, categorie:renderCat,
@@ -3175,9 +3198,9 @@ function onSposArticoloChange() {
     const virtBadge = isVirt ? `<span class="stock-map-badge badge-virt">🗑 Cestino</span>` : '';
     const daBadge = isDa ? `<span class="stock-map-badge" class="stock-badge-da">DA</span>` : '';
     const aBadge  = isA  ? `<span class="stock-map-badge" class="stock-badge-a">A</span>` : '';
-    return `<div class="${cls}" onclick="onSposMapClick(${m.id})">
+    return `<div class="${cls}" style="--mc:${m.colore || 'var(--border)'}" onclick="onSposMapClick(${m.id})">
       <div>
-        <div style="font-weight:600;display:flex;align-items:center">${colDot}${h(m.nome)}</div>
+        <div class="sm-name">${colDot}${h(m.nome)}</div>${m.citta ? `<div class="sm-city">${h(m.citta)}</div>` : ''}
         <div class="stock-map-badges">${virtBadge}${daBadge}${aBadge}</div>
       </div>
       <span class="stock-map-qty" style="color:${qty===0?'var(--ink3)':'var(--ink)'}">${qty}<span style="font-size:11px;font-weight:400;font-family:'DM Sans',sans-serif;margin-left:3px">${h(a?.um)||'pz'}</span>${D._contMap?.[artId]?.[m.id]?.tot?`<span style="font-size:10px;font-weight:400;color:var(--ink3);margin-left:6px">+${D._contMap[artId][m.id].tot} nei case</span>`:''}</span>
@@ -3256,12 +3279,21 @@ async function salvaSpostamento() {
 
 // ─── CARICO / SCARICO ───
 function renderCaricoNoStock() {
-  const listNoStock = D.articoli.filter(a =>
-    totalArtAny(a.id) === 0
-  );
-  const mv = modelliSenzaPezzi();
+  const senzaStock = D.articoli.filter(a => totalArtAny(a.id) === 0);
+  const modSenza = modelliSenzaPezzi();
   const wrap = document.getElementById('caricoNoStockWrap');
-  if (wrap) wrap.style.display = (listNoStock.length || mv.length) ? '' : 'none';
+  if (wrap) wrap.style.display = (senzaStock.length || modSenza.length) ? '' : 'none';
+  // filtro categoria: solo le categorie che hanno articoli senza stock
+  const catSel = document.getElementById('cNoStockCat');
+  if (catSel) {
+    const prev = catSel.value;
+    const ids = new Set([...senzaStock.map(a => a.cat_id), ...modSenza.map(m => m.cat_id)]);
+    catSel.innerHTML = '<option value="">Tutte le categorie</option>' +
+      D.categorie.filter(c => ids.has(c.id)).map(c => `<option value="${c.id}"${c.id == prev ? ' selected' : ''}>${h(c.nome)}</option>`).join('');
+  }
+  const cf = catSel?.value || '';
+  const listNoStock = cf ? senzaStock.filter(a => a.cat_id == cf) : senzaStock;
+  const mv = cf ? modSenza.filter(m => m.cat_id == cf) : modSenza;
   const tbody = document.getElementById('tbCaricoNoStock');
   if (!tbody) return;
   tbody.innerHTML = (listNoStock.length || mv.length)
@@ -4837,24 +4869,27 @@ function renderStock() {
 // ─── MODALS ───
 // Ricerca + filtro categoria dentro un menu a tendina: nasconde le voci che non corrispondono; se resta una sola voce la seleziona
 const _SEL_FILTRI = { flcArtContenuto: ['flcArtCat', 'flcArtSearch'], flckVoceArt: ['flckVoceArtCat', 'flckVoceArtSearch'], flckVoceMod: ['flckVoceModCat', 'flckVoceModSearch'] };
+// Menù articolo con filtro categoria/testo: le voci vengono ricostruite (l'attributo `hidden` sulle <option> è ignorato da Safari/iPad).
+// _selMaster conserva l'elenco completo di ogni menù, registrato da _riempiCatSel dopo averlo popolato.
+const _selMaster = {};
 function _riempiCatSel(catId, selId) {   // categorie presenti nelle voci del menu
   const c = document.getElementById(catId), sel = document.getElementById(selId); if (!c || !sel) return;
-  const ids = new Set([...sel.options].map(o => o.dataset.cat).filter(Boolean));
+  const opts = [...sel.options];
+  _selMaster[selId] = { ph: opts[0]?.textContent || '', items: opts.filter(o => o.value !== '').map(o => ({ v: o.value, t: o.textContent, c: o.dataset.cat })) };
+  const ids = new Set(_selMaster[selId].items.map(o => o.c).filter(Boolean));
   c.innerHTML = '<option value="">Tutte le categorie</option>' + D.categorie.filter(x => ids.has(String(x.id))).map(x => `<option value="${x.id}">${h(x.nome)}</option>`).join('');
   const t = document.getElementById(_SEL_FILTRI[selId][1]); if (t) t.value = '';
 }
 function filtraSelect(selId) {
-  const sel = document.getElementById(selId); if (!sel) return;
+  const sel = document.getElementById(selId), m = _selMaster[selId]; if (!sel || !m) return;
   const [catId, txtId] = _SEL_FILTRI[selId];
   const cat = document.getElementById(catId)?.value || '';
   const q = (document.getElementById(txtId)?.value || '').trim().toLowerCase();
-  const vis = [];
-  [...sel.options].filter(o => o.value !== '').forEach(o => {
-    const ok = (!q || o.textContent.toLowerCase().includes(q)) && (!cat || o.dataset.cat === cat);
-    o.hidden = !ok; o.disabled = !ok; if (ok) vis.push(o);
-  });
-  if (sel.selectedOptions[0] && sel.selectedOptions[0].disabled) sel.value = '';
-  if ((q || cat) && vis.length === 1) sel.value = vis[0].value;
+  const prev = sel.value;
+  const vis = m.items.filter(o => (!q || o.t.toLowerCase().includes(q)) && (!cat || o.c === cat));
+  sel.innerHTML = `<option value="">${h(m.ph)}</option>` + vis.map(o => `<option value="${h(o.v)}" data-cat="${h(o.c || '')}">${h(o.t)}</option>`).join('');
+  sel.value = vis.some(o => o.v === prev) ? prev : '';
+  if ((q || cat) && vis.length === 1) sel.value = vis[0].v;
   if (sel.onchange) sel.onchange();
 }
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
@@ -6063,7 +6098,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 30;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 31;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
@@ -6643,12 +6678,38 @@ function chiudiBauleDettaglio() {
   _aggiornaBauliD().then(() => renderBauli());
 }
 
+// Modifica (solo admin): _btEdit = id dell'elemento in modifica, null = creazione nuova
+let _btEdit = null;
+function modificaBt(id) {
+  if (isBauleArt(id)) openModalBauleEdit(id);
+  else if (isFlckArt(id)) openModalFlckEdit(id);
+  else openModalFlcEdit(id);
+}
+// dopo una modifica: ricarica tutto (nomi e note compaiono anche in liste, stock, storico) e ridisegna l'elenco aperto
+async function _btDopoModifica(msg) {
+  await load();
+  ({ bauli: renderBauli, flc: renderFlc, flck: renderFlck })[_bauliTab]();
+  toast(msg);
+}
+function _bauleForm(edit) {
+  document.getElementById('bauleTitle').textContent = edit ? 'Modifica baule' : 'Nuovo baule';
+  document.getElementById('bauleMagGrp').style.display = edit ? 'none' : '';
+  document.getElementById('bauleSalvaBtn').textContent = edit ? 'Salva' : 'Crea baule';
+}
 function openModalBauleNew() {
+  _btEdit = null; _bauleForm(false);
   document.getElementById('bauleNome').value = '';
   document.getElementById('bauleNote').value = '';
   const sel = document.getElementById('bauleMagId');
   sel.innerHTML = '<option value="">— Seleziona magazzino —</option>' +
     getMagReali().map(m => `<option value="${m.id}">${m.icona||'🏭'} ${h(m.nome)}</option>`).join('');
+  openModal('modalBaule');
+}
+function openModalBauleEdit(id) {
+  const a = getArt(id); if (!a) return;
+  _btEdit = id; _bauleForm(true);
+  document.getElementById('bauleNome').value = a.nome;
+  document.getElementById('bauleNote').value = a.note || '';
   openModal('modalBaule');
 }
 
@@ -6657,8 +6718,14 @@ async function salvaBaule() {
   const note  = document.getElementById('bauleNote').value.trim();
   const mag_id = +document.getElementById('bauleMagId').value;
   if (!nome)   { toast('Nome obbligatorio', true); return; }
-  if (!mag_id) { toast('Seleziona un magazzino', true); return; }
+  if (!_btEdit && !mag_id) { toast('Seleziona un magazzino', true); return; }
   try {
+    if (_btEdit) {
+      await apiFetch('PUT', `/bauli/${_btEdit}`, { nome, note });
+      closeModal('modalBaule');
+      await _btDopoModifica('Baule modificato ✓');
+      return;
+    }
     await apiFetch('POST', '/bauli', { nome, note, mag_id });
     closeModal('modalBaule');
     // Ricarica articoli, stock, spostamenti e bauli
@@ -6771,13 +6838,14 @@ function _btRender(grid, items, vuoto) {
   const dup = i => !admin ? '' : i.dupOk
     ? `<button class="bt-dup" title="Duplica" aria-label="Duplica" onclick="event.stopPropagation();duplicaBt(${i.id})">⧉</button>`
     : `<button class="bt-dup off" title="Svuota prima il case per duplicarlo" aria-label="Duplica non disponibile" onclick="event.stopPropagation()">⧉</button>`;
+  const edt = i => !admin ? '' : `<button class="bt-dup bt-edt" title="Modifica" aria-label="Modifica" onclick="event.stopPropagation();modificaBt(${i.id})">✎</button>`;
   const chip = i => `<span class="bt-chip ${i.ok ? 'ok' : 'no'}">${h(i.chip)}</span>`;
   const cod = i => h(i.cod) + (i.sub ? ' · ' + h(i.sub) : '');
   const pos = i => { const m = getMag(D.stock.find(s => s.art_id == i.id && s.qty > 0)?.mag_id); return m ? { ic: h(m.icona || '📍'), nome: h(m.nome), col: m.colore || 'var(--ink3)' } : null; };
   grid.className = list ? 'bt-list' : 'bt-grid';
   grid.innerHTML = items.map(i => list
-    ? (p => `<div class="bt-row" style="--bc:${i.col}" onclick="${i.onOpen}"><i class="bt-dot"></i><span class="bt-rn"><span>${h(i.nome)}</span>${p ? `<span class="bt-rl">📍 ${p.nome}</span>` : ''}</span><span class="bt-rc">${cod(i)}</span>${p ? `<span class="bt-pos2" style="--mc:${p.col}">${p.ic} ${p.nome}</span>` : ''}${chip(i)}${dup(i)}${del(i)}</div>`)(pos(i))
-    : (p => `<div class="bt-card" style="--bc:${i.col}" onclick="${i.onOpen}">${dup(i)}${del(i)}<div class="bt-band">${p ? `<span class="bt-pos">${p.ic} ${p.nome}</span>` : ''}${_BT_SVG}</div><div class="bt-foot"><div class="bt-nome">${h(i.nome)}</div><div class="bt-r2"><span class="bt-cod">${cod(i)}</span>${chip(i)}</div></div></div>`)(pos(i))
+    ? (p => `<div class="bt-row" style="--bc:${i.col}" onclick="${i.onOpen}"><i class="bt-dot"></i><span class="bt-rn"><span>${h(i.nome)}</span>${p ? `<span class="bt-rl">📍 ${p.nome}</span>` : ''}</span><span class="bt-rc">${cod(i)}</span>${p ? `<span class="bt-pos2" style="--mc:${p.col}">${p.ic} ${p.nome}</span>` : ''}${chip(i)}${edt(i)}${dup(i)}${del(i)}</div>`)(pos(i))
+    : (p => `<div class="bt-card" style="--bc:${i.col}" onclick="${i.onOpen}">${edt(i)}${dup(i)}${del(i)}<div class="bt-band">${p ? `<span class="bt-pos">${p.ic} ${p.nome}</span>` : ''}${_BT_SVG}</div><div class="bt-foot"><div class="bt-nome">${h(i.nome)}</div><div class="bt-r2"><span class="bt-cod">${cod(i)}</span>${chip(i)}</div></div></div>`)(pos(i))
   ).join('');
 }
 
@@ -6879,22 +6947,41 @@ async function scaricaFlc() {
   } catch(e) { toast(e.message || 'Errore', true); }
 }
 
+function _flcForm(edit) {
+  document.getElementById('modalFlcTitle').textContent = edit ? 'Modifica Flight Case' : 'Nuovo Flight Case';
+  document.getElementById('flcMagGrp').style.display = edit ? 'none' : '';
+  document.getElementById('flcSalvaBtn').textContent = edit ? 'Salva' : 'Crea flight case';
+}
+// menù dell'articolo contenuto (esclude bauli, FLC, FLCK e pezzi con varianti)
+function _flcPopolaArticoli() {
+  const pfx = ['BAU', 'FLC', 'FLCK'].map(p => D.categorie.find(c => c.prefisso === p)?.id);
+  const artFiltrati = D.articoli.filter(a => !pfx.includes(a.cat_id) && !a.modello_id);
+  document.getElementById('flcArtContenuto').innerHTML = '<option value="">— Seleziona articolo —</option>' +
+    artFiltrati.map(a => `<option value="${a.id}" data-cat="${a.cat_id}">[${h(a.codice)}] ${h(a.nome)}${a.variante?' · '+h(a.variante):''}</option>`).join('');
+  _riempiCatSel('flcArtCat', 'flcArtContenuto');
+}
 function openModalFlcNew() {
+  _btEdit = null; _flcForm(false);
   document.getElementById('flcNome').value = '';
   document.getElementById('flcNote').value = '';
   document.getElementById('flcQtyMax').value = '1';
   const selMag = document.getElementById('flcMagId');
   selMag.innerHTML = '<option value="">— Seleziona magazzino —</option>' +
     getMagReali().map(m => `<option value="${m.id}">${m.icona||'🏭'} ${h(m.nome)}</option>`).join('');
-  // Popola articoli (escludi BAU e FLC)
-  const catBAU = D.categorie.find(c => c.prefisso === 'BAU');
-  const catFLC = D.categorie.find(c => c.prefisso === 'FLC');
-  const catFLCK = D.categorie.find(c => c.prefisso === 'FLCK');
-  const artFiltrati = D.articoli.filter(a => a.cat_id !== catBAU?.id && a.cat_id !== catFLC?.id && a.cat_id !== catFLCK?.id && !a.modello_id);
-  const selArt = document.getElementById('flcArtContenuto');
-  selArt.innerHTML = '<option value="">— Seleziona articolo —</option>' +
-    artFiltrati.map(a => `<option value="${a.id}" data-cat="${a.cat_id}">[${h(a.codice)}] ${h(a.nome)}${a.variante?' · '+h(a.variante):''}</option>`).join('');
-  _riempiCatSel('flcArtCat', 'flcArtContenuto');
+  document.getElementById('flcArtGrp').style.display = '';
+  _flcPopolaArticoli();
+  openModal('modalFlc');
+}
+function openModalFlcEdit(id) {
+  const a = getArt(id), fc = D.flightcase.find(x => x.id === id); if (!a || !fc) return;
+  _btEdit = id; _flcForm(true);
+  document.getElementById('flcNome').value = a.nome;
+  document.getElementById('flcNote').value = a.note || '';
+  document.getElementById('flcQtyMax').value = fc.qty_max;
+  // l'articolo contenuto si cambia solo a case vuoto
+  document.getElementById('flcArtGrp').style.display = fc.qty_caricata > 0 ? 'none' : '';
+  _flcPopolaArticoli();
+  document.getElementById('flcArtContenuto').value = fc.art_id_contenuto;
   openModal('modalFlc');
 }
 
@@ -6905,10 +6992,16 @@ async function salvaFlc() {
   const qty_max = document.getElementById('flcQtyMax').value;
   const note = document.getElementById('flcNote').value.trim();
   if (!nome) { toast('Nome obbligatorio', true); return; }
-  if (!mag_id) { toast('Seleziona un magazzino', true); return; }
+  if (!_btEdit && !mag_id) { toast('Seleziona un magazzino', true); return; }
   if (!art_id_contenuto) { toast('Seleziona l\'articolo contenuto', true); return; }
   if (!qty_max || parseInt(qty_max) < 1) { toast('Capienza non valida', true); return; }
   try {
+    if (_btEdit) {
+      await apiFetch('PUT', `/bauli/${_btEdit}`, { nome, note, art_id_contenuto: +art_id_contenuto, qty_max: +qty_max });
+      closeModal('modalFlc');
+      await _btDopoModifica('Flight case modificato ✓');
+      return;
+    }
     await apiFetch('POST', '/flightcase', { nome, note, mag_id: +mag_id, art_id_contenuto: +art_id_contenuto, qty_max: +qty_max });
     closeModal('modalFlc');
     await _aggiornaBauliD();
@@ -7030,11 +7123,25 @@ async function eliminaFlck(id) {
     toast(`"${k.nome}" eliminato ✓`);
   } catch (e) {}
 }
+function _flckForm(edit) {
+  document.getElementById('flckTitle').textContent = edit ? 'Modifica Flightcase K' : 'Nuovo Flightcase K';
+  document.getElementById('flckMagGrp').style.display = edit ? 'none' : '';
+  document.getElementById('flckInfoNew').style.display = edit ? 'none' : '';
+  document.getElementById('flckSalvaBtn').textContent = edit ? 'Salva' : 'Crea';
+}
 function openModalFlckNew() {
+  _btEdit = null; _flckForm(false);
   document.getElementById('flckNome').value = '';
   document.getElementById('flckNote').value = '';
   document.getElementById('flckMagId').innerHTML = '<option value="">— Seleziona magazzino —</option>' +
     getMagReali().map(m => `<option value="${m.id}">${m.icona || '🏭'} ${h(m.nome)}</option>`).join('');
+  openModal('modalFlckNew');
+}
+function openModalFlckEdit(id) {
+  const a = getArt(id); if (!a) return;
+  _btEdit = id; _flckForm(true);
+  document.getElementById('flckNome').value = a.nome;
+  document.getElementById('flckNote').value = a.note || '';
   openModal('modalFlckNew');
 }
 async function salvaFlckNew() {
@@ -7042,8 +7149,14 @@ async function salvaFlckNew() {
   const mag_id = document.getElementById('flckMagId').value;
   const note = document.getElementById('flckNote').value.trim();
   if (!nome) { toast('Nome obbligatorio', true); return; }
-  if (!mag_id) { toast('Seleziona un magazzino', true); return; }
+  if (!_btEdit && !mag_id) { toast('Seleziona un magazzino', true); return; }
   try {
+    if (_btEdit) {
+      await apiFetch('PUT', `/bauli/${_btEdit}`, { nome, note });
+      closeModal('modalFlckNew');
+      await _btDopoModifica('Flightcase K modificato ✓');
+      return;
+    }
     const r = await apiFetch('POST', '/flck', { nome, note, mag_id: +mag_id });
     closeModal('modalFlckNew');
     await Promise.all([loadPartial('spostamenti'), _aggiornaBauliD()]);

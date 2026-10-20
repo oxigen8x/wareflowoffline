@@ -75,7 +75,7 @@ async function localFetch(method, url, body) {
   return out;
 }
 window.localFetch = localFetch;
-window.LOCALAPI_BUILD = 30;   // deve coincidere con APP_BUILD in index.html
+window.LOCALAPI_BUILD = 31;   // deve coincidere con APP_BUILD in index.html
 
 function isValidColore(c) {
   return !c || /^#[0-9a-fA-F]{3,6}$/.test(c);
@@ -878,6 +878,36 @@ app.put('/api/flightcase/:id', (req, res) => {
   db.prepare('UPDATE flightcase_def SET art_id_contenuto=?, qty_max=? WHERE art_id=?')
     .run(newArt, newQty, req.params.id);
   res.json({ ok: true });
+});
+
+// PUT modifica di baule / flight case / flightcase K (nome e note; per il FLC anche capienza e, a case vuoto, articolo contenuto)
+app.put('/api/bauli/:id', (req, res) => {
+  touch();
+  const el = db.prepare("SELECT a.id, c.prefisso FROM articoli a JOIN categorie c ON c.id=a.cat_id WHERE a.id=? AND c.prefisso IN ('BAU','FLC','FLCK')").get(req.params.id);
+  if (!el) return res.status(404).json({ error: 'Elemento non trovato' });
+  const { nome, note = '' } = req.body;
+  if (!nome?.trim()) return res.status(400).json({ error: 'Nome obbligatorio' });
+  let fcNuovo = null;
+  if (el.prefisso === 'FLC') {
+    const fc = db.prepare('SELECT * FROM flightcase_def WHERE art_id=?').get(el.id);
+    const qm = req.body.qty_max === undefined ? fc.qty_max : parseInt(req.body.qty_max);
+    const art = req.body.art_id_contenuto ? +req.body.art_id_contenuto : fc.art_id_contenuto;
+    if (!(qm >= 1)) return res.status(400).json({ error: 'Capienza non valida' });
+    if (qm < fc.qty_caricata) return res.status(400).json({ error: `Capienza non può essere inferiore alla quantità caricata (${fc.qty_caricata})` });
+    if (art !== fc.art_id_contenuto) {
+      if (fc.qty_caricata > 0) return res.status(400).json({ error: 'Il flight case non è vuoto: svuotalo prima di cambiare articolo' });
+      if (!db.prepare('SELECT 1 FROM articoli WHERE id=?').get(art)) return res.status(400).json({ error: 'Articolo contenuto non trovato' });
+      if (isUnico(art)) return res.status(400).json({ error: 'I pezzi univoci con varianti non vanno in un flight case: usa un Flightcase K' });
+    }
+    fcNuovo = { art, qm };
+  }
+  try {
+    db.transaction(() => {
+      db.prepare('UPDATE articoli SET nome=?, note=? WHERE id=?').run(nome.trim(), note, el.id);
+      if (fcNuovo) db.prepare('UPDATE flightcase_def SET art_id_contenuto=?, qty_max=? WHERE art_id=?').run(fcNuovo.art, fcNuovo.qm, el.id);
+    })();
+    res.json({ ok: true });
+  } catch (e) { res.status(400).json({ error: 'Esiste già un elemento con questo nome' }); }
 });
 
 // POST carica articoli dentro un flight case
