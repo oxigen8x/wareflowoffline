@@ -1,6 +1,6 @@
 // Cambia il numero per forzare il rinnovo completo della cache
-const V = 'wareflow-offline-v33';
-const SHELL = ['./', 'index.html', 'app.css', 'app.js', 'logo-top.png', 'logo-sidebar.png', 'localapi.js', 'sql-wasm.js', 'sql-wasm.wasm', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
+const V = 'wareflow-offline-v34';
+const SHELL = ['./', 'index.html', 'app.css', 'app.js', 'localapi.js', 'sql-wasm.js', 'sql-wasm.wasm', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 self.addEventListener('install', e => e.waitUntil(
   caches.open(V).then(c => Promise.all(SHELL.map(u => fetch(new Request(u, { cache: 'reload' })).then(r => { if (!r.ok) throw new Error(u); return c.put(u, r); }))))
     .then(() => self.skipWaiting())));

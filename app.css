@@ -431,6 +431,16 @@ body.dark{background:linear-gradient(160deg,#1a1712 0%,#0e0c09 60%,#080806 100%)
 .shell{display:flex;min-height:100vh;align-items:stretch;}
 aside{width:250px;background:linear-gradient(180deg,#1c1c1c 0%,#0a0a0a 100%);color:#f4f1eb;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;flex-shrink:0;overflow:hidden;}
 .aside-logo{padding:16px 15px 14px;border-bottom:1px solid rgba(29,158,117,.2);display:flex;align-items:center;justify-content:center;}
+/* Logo vettoriale: "bancale" e filetto seguono il colore del testo del contenitore, "zio" è ambra */
+.zb-logo{display:block;flex-shrink:0;}
+.zb-z{fill:#F2B705;}
+.zb-t{fill:currentColor;}
+body[data-style]:not(.dark) .zb-z{fill:#C98F00;}
+.aside-logo .zb-full{width:210px;height:62.6px;}
+.aside-logo .zb-line,.aside-logo .zb-mark{display:none;}
+.mobile-topbar-logo{color:#f4f1eb;}
+body[data-style] .mobile-topbar-logo{color:var(--ink);}
+.mobile-topbar-logo .zb-line{width:95px;height:26px;}
 .beta-badge{display:block;text-align:center;margin:-8px 0 4px;font-size:9px;font-family:'DM Mono',monospace;color:rgba(93,202,165,.6);letter-spacing:1px;}
 .beta-badge{font-size:9px;font-family:'DM Mono',monospace;font-weight:500;background:rgba(29,158,117,.2);color:#5DCAA5;border:1px solid rgba(29,158,117,.3);border-radius:4px;padding:1px 5px;letter-spacing:.3px;margin-left:2px;vertical-align:middle;white-space:nowrap;}
 .aside-nav{padding:14px 10px;flex:1;min-height:0;display:flex;flex-direction:column;gap:1px;overflow-y:auto;}
@@ -1401,7 +1411,8 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
   body[data-struct="top"] .shell{flex-direction:column;}
   body[data-struct="top"] aside{position:sticky;top:0;z-index:60;width:100%;height:auto;min-height:58px;flex-direction:row;align-items:center;gap:4px;padding:0 14px;overflow:visible;}
   body[data-struct="top"] .aside-logo{padding:0 10px 0 0;border:0;flex-shrink:0;}
-  body[data-struct="top"] .aside-logo img{width:auto!important;height:32px!important;}
+  body[data-struct="top"] .aside-logo .zb-full{display:none;}
+  body[data-struct="top"] .aside-logo .zb-line{display:block;width:117px;height:32px;}
   body[data-struct="top"] .beta-badge,body[data-struct="top"] .aside-toggle,body[data-struct="top"] .nav-group-label{display:none!important;}
   body[data-struct="top"] .aside-nav{flex:1;min-width:0;flex-direction:row;align-items:center;overflow-x:auto;overflow-y:hidden;padding:6px 4px;gap:2px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
   body[data-struct="top"] .aside-nav::-webkit-scrollbar{display:none;}
@@ -1487,7 +1498,8 @@ body[data-style="cr"].dark th{color:var(--ink3);}
 @media(min-width:769px){
   body[data-style="cr"]:not([data-struct="top"]) aside{width:88px;}
   body[data-style="cr"]:not([data-struct="top"]) .aside-logo{padding:12px 6px;}
-  body[data-style="cr"]:not([data-struct="top"]) .aside-logo img{width:64px!important;}
+  body[data-style="cr"]:not([data-struct="top"]) .aside-logo .zb-full{display:none;}
+  body[data-style="cr"]:not([data-struct="top"]) .aside-logo .zb-mark{display:block;width:44px;height:44px;}
   body[data-style="cr"]:not([data-struct="top"]) .beta-badge{display:none;}
   body[data-style="cr"]:not([data-struct="top"]) .aside-nav{padding:10px 6px;gap:3px;}
   body[data-style="cr"]:not([data-struct="top"]) .nav-btn{flex-direction:column;gap:3px;padding:9px 3px;font-size:10px;text-align:center;line-height:1.15;justify-content:center;position:relative;}
