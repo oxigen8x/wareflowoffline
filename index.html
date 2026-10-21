@@ -116,6 +116,12 @@
         <span class="nav-badge" id="navNonAssBadge" style="display:none">0</span>
       </button>
     </nav>
+    <div class="aside-tools">
+    <div class="aspetto-wrap">
+      <button class="aspetto-btn" id="aspettoBtn" onclick="toggleAspetto(event)" aria-haspopup="dialog" aria-expanded="false" title="Aspetto">
+        <svg class="aspetto-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18 2 2 0 0 0 1.6-3.2 2 2 0 0 1 1.6-3.2H18a3 3 0 0 0 3-3C21 6.6 17 3 12 3z"/><circle cx="8" cy="10.5" r="1" fill="currentColor" stroke="none"/><circle cx="10.5" cy="7" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="7.5" r="1" fill="currentColor" stroke="none"/><circle cx="7.6" cy="14.6" r="1.4" class="pt"/></svg><span class="aspetto-lbl">Aspetto</span>
+      </button>
+    </div>
     <div class="online-pill" id="onlinePill" style="display:none">
       <div class="online-pill-inner">
         <div class="online-dot"></div>
@@ -123,16 +129,12 @@
         <div class="online-avatars" id="onlineAvatars"></div>
       </div>
     </div>
-    <div class="aspetto-wrap">
-      <button class="aspetto-btn" id="aspettoBtn" onclick="toggleAspetto(event)" aria-haspopup="dialog" aria-expanded="false" title="Aspetto">
-        <span class="aspetto-sw"></span><span class="aspetto-lbl">Aspetto</span><span class="aspetto-arr">▴</span>
-      </button>
     </div>
     <div id="userInfo" style="padding:8px 14px 0;font-size:12.5px;color:rgba(255,255,255,.45);font-family:'DM Mono',monospace;display:flex;flex-direction:column;gap:6px">
       <span id="userLabel">—</span>
-      <button onclick="exportaDb()" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);border-radius:4px;padding:6px 8px;font-size:12px;cursor:pointer;font-family:'DM Mono',monospace;text-align:left">💾<span class="ui-t"> Esporta database</span></button>
-      <button onclick="document.getElementById('impFile').click()" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);border-radius:4px;padding:6px 8px;font-size:12px;cursor:pointer;font-family:'DM Mono',monospace;text-align:left">⤓<span class="ui-t"> Importa database</span></button>
-      <button onclick="eliminaDb()" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);border-radius:4px;padding:6px 8px;font-size:12px;cursor:pointer;font-family:'DM Mono',monospace;text-align:left;color:#fca5a5;border-color:rgba(252,165,165,.35)">🗑<span class="ui-t"> Elimina database</span></button>
+      <button onclick="exportaDb()" title="Esporta database" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);border-radius:4px;padding:6px 8px;font-size:12px;cursor:pointer;font-family:'DM Mono',monospace;text-align:left">💾<span class="ui-t"> Esporta database</span></button>
+      <button onclick="document.getElementById('impFile').click()" title="Importa database" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);border-radius:4px;padding:6px 8px;font-size:12px;cursor:pointer;font-family:'DM Mono',monospace;text-align:left">⤓<span class="ui-t"> Importa database</span></button>
+      <button onclick="eliminaDb()" title="Elimina database" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);border-radius:4px;padding:6px 8px;font-size:12px;cursor:pointer;font-family:'DM Mono',monospace;text-align:left;color:#fca5a5;border-color:rgba(252,165,165,.35)">🗑<span class="ui-t"> Elimina database</span></button>
       <input type="file" id="impFile" accept=".db,.sqlite,.sqlite3,application/octet-stream" style="display:none" onchange="importaDb(this)">
     </div>
     <div class="aside-foot" id="clock">--:--</div>

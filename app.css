@@ -1594,3 +1594,83 @@ body[data-style="flat"] .nav-btn.active .ni{color:var(--acc);}
 body[data-style="flat"] .bt-tab.active,body[data-style="flat"] .lk-tab.active{border-color:var(--ink);}
 body[data-style="flat"] .bt-tab.active span{background:var(--ink);color:var(--bg);border-color:var(--ink);}
 body[data-style="flat"] .bt-view button.on{color:var(--ink);}
+
+/* ═══════════ BUILD 36 — sidebar/topbar compatte, icona Aspetto, verde "a posto" ═══════════ */
+:root{--ok:#1D9E75;--ok-bg:rgba(29,158,117,.10);--ok-bg2:rgba(29,158,117,.13);--ok-border:rgba(29,158,117,.4);}
+
+/* icona Aspetto (tavolozza; il puntino prende il colore del tema scelto) */
+.aspetto-ic{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.aspetto-ic .pt{fill:var(--asw,#e6a830);stroke:none;}
+.aspetto-arr{display:none;}
+
+/* riga strumenti: Aspetto + utenti online */
+.aside-tools{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border-top:1px solid rgba(255,255,255,.1);}
+body[data-style] .aside-tools{border-top-color:var(--border);}
+.aside-tools .aspetto-wrap{padding:0!important;border:0!important;flex:0 0 auto;}
+.aside-tools .aspetto-btn{height:26px!important;min-height:0!important;width:auto!important;padding:0 9px 0 7px!important;font-size:11.5px!important;gap:6px!important;border-radius:7px!important;}
+.aside-tools .aspetto-lbl{flex:none;}
+.aside-tools .online-pill{padding:0!important;border:0!important;flex:0 1 auto;min-width:0;}
+.aside-tools .online-pill-inner{padding:3px 7px!important;gap:5px!important;}
+.online-count{flex:none!important;font-size:10.5px!important;}
+.online-avatars{gap:0!important;}
+.online-av{margin-left:-6px;width:17px!important;height:17px!important;}
+.online-av:first-child{margin-left:0;}
+
+/* utente: una riga (nome, esci, chiave) */
+#userInfo{padding:2px 12px 8px!important;flex-direction:row!important;flex-wrap:wrap;align-items:center;gap:6px!important;}
+#userInfo>div:first-child{flex:1 1 100%;min-width:0;gap:6px!important;}
+#userInfo #userLabel{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#userInfo>#userLabel{flex:1 1 100%;}
+#userInfo button[title="Cambia password"]{width:auto!important;padding:2px 7px!important;}
+#userInfo button[title="Cambia password"] .ui-t{display:none;}
+#userInfo>button{flex:1 1 0;text-align:center!important;padding:5px 4px!important;}
+#userInfo>button .ui-t{display:none;}
+.aside-foot{padding:2px 14px 8px!important;}
+
+/* schermi bassi (telefono in orizzontale): più spazio alle voci di menu */
+@media(max-height:560px){
+  body:not([data-struct="top"]) .aside-foot{display:none!important;}
+  body:not([data-struct="top"]) .beta-badge{display:none!important;}
+  body:not([data-struct="top"]):not([data-style="cr"]) .aside-logo{padding:8px 10px!important;}
+  body:not([data-struct="top"]):not([data-style="cr"]) .aside-logo .zb-full{width:120px!important;height:36px!important;}
+}
+
+/* topbar */
+@media(min-width:769px){
+  body[data-struct="top"] .aside-tools{display:contents;}
+  body[data-struct="top"] .aside-tools .online-pill{order:1;padding:0 6px!important;flex-shrink:0;}
+  body[data-struct="top"] .aside-tools .aspetto-wrap{order:2;padding:0 4px!important;flex-shrink:0;}
+  body[data-struct="top"] .aside-tools .aspetto-btn{width:30px!important;height:30px!important;padding:0!important;justify-content:center;border-radius:8px!important;}
+  body[data-struct="top"] .aspetto-lbl{display:none!important;}
+  body[data-struct="top"] .aspetto-ic{width:17px;height:17px;}
+  body[data-struct="top"] #userInfo{order:3;flex-wrap:nowrap;}
+  body[data-struct="top"] #userInfo>div:first-child{flex:none;}
+  body[data-struct="top"] #userInfo>#userLabel{flex:none;}
+  body[data-struct="top"] #userInfo>button{flex:none;}
+  body[data-struct="top"] .aside-foot{order:4;}
+  body[data-struct="top"] .nav-btn{padding:8px 9px;font-size:13px;gap:7px;}
+  body[data-struct="top"] .aside-nav{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent);}
+}
+@media(min-width:769px) and (max-width:1699px){
+  body[data-struct="top"] #userLabel,body[data-struct="top"] .aside-foot{display:none;}
+}
+@media(min-width:769px) and (max-width:1799px){
+  body[data-struct="top"] .nav-btn:not(.active){padding:8px 10px;}
+  body[data-struct="top"] .nav-btn:not(.active)>span:not(.ni):not(.nav-badge){display:none;}
+}
+
+/* Control Room: barra stretta, strumenti in colonna */
+@media(min-width:769px){
+  body[data-style="cr"]:not([data-struct="top"]) .aside-tools{flex-direction:column;gap:6px;padding:8px 6px;}
+  body[data-style="cr"]:not([data-struct="top"]) .aside-tools .aspetto-btn{width:34px!important;height:34px!important;padding:0!important;justify-content:center;}
+  body[data-style="cr"]:not([data-struct="top"]) .aspetto-lbl{display:none!important;}
+  body[data-style="cr"]:not([data-struct="top"]) .aspetto-ic{width:17px;height:17px;}
+  body[data-style="cr"]:not([data-struct="top"]) .aside-tools .online-pill{width:100%;}
+}
+
+/* "a posto" = verde fisso, indipendente da stile e colore del tema */
+body .ph-src.on{border:1px solid var(--ok)!important;background:var(--ok-bg2)!important;}
+body .ph-badge.ok{background:var(--ok)!important;border-color:var(--ok)!important;color:#fff!important;}
+body .ph-row2.ok{border:1.5px solid var(--ok)!important;background:var(--ok-bg)!important;}
+body .ph-step.done:not(.on){border-color:var(--ok-border)!important;background:var(--ok-bg2)!important;color:var(--ok)!important;}
+body .ph-step.done .ph-dot{background:var(--ok)!important;border-color:var(--ok)!important;color:#fff!important;}

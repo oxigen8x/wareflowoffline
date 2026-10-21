@@ -3414,13 +3414,15 @@ function _renderOnlineFromList(lista) {
   const avEl = document.getElementById('onlineAvatars');
   if (!countEl || !avEl) return;
   const n = lista.length;
-  countEl.textContent = n === 1 ? '1 utente online' : `${n} utenti online`;
-  const visibili = lista.slice(0, 4);
+  countEl.textContent = String(n);
+  const pill = document.getElementById('onlinePill');
+  if (pill) pill.title = (n === 1 ? '1 utente online' : `${n} utenti online`) + (n ? ': ' + lista.map(u => u.username).join(', ') : '');
+  const visibili = lista.slice(0, 3);
   avEl.innerHTML = visibili.map(u => {
     const c = avatarColor(u.username);
     const iniziale = u.username.charAt(0).toUpperCase();
     return `<div class="online-av" style="background:${c.bg};color:${c.fg}" title="${h(u.username)}">${iniziale}</div>`;
-  }).join('') + (lista.length > 4 ? `<div class="online-av" style="background:rgba(255,255,255,.12);color:rgba(255,255,255,.5)">+${lista.length-4}</div>` : '');
+  }).join('') + (n > 3 ? `<div class="online-av" style="background:#3a3835;color:#ddd" title="${n - 3} altri">+${n - 3}</div>` : '');
 }
 
 function initOnline() {}
@@ -3464,7 +3466,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 35;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 36;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
@@ -4640,4 +4642,14 @@ function initHistory() {
   renderDash();
   initHistory();
   playLoginSound();
+})();
+
+// tooltip sulle voci di menu: servono quando in topbar restano solo le icone
+(function navTitoli() {
+  const f = () => document.querySelectorAll('.nav-btn').forEach(b => {
+    if (b.title) return;
+    const l = b.querySelector('span:not(.ni):not(.nav-badge)');
+    if (l) b.title = l.textContent.trim();
+  });
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', f); else f();
 })();
