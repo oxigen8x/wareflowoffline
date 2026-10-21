@@ -2302,7 +2302,7 @@ const THEMES = [
   {id:'red',    name:'Pure Red',c:'#dc2626'},
   {id:'cemento',name:'Cemento', c:'#8a8a8a'},
 ];
-const ASP_STILI = ['', 'cr', 'neu', 'term', 'flat'];
+const ASP_STILI = ['', 'cr', 'neu', 'term', 'flat', 'sheet', 'w95'];
 function _lsSet(k, v) { try { if (v) localStorage.setItem(k, v); else localStorage.removeItem(k); } catch (e) {} }
 function _lsGet(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
 function _setBodyAttr(name, val) { if (val) document.body.setAttribute(name, val); else document.body.removeAttribute(name); }
@@ -2312,10 +2312,18 @@ function setTheme(theme) {
   _lsSet('wf-theme', theme);
   aspettoRefresh();
 }
+// Modo scuro effettivo: lo stile Anni 90 resta sempre chiaro
+function _applyDarkClass() {
+  const s = _lsGet('wf-dark');
+  let d = s === '1' || (s !== '0' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (document.body.getAttribute('data-style') === 'w95') d = false;
+  document.body.classList.toggle('dark', d);
+}
 function setStile(stile) {
   if (!ASP_STILI.includes(stile)) stile = '';
   _setBodyAttr('data-style', stile);
   _lsSet('wf-style', stile);
+  _applyDarkClass();
   aspettoRefresh();
 }
 function setStruttura(s) {
@@ -2327,8 +2335,8 @@ function setStruttura(s) {
 }
 // Modo: 'l' chiaro, 'd' scuro, 'a' automatico (segue il sistema)
 function setModo(m) {
-  if (m === 'a') { _lsSet('wf-dark', ''); document.body.classList.toggle('dark', window.matchMedia('(prefers-color-scheme: dark)').matches); }
-  else { _lsSet('wf-dark', m === 'd' ? '1' : '0'); document.body.classList.toggle('dark', m === 'd'); }
+  _lsSet('wf-dark', m === 'a' ? '' : (m === 'd' ? '1' : '0'));
+  _applyDarkClass();
   aspettoRefresh();
 }
 function resetAspetto() { setStile(''); setStruttura(''); setTheme(''); setModo('a'); }
@@ -2394,7 +2402,7 @@ function initTheme() {
   setTheme(_lsGet('wf-theme'));
   // Modo automatico: segue il cambio di tema del sistema
   const mq = window.matchMedia('(prefers-color-scheme: dark)');
-  const onMq = e => { if (!_lsGet('wf-dark')) document.body.classList.toggle('dark', e.matches); };
+  const onMq = () => { if (!_lsGet('wf-dark')) _applyDarkClass(); };
   if (mq.addEventListener) mq.addEventListener('change', onMq);
   aspettoRefresh();
 }
@@ -3466,7 +3474,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 36;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 37;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
@@ -4636,6 +4644,7 @@ function initHistory() {
   initOnline();
   // trasferisci da html a body se necessario
   if (document.documentElement.classList.contains("dark-pre")) { document.body.classList.add("dark"); document.documentElement.classList.remove("dark-pre"); }
+  _applyDarkClass();
   const ok = await initAuth();
   if (!ok) return;
   await load();
