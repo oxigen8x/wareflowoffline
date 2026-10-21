@@ -2301,8 +2301,9 @@ const THEMES = [
   {id:'sand',   name:'Sand',    c:'#c9a96e'},
   {id:'red',    name:'Pure Red',c:'#dc2626'},
   {id:'cemento',name:'Cemento', c:'#8a8a8a'},
+  {id:'neutro', name:'Neutro',  c:'#d8d8dc'},
 ];
-const ASP_STILI = ['', 'cr', 'neu', 'term', 'flat', 'sheet', 'w95'];
+const ASP_STILI = ['', 'cr', 'neu', 'term', 'sheet', 'w95'];
 function _lsSet(k, v) { try { if (v) localStorage.setItem(k, v); else localStorage.removeItem(k); } catch (e) {} }
 function _lsGet(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
 function _setBodyAttr(name, val) { if (val) document.body.setAttribute(name, val); else document.body.removeAttribute(name); }
@@ -3474,7 +3475,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 37;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 38;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
