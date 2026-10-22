@@ -449,8 +449,8 @@ function spRenderList() {
     const c = spInCart(a.id);
     const cat = getCat(a.cat_id);
     return `<div class="sp-ar${a.id===SP.sel?' on':''}${c?' in':''}" onclick="spPick(${a.id})">
-      <span class="sp-cd">${h(a.codice)}</span>
-      <span class="sp-nm">${h(a.nome)}${a.variante?' · '+h(a.variante):''}<span class="sp-ct">${h(cat?.nome||'')}</span></span>
+      ${codiceBadge(a.codice, cat?.colore)}
+      <span class="sp-nm"><strong>${h(a.nome)}</strong>${a.variante?' · '+h(a.variante):''}</span><span class="sp-cp">${catPill(cat)}</span>
       ${c?`<span class="sp-tag">×${c.qty}</span>`:''}
       <span class="sp-av">${spAvail(a.id)}<small>disp.</small></span></div>`;
   }).join('') : '<div class="sp-empty">Nessun articolo disponibile con questi filtri</div>';
@@ -461,9 +461,9 @@ function spRenderSel() {
   const a = SP.sel ? getArt(SP.sel) : null;
   const d = a ? spAvail(a.id) : 0, c = a ? spInCart(a.id) : null;
   const chips = a ? spMags().filter(m => getStock(a.id, m.id) > 0).map(m =>
-    `<span class="sp-chip${m.id===SP.src?' me':''}">${m.virtuale?'🗑 ':''}${h(m.nome)} ${getStock(a.id, m.id)}</span>`).join('') : '';
+    `<span class="stock-pill${m.id===SP.src?' sp-me':''}"><strong>${getStock(a.id, m.id)}</strong> ${m.virtuale?'🗑 ':''}${h(m.nome)}</span>`).join('') : '';
   document.getElementById('spSel').innerHTML = `<div class="sp-sel">
-    <div class="sp-code">${a ? h(a.codice)+' · '+h(getCat(a.cat_id)?.nome||'') : '—'}</div>
+    <div class="sp-code">${a ? codiceBadge(a.codice, getCat(a.cat_id)?.colore)+' '+catPill(getCat(a.cat_id)) : '—'}</div>
     <div class="sp-name${a?'':' ph'}">${a ? h(a.nome)+(a.variante?' · '+h(a.variante):'') : 'Nessun articolo selezionato'}</div>
     <div class="sp-chips">${a ? chips : '<span class="sp-hint">Scegli un articolo dall\'elenco</span>'}</div>
     <label class="sp-lab">Quantità${a?` (max ${d}${a.um&&a.um!=='pz'?' '+h(a.um):''})`:''}</label>
@@ -476,13 +476,13 @@ function spRenderSel() {
 function spRenderCart() {
   const n = SP.cart.length;
   document.getElementById('spCartCnt').textContent = n ? `${n} articol${n===1?'o':'i'} · ${spPcs()} pz` : '';
-  document.getElementById('spCart').innerHTML = n ? `<table class="sp-tbl"><thead><tr><th>Articolo</th><th>Disp.</th><th>Quantità</th><th></th></tr></thead><tbody>${
+  document.getElementById('spCart').innerHTML = n ? `<div class="tbl-uni"><table class="sp-tbl"><thead><tr><th>Articolo</th><th>Disp.</th><th>Quantità</th><th></th></tr></thead><tbody>${
     SP.cart.map(c => { const a = getArt(c.id); return `<tr>
-      <td><span class="sp-cd">${h(a.codice)}</span> ${h(a.nome)}${a.variante?' · '+h(a.variante):''}</td>
+      <td>${codiceBadge(a.codice, getCat(a.cat_id)?.colore)} <strong>${h(a.nome)}</strong>${a.variante?' · '+h(a.variante):''}</td>
       <td class="sp-hint">${spAvail(c.id)}</td>
       <td><div class="sp-step"><button type="button" aria-label="Meno" onclick="spCq(${c.id},-1)">${SP_MINUS}</button><input value="${c.qty}" inputmode="numeric" onchange="spCset(${c.id},this.value)"><button type="button" aria-label="Più" onclick="spCq(${c.id},1)">${SP_PLUS}</button></div></td>
       <td><button type="button" class="sp-x" aria-label="Togli" onclick="spRm(${c.id})">✕</button></td></tr>`; }).join('')
-  }</tbody></table>` : '<div class="sp-empty">Nessun articolo selezionato</div>';
+  }</tbody></table></div>` : '<div class="sp-empty">Nessun articolo selezionato</div>';
   spRenderBar();
 }
 function spRenderBar() {
@@ -3445,7 +3445,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 39;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 40;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);

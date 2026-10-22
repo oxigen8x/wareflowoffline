@@ -1859,7 +1859,6 @@ body.dark #sposAdmin{--sp-ac:var(--teal-light);}
 .sp-sum{flex:1;min-width:200px;font-size:13px;color:var(--ink);}
 .sp-nt{flex:1.2;min-width:180px;}
 #sposAdmin .btn[disabled]{opacity:.45;cursor:not-allowed;}
-#cardTrasferisciTutto{max-width:760px;}
 @container sp (max-width:900px){
   .sp-mid{grid-template-columns:1fr;}
   .sp-da{grid-template-columns:1fr;}
@@ -1875,3 +1874,21 @@ body.dark #sposAdmin{--sp-ac:var(--teal-light);}
   .sp-tbl td:nth-child(2)::before{content:'disp. ';}
   .sp-tbl td:nth-child(3){margin-left:auto;}
 }
+
+.stock-pill.sp-me{border-color:var(--teal);color:var(--sp-ac);background:var(--teal-bg);}
+.sp-ct{margin-top:2px;}.sp-ct .cat-pill{font-size:10px;padding:1px 6px;}
+
+/* righe elenco articoli Spostamento più compatte */
+.sp-ar{padding:5px 14px;gap:8px;}
+.sp-cp{flex:none;}.sp-cp .cat-pill{font-size:10px;padding:1px 6px;}
+.sp-av small{display:inline;margin-left:3px;}
+.sp-av{white-space:nowrap;}
+@container sp (max-width:560px){.sp-cp{display:none;}}
+
+/* Trasferisci tutto (Tour) — stessa grafica del nuovo Spostamento */
+.sp-tt{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:end;padding:14px;}
+.sp-tt .sp-arrow{padding-bottom:8px;}
+.sp-ttbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 14px;border-top:1px solid var(--border);}
+.sp-ttbar .sp-sum{min-height:18px;color:var(--ink2);}
+#cardTrasferisciTutto{container-type:inline-size;container-name:tt;}
+@container tt (max-width:620px){.sp-tt{grid-template-columns:1fr;}.sp-tt .sp-arrow{transform:rotate(90deg);justify-self:center;padding:0;}}

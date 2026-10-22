@@ -167,10 +167,10 @@
 
     <!-- SPOSTAMENTO -->
     <div class="page" id="page-spostamento">
-      <div class="page-head" style="max-width:1100px;margin:0 auto">
+      <div class="page-head">
         <div><div class="page-title">Spostamento</div><div class="page-sub" id="sposSub">Sposta merce tra magazzini</div></div>
       </div>
-      <div style="max-width:1100px;margin:0 auto">
+      <div>
         <div class="admin-only" id="sposAdmin" style="display:none">
           <!-- Da → A -->
           <div class="sp-da">
@@ -220,17 +220,17 @@
 <div class="lk-empty" id="sposVuoto" style="display:none">Nessun magazzino Tour disponibile</div>
 
         <!-- TRASFERISCI TUTTO — solo magazzini Tour -->
-        <div class="card" id="cardTrasferisciTutto" style="margin-top:16px;border-top:5px solid var(--teal-dark);display:none">
-          <div class="card-head"><span class="card-title" style="color:var(--teal-darker)">📦 Trasferisci tutto (Tour)</span><span style="font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.8px;color:#1D9E75;opacity:.7">OPERAZIONE</span></div>
-          <div class="card-body">
-            <div style="font-size:13px;color:var(--ink2);margin-bottom:14px">Sposta l'intero contenuto di un magazzino Tour in un altro magazzino in un'unica operazione.</div>
-            <div class="form-grid form-row-2" style="margin-bottom:14px">
+        <div id="cardTrasferisciTutto" style="margin-top:12px;display:none">
+          <div class="card">
+            <div class="card-head sp-bh"><span class="card-title">Trasferisci tutto (Tour)</span><small class="sp-hint">sposta l'intero contenuto di un magazzino Tour</small></div>
+            <div class="sp-tt">
               <div class="fgroup">
                 <label>Magazzino Tour (Da) *</label>
                 <select class="finput" id="ttMagDa" onchange="onTTMagDaChange()" autocomplete="off">
                   <option value="">— seleziona —</option>
                 </select>
               </div>
+              <div class="sp-arrow">→</div>
               <div class="fgroup">
                 <label>Magazzino destinazione (A) *</label>
                 <select class="finput" id="ttMagA" autocomplete="off">
@@ -238,9 +238,9 @@
                 </select>
               </div>
             </div>
-            <div id="ttPreview" style="font-size:12px;color:var(--ink3);min-height:18px;margin-bottom:12px;font-family:'DM Mono',monospace"></div>
-            <div style="border-top:1px solid var(--border);padding-top:14px">
-              <button class="btn btn-primary" style="width:100%;padding:11px" onclick="salvaTrasferisciTutto()">📦 Trasferisci tutto</button>
+            <div class="sp-ttbar">
+              <div class="sp-sum" id="ttPreview"></div>
+              <button class="btn btn-primary" onclick="salvaTrasferisciTutto()">⇄ Trasferisci tutto</button>
             </div>
           </div>
         </div>
