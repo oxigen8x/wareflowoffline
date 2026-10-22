@@ -539,13 +539,13 @@
         <div class="nonass-banner-icon">ℹ️</div>
         <div class="nonass-banner-text">
           <div class="nonass-banner-title">Come funziona</div>
-          <div class="nonass-banner-sub">Sposta qui gli articoli che vuoi eliminare usando "→ Cestino" nella pagina Articoli, oppure "📦 Svuota" nelle card Magazzini. Puoi eliminarli definitivamente quando non hanno più stock in nessun magazzino reale. Se li risposti in un magazzino reale, tornano automaticamente nella lista Articoli.</div>
+          <div class="nonass-banner-sub">Sposta qui gli articoli che vuoi eliminare usando "→ Cestino" nella pagina Articoli, oppure "📦 Svuota" nelle card Magazzini. Puoi <strong>eliminarli</strong> definitivamente quando non hanno più stock in nessun magazzino reale, oppure <strong>scaricare</strong> solo alcuni pezzi (l'articolo resta nel catalogo). Se li risposti in un magazzino reale, tornano automaticamente nella lista Articoli.</div>
         </div>
       </div>
       <div class="card">
         <div class="tbl-wrap">
           <table>
-            <colgroup><col class="cw-code"><col class="cw-xl"><col class="cw-lg"><col class="cw-um"><col class="cw-qty"><col class="cw-lg"><col style="width:180px"></colgroup>
+            <colgroup><col class="cw-code"><col class="cw-xl"><col class="cw-lg"><col class="cw-um"><col class="cw-qty"><col class="cw-lg"><col style="width:230px"></colgroup>
 <thead><tr><th>Codice</th><th>Articolo</th><th>Categoria</th><th>U.M.</th><th>Qtà park.</th><th>Altri mag.</th><th></th></tr></thead>
             <tbody id="tbNonAss"></tbody>
           </table>
@@ -830,6 +830,27 @@
     </div>
   </div>
 </div>
+<!-- MODAL: SCARICA PEZZI DAL CESTINO -->
+<div class="overlay" id="modalScaricaCest">
+  <div class="modal modal-sm">
+    <button class="modal-close" onclick="closeModal('modalScaricaCest')">✕</button>
+    <div class="modal-title">Scarica pezzi</div>
+    <div id="scCestSub" style="font-size:13px;color:var(--ink3);margin-top:-14px;margin-bottom:16px"></div>
+    <div style="font-size:11px;color:var(--ink3);background:var(--bg2);border-radius:6px;padding:8px 12px;margin-bottom:14px">💡 I pezzi vengono tolti dal Cestino e registrati nello Storico come <strong>scarico</strong>. L'articolo resta nel catalogo.</div>
+    <div class="fgroup"><label>Quantità da scaricare *</label>
+      <div class="sp-qrow">
+        <div class="sp-step"><button type="button" aria-label="Meno" onclick="scCestAdj(-1)"><svg viewBox="0 0 12 12"><path d="M2 6h8"/></svg></button><input id="scCestQty" inputmode="numeric" autocomplete="off" onchange="scCestSet(this.value)" oninput="scCestLive()" onkeydown="if(event.key==='Enter'){event.preventDefault();scCestConferma()}"><button type="button" aria-label="Più" onclick="scCestAdj(1)"><svg viewBox="0 0 12 12"><path d="M2 6h8M6 2v8"/></svg></button></div>
+        <button class="btn btn-green btn-sm" type="button" onclick="scCestMax()">MAX</button>
+        <span class="sp-hint" id="scCestInfo"></span>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('modalScaricaCest')">Annulla</button>
+      <button class="btn dlg-danger" id="scCestOk" onclick="scCestConferma()">Scarica</button>
+    </div>
+  </div>
+</div>
+
 <iframe id="printFrame" style="display:none" title="Stampa"></iframe>
 
 <!-- MODAL: DESTINAZIONE LISTA VELOCE -->

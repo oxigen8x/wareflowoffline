@@ -307,6 +307,7 @@ document.addEventListener('click', async e => {
   else if (action === 'delArtDirect')   await delArtDirect(+id);
   else if (action === 'mandaNonAss')    await mandaANonAssegnati(+id);
   else if (action === 'eliminaDef')     await eliminaArtDefinitivo(+artId);
+  else if (action === 'scaricaCest')    scaricaCestino(+artId);
   else if (action === 'openMagDetail')  openMagDetail(+id);
 });
 
@@ -1622,14 +1623,15 @@ function renderNonAssegnati() {
       <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--ink3)">${h(a?.um)||'pz'}</td>
       <td><span style="font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--virt-text)">${getTot(s.art_id,s.mag_id)}</span></td>
       <td>${stockReale>0?`<div class="stock-inline">${pillsReali}</div>`:'<span style="font-size:12px;color:var(--ink3)">Nessuno stock altrove</span>'}</td>
-      <td style="text-align:right">
+      <td style="text-align:right"><div style="display:flex;gap:6px;justify-content:flex-end;align-items:center;flex-wrap:wrap">
+        ${(isBauleArt(s.art_id)||isFlightcaseArt(s.art_id)||isFlckArt(s.art_id)) ? '' : `<button class="btn btn-orange btn-xs" data-action="scaricaCest" data-art-id="${s.art_id}">↓ Scarica</button>`}
         ${stockReale===0
           ? (() => { if (isBauleArt(s.art_id)) return `<button class="btn btn-danger btn-xs" onclick="eliminaBaule(${s.art_id})">🗑 Elimina baule</button>`;
               if (isFlightcaseArt(s.art_id)) return `<button class="btn btn-danger btn-xs" onclick="eliminaBaule(${s.art_id})">🗑 Elimina case</button>`;
               if (isFlckArt(s.art_id)) return `<button class="btn btn-danger btn-xs" onclick="eliminaFlck(${s.art_id})">🗑 Elimina case K</button>`;
               return `<button class="btn btn-danger btn-xs" data-action="eliminaDef" data-art-id="${s.art_id}">🗑 Elimina</button>`; })()
           : `<span style="font-size:11px;color:var(--ink3)">Svuota prima gli altri magazzini</span>`}
-      </td>
+      </div></td>
     </tr>`;
   }).join('');
 }
@@ -1656,6 +1658,41 @@ async function eliminaArtDefinitivo(artId) {
     await loadPartial('articoli'); renderNonAssegnati();
     toast(`"${a?.nome}" eliminato ✓`);
   } catch(e) { toast(e.message||'Errore imprevisto — riprova', true); }
+}
+
+// ─── SCARICO DAL CESTINO (toglie alcuni pezzi senza eliminare l'articolo) ───
+let _scCestArt = 0, _scCestMax = 0;
+function scaricaCestino(artId) {
+  const mv = getMagVirt(); if (!mv) { toast('Magazzino virtuale non trovato', true); return; }
+  const a = getArt(artId), max = getTot(artId, mv.id);
+  if (!a || max < 1) { toast('Nessun pezzo nel Cestino', true); return; }
+  _scCestArt = artId; _scCestMax = max;
+  document.getElementById('scCestSub').innerHTML = `${codiceBadge(a.codice, getCat(a.cat_id)?.colore)} <strong style="color:var(--ink)">${h(a.nome)}</strong>${varChip(a)}`;
+  document.getElementById('scCestQty').value = 1;
+  scCestLive();
+  openModal('modalScaricaCest');
+  setTimeout(() => { const i = document.getElementById('scCestQty'); i.focus(); i.select(); }, 50);
+}
+const scCestClamp = v => Math.max(1, Math.min(_scCestMax, parseInt(v) || 1));
+function scCestAdj(d) { const i = document.getElementById('scCestQty'); i.value = scCestClamp((parseInt(i.value) || 0) + d); scCestLive(); }
+function scCestSet(v) { document.getElementById('scCestQty').value = scCestClamp(v); scCestLive(); }
+function scCestMax()  { document.getElementById('scCestQty').value = _scCestMax; scCestLive(); }
+function scCestLive() {
+  const q = parseInt(document.getElementById('scCestQty').value) || 0, rest = _scCestMax - q;
+  document.getElementById('scCestInfo').textContent = `su ${_scCestMax} nel Cestino · ${rest >= 0 ? 'restano ' + rest : 'troppi'}`;
+  const ok = q >= 1 && q <= _scCestMax, btn = document.getElementById('scCestOk');
+  btn.disabled = !ok; btn.style.opacity = ok ? '' : '.5';
+}
+async function scCestConferma() {
+  const mv = getMagVirt(), q = parseInt(document.getElementById('scCestQty').value) || 0;
+  if (!mv || q < 1 || q > _scCestMax) return;
+  const a = getArt(_scCestArt);
+  try {
+    await apiFetch('POST', '/stock/scarica', { art_id:_scCestArt, mag_id:mv.id, qty:q, note:'Scarico dal cestino', data:nowRoma() });
+    closeModal('modalScaricaCest');
+    await loadPartial('spostamenti'); renderNonAssegnati();
+    toast(`Scaricati ${q} ${a?.um || 'pz'} di "${a?.nome}" ✓` + (q === _scCestMax ? ' — l\'articolo resta nel catalogo' : ''));
+  } catch(e) { toast(e.message || 'Errore imprevisto — riprova', true); }
 }
 
 // ─── FORM ARTICOLO: cambio categoria → aggiorna codice suggerito ───
@@ -3445,7 +3482,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 41;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 42;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
