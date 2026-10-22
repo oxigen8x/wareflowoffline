@@ -396,205 +396,168 @@ function renderSpos() {
     ttA.innerHTML = '<option value="">— seleziona —</option>' +
       allDest.map(m=>`<option value="${m.id}">${m.icona||'🏭'} ${h(m.nome)}</option>`).join('');
   }
-  // Popola categorie
-  const catSel = document.getElementById('sCategoria');
-  const prevCat = catSel.value;
+  if(!soloTour) spInit();
+}
+
+// Spostamento multiplo (solo admin): stato della schermata
+const SP = { src:0, dst:0, cat:'', q:'', sel:0, qty:0, cart:[], busy:false };
+const spMags   = () => D.magazzini.filter(m => currentUser?.ruolo==='admin' || !m.virtuale);
+const spAvail  = id => getStock(id, SP.src) || 0;
+const spInCart = id => SP.cart.find(c => c.id === id);
+const spPcs    = () => SP.cart.reduce((n,c) => n + c.qty, 0);
+const spMagLbl = m => m.virtuale ? '🗑 Cestino' : (m.citta || '');
+function spLista() {
+  const q = SP.q.trim().toLowerCase();
+  return D.articoli.filter(a => spAvail(a.id) > 0
+    && (!SP.cat || a.cat_id == SP.cat)
+    && (!q || `${a.codice} ${a.nome} ${a.variante||''}`.toLowerCase().includes(q)));
+}
+function spInit() {
+  const mags = spMags();
+  if(!mags.some(m => m.id === SP.src)) SP.src = (getMagReali()[0] || mags[0] || {}).id || 0;
+  if(SP.dst === SP.src || !mags.some(m => m.id === SP.dst)) SP.dst = 0;
+  // categorie
+  const catSel = document.getElementById('spCat');
   catSel.innerHTML = '<option value="">Tutte</option>' +
-    D.categorie.map(c=>`<option value="${c.id}"${c.id==prevCat?' selected':''}>[${h(c.prefisso)}] ${h(c.nome)}</option>`).join('');
-  // Popola filtro magazzino (escludi virtuale per standard)
-  const isAdminSpos = currentUser?.ruolo==='admin';
-  const magsPerFiltro = D.magazzini.filter(m=>!m.virtuale||(isAdminSpos&&m.virtuale));
-  const sMagF = document.getElementById('sMagFiltro');
-  if(sMagF) {
-    const prevMagF = sMagF.value;
-    sMagF.innerHTML = '<option value="">Tutti</option>' +
-      magsPerFiltro.map(m=>`<option value="${m.id}"${m.id==prevMagF?' selected':''}>${m.icona||'🏭'} ${h(m.nome)}</option>`).join('');
-  }
-  filterSposArticoli();
-  // Popola i dropdown con tutti i magazzini
-  const isAdmin = currentUser?.ruolo==='admin';
-  const magsPerSpos = D.magazzini.filter(m => isAdmin || !m.virtuale);
-  const magOpts = '<option value="">— seleziona —</option>' +
-    magsPerSpos.map(m=>`<option value="${m.id}">${h(m.nome)}${m.virtuale?' 📦':''}</option>`).join('');
-  document.getElementById('sMagDa').innerHTML = magOpts;
-  document.getElementById('sMagA').innerHTML  = magOpts;
-  setSposBox('da', null); setSposBox('a', null);
-  onSposArticoloChange();
+    D.categorie.map(c => `<option value="${c.id}"${c.id==SP.cat?' selected':''}>[${h(c.prefisso)}] ${h(c.nome)}</option>`).join('');
+  if(SP.cat && !D.categorie.some(c => c.id == SP.cat)) { SP.cat = ''; catSel.value = ''; }
+  document.getElementById('spQ').value = SP.q;
+  // sorgente
+  document.getElementById('spSrc').innerHTML = mags.map(m =>
+    `<option value="${m.id}"${m.id===SP.src?' selected':''}>${m.virtuale?'🗑 ':''}${h(m.nome)}</option>`).join('');
+  // il carrello segue lo stock aggiornato
+  SP.cart = SP.cart.filter(c => spAvail(c.id) > 0);
+  SP.cart.forEach(c => { c.qty = Math.min(c.qty, spAvail(c.id)); });
+  if(SP.sel && spAvail(SP.sel) <= 0) { SP.sel = 0; SP.qty = 0; }
+  if(SP.sel) SP.qty = Math.max(1, Math.min(spAvail(SP.sel), SP.qty || 1));
+  spRenderAll();
 }
-
-// Aggiorna il riquadro visivo Da/A e il dropdown corrispondente
-function setSposBox(tipo, magId) {
-  const boxEl  = document.getElementById(tipo==='da' ? 'sBoxDa' : 'sBoxA');
-  const valEl  = document.getElementById(tipo==='da' ? 'sBoxDaVal' : 'sBoxAVal');
-  const selEl  = document.getElementById(tipo==='da' ? 'sMagDa' : 'sMagA');
-  if (magId) {
-    const m = getMag(magId);
-    valEl.textContent = m.nome;
-    selEl.value = magId;
-    boxEl.classList.add('filled');
-  } else {
-    valEl.textContent = '— non selezionato —';
-    selEl.value = '';
-    boxEl.classList.remove('filled');
-  }
+function spRenderAll() { spRenderDst(); spRenderList(); spRenderSel(); spRenderCart(); }
+function spRenderDst() {
+  const dstMags = spMags().filter(m => m.id !== SP.src);
+  document.getElementById('spDst').innerHTML = dstMags.length ? dstMags.map(m =>
+    `<div class="sp-dc${m.id===SP.dst?' on':''}" style="--mc:${m.colore||'var(--border2)'}" onclick="spSetDst(${m.id})">
+       <b>${h(m.nome)}</b><small>${h(spMagLbl(m))||'&nbsp;'}</small></div>`).join('')
+    : '<div class="sp-empty">Nessun altro magazzino</div>';
+  const d = getMag(SP.dst);
+  document.getElementById('spDstName').textContent = d ? d.nome : 'scegli';
+  spRenderBar();
 }
-
-// Sincronizza dropdown → box quando si usa il menù a tendina
-function onSposDaChange() {
-  const da = document.getElementById('sMagDa');
-  const a  = document.getElementById('sMagA');
-  if (da.value && da.value === a.value) {
-    toast('Partenza e destinazione non possono essere uguali', true);
-    a.value = ''; setSposBox('a', null);
-  }
-  setSposBox('da', da.value ? +da.value : null);
-  onSposArticoloChange();
-  updateSposDisp();
+function spRenderList() {
+  const L = spLista();
+  document.getElementById('spList').innerHTML = L.length ? L.map(a => {
+    const c = spInCart(a.id);
+    const cat = getCat(a.cat_id);
+    return `<div class="sp-ar${a.id===SP.sel?' on':''}${c?' in':''}" onclick="spPick(${a.id})">
+      <span class="sp-cd">${h(a.codice)}</span>
+      <span class="sp-nm">${h(a.nome)}${a.variante?' · '+h(a.variante):''}<span class="sp-ct">${h(cat?.nome||'')}</span></span>
+      ${c?`<span class="sp-tag">×${c.qty}</span>`:''}
+      <span class="sp-av">${spAvail(a.id)}<small>disp.</small></span></div>`;
+  }).join('') : '<div class="sp-empty">Nessun articolo disponibile con questi filtri</div>';
 }
-function onSposAChange() {
-  const da = document.getElementById('sMagDa');
-  const a  = document.getElementById('sMagA');
-  if (a.value && a.value === da.value) {
-    toast('Destinazione non può essere uguale alla partenza', true);
-    a.value = ''; setSposBox('a', null); return;
-  }
-  setSposBox('a', a.value ? +a.value : null);
-  onSposArticoloChange();
+const SP_MINUS = '<svg viewBox="0 0 12 12"><path d="M2 6h8"/></svg>';
+const SP_PLUS  = '<svg viewBox="0 0 12 12"><path d="M2 6h8M6 2v8"/></svg>';
+function spRenderSel() {
+  const a = SP.sel ? getArt(SP.sel) : null;
+  const d = a ? spAvail(a.id) : 0, c = a ? spInCart(a.id) : null;
+  const chips = a ? spMags().filter(m => getStock(a.id, m.id) > 0).map(m =>
+    `<span class="sp-chip${m.id===SP.src?' me':''}">${m.virtuale?'🗑 ':''}${h(m.nome)} ${getStock(a.id, m.id)}</span>`).join('') : '';
+  document.getElementById('spSel').innerHTML = `<div class="sp-sel">
+    <div class="sp-code">${a ? h(a.codice)+' · '+h(getCat(a.cat_id)?.nome||'') : '—'}</div>
+    <div class="sp-name${a?'':' ph'}">${a ? h(a.nome)+(a.variante?' · '+h(a.variante):'') : 'Nessun articolo selezionato'}</div>
+    <div class="sp-chips">${a ? chips : '<span class="sp-hint">Scegli un articolo dall\'elenco</span>'}</div>
+    <label class="sp-lab">Quantità${a?` (max ${d}${a.um&&a.um!=='pz'?' '+h(a.um):''})`:''}</label>
+    <div class="sp-qrow">
+      <div class="sp-step${a?'':' off'}"><button type="button" aria-label="Meno" onclick="spAdj(-1)">${SP_MINUS}</button><input id="spQty" ${a?'':'disabled'} value="${a?SP.qty:''}" placeholder="0" inputmode="numeric" onchange="spSetQty(this.value)"><button type="button" aria-label="Più" onclick="spAdj(1)">${SP_PLUS}</button></div>
+      <button class="btn btn-green btn-sm" ${a?'':'disabled'} onclick="spMax()">MAX</button>
+      <button class="btn btn-primary btn-sm" ${a?'':'disabled'} onclick="spAdd()">${c?'Aggiorna':'＋ Aggiungi'}</button>
+    </div></div>`;
 }
-
-function onSposCategoriaChange() {
-  filterSposArticoli();
-  onSposArticoloChange();
+function spRenderCart() {
+  const n = SP.cart.length;
+  document.getElementById('spCartCnt').textContent = n ? `${n} articol${n===1?'o':'i'} · ${spPcs()} pz` : '';
+  document.getElementById('spCart').innerHTML = n ? `<table class="sp-tbl"><thead><tr><th>Articolo</th><th>Disp.</th><th>Quantità</th><th></th></tr></thead><tbody>${
+    SP.cart.map(c => { const a = getArt(c.id); return `<tr>
+      <td><span class="sp-cd">${h(a.codice)}</span> ${h(a.nome)}${a.variante?' · '+h(a.variante):''}</td>
+      <td class="sp-hint">${spAvail(c.id)}</td>
+      <td><div class="sp-step"><button type="button" aria-label="Meno" onclick="spCq(${c.id},-1)">${SP_MINUS}</button><input value="${c.qty}" inputmode="numeric" onchange="spCset(${c.id},this.value)"><button type="button" aria-label="Più" onclick="spCq(${c.id},1)">${SP_PLUS}</button></div></td>
+      <td><button type="button" class="sp-x" aria-label="Togli" onclick="spRm(${c.id})">✕</button></td></tr>`; }).join('')
+  }</tbody></table>` : '<div class="sp-empty">Nessun articolo selezionato</div>';
+  spRenderBar();
 }
-function onSposMagFiltroChange() {
-  filterSposArticoli();
-  onSposArticoloChange();
+function spRenderBar() {
+  const n = SP.cart.length, d = getMag(SP.dst);
+  document.getElementById('spSum').innerHTML =
+    (n ? `<b>${n}</b> articol${n===1?'o':'i'} · <b>${spPcs()}</b> pezzi` : 'Nessun articolo') +
+    (d ? ` → <b>${h(d.nome)}</b>` : ' · scegli la destinazione');
+  document.getElementById('spReg').disabled = !(n && d) || SP.busy;
 }
-function filterSposArticoli() {
-  const catId  = document.getElementById('sCategoria').value;
-  const magFId = document.getElementById('sMagFiltro')?.value;
-  const prevArt = document.getElementById('sArticolo').value;
-  // Filtra per categoria
-  let lista = catId ? D.articoli.filter(a=>a.cat_id==catId) : D.articoli;
-  // Filtra per magazzino (filtro esplicito separato)
-  if (magFId) {
-    const artConStock = magFId
-    ? new Set(Object.entries(D._stockMap||{}).filter(([,mm])=>(mm[magFId]||0)>0).map(([id])=>+id))
-    : new Set(D.stock.filter(s=>s.qty>0).map(s=>s.art_id));
-    lista = lista.filter(a=>artConStock.has(a.id));
-  }
-  document.getElementById('sArticolo').innerHTML = lista.length
-    ? lista.map(a=>`<option value="${a.id}"${a.id==prevArt?' selected':''}>[${h(a.codice)}] ${h(a.nome)}${a.variante?' · '+h(a.variante):''}</option>`).join('')
-    : '<option value="" disabled>— nessun articolo —</option>';
+function spSetSrc(v) {
+  SP.src = +v; SP.q = ''; SP.cart = []; SP.sel = 0; SP.qty = 0;
+  if(SP.dst === SP.src) SP.dst = 0;
+  document.getElementById('spQ').value = '';
+  spRenderAll();
 }
-function onSposArticoloChange() {
-  const artId = document.getElementById('sArticolo').value;
-  const a = getArt(+artId);
-  if (a?.modello_id) document.getElementById('sQty').value = 1;
-  // Riquadro articolo selezionato
-  const card = document.getElementById('sArtCard');
-  if(a && artId) {
-    document.getElementById('sArtCardCode').textContent = a.codice || '';
-    document.getElementById('sArtCardName').textContent = a.nome || '';
-    card.style.display = '';
-  } else {
-    card.style.display = 'none';
-  }
-  if (!artId) { document.getElementById('sStockMap').style.display='none'; return; }
-  // Tutti i magazzini — escludi virtuale per utenti standard
-  const magAll = (currentUser?.ruolo==='admin') ? D.magazzini : getMagReali();
-  document.getElementById('sStockMap').style.display = '';
-  const magDaId = +document.getElementById('sMagDa').value;
-  const magAId  = +document.getElementById('sMagA').value;
-  document.getElementById('sStockMapList').innerHTML = magAll.map(m=>{
-    const qty    = getStock(artId, m.id);
-    const isVirt = !!m.virtuale;
-    const isDa   = magDaId && m.id==magDaId;
-    const isA    = magAId  && m.id==magAId;
-    let cls = 'stock-map-row clickable' + (qty===0&&!isVirt?' stock-map-zero':'');
-    if (isDa) cls += ' sel-da';
-    if (isA)  cls += ' sel-a';
-    const colDot = m.colore ? `<span style="width:8px;height:8px;border-radius:50%;background:${m.colore};display:inline-block;margin-right:5px"></span>` : '';
-    const virtBadge = isVirt ? `<span class="stock-map-badge badge-virt">🗑 Cestino</span>` : '';
-    const daBadge = isDa ? `<span class="stock-map-badge" class="stock-badge-da">DA</span>` : '';
-    const aBadge  = isA  ? `<span class="stock-map-badge" class="stock-badge-a">A</span>` : '';
-    return `<div class="${cls}" style="--mc:${m.colore || 'var(--border)'}" onclick="onSposMapClick(${m.id})">
-      <div>
-        <div class="sm-name">${colDot}${h(m.nome)}</div>${m.citta ? `<div class="sm-city">${h(m.citta)}</div>` : ''}
-        <div class="stock-map-badges">${virtBadge}${daBadge}${aBadge}</div>
-      </div>
-      <span class="stock-map-qty" style="color:${qty===0?'var(--ink3)':'var(--ink)'}">${qty}<span style="font-size:11px;font-weight:400;font-family:'DM Sans',sans-serif;margin-left:3px">${h(a?.um)||'pz'}</span>${D._contMap?.[artId]?.[m.id]?.tot?`<span style="font-size:10px;font-weight:400;color:var(--ink3);margin-left:6px">+${D._contMap[artId][m.id].tot} nei case</span>`:''}</span>
-    </div>`;
-  }).join('');
-  updateSposDisp();
+function spSetCat(v) { SP.cat = v; SP.q = ''; document.getElementById('spQ').value = ''; spRenderList(); }
+function spSetQ(v)   { SP.q = v; spRenderList(); }
+function spSetDst(id){ SP.dst = id; spRenderDst(); }
+function spPick(id) {
+  SP.sel = id; const c = spInCart(id);
+  SP.qty = c ? c.qty : 1;
+  spRenderList(); spRenderSel();
 }
-
-// Click su un magazzino nella mappa: primo click = DA, secondo click diverso = A, click su DA = deseleziona DA
-function onSposMapClick(magId) {
-  const magDaId = +document.getElementById('sMagDa').value;
-  const magAId  = +document.getElementById('sMagA').value;
-  if (!magDaId) {
-    // Nessuno selezionato → imposta DA
-    setSposBox('da', magId);
-  } else if (magDaId === magId) {
-    // Click di nuovo su DA → deseleziona DA
-    setSposBox('da', null);
-  } else if (!magAId) {
-    // DA già selezionato, nessun A → imposta A (solo se diverso da DA)
-    if (magId === magDaId) { toast('Partenza e destinazione non possono essere uguali', true); return; }
-    setSposBox('a', magId);
-  } else if (magAId === magId) {
-    // Click di nuovo su A → deseleziona A
-    setSposBox('a', null);
-  } else {
-    // Entrambi già selezionati → rimpiazza A (solo se diverso da DA)
-    if (magId === magDaId) { toast('Partenza e destinazione non possono essere uguali', true); return; }
-    setSposBox('a', magId);
-  }
-  onSposArticoloChange(); // aggiorna highlight
-  updateSposDisp();
+function spClampQty(v) { return Math.max(1, Math.min(spAvail(SP.sel), parseInt(v) || 1)); }
+function spAdj(d)      { if(!SP.sel) return; SP.qty = spClampQty(SP.qty + d); spRenderSel(); }
+function spSetQty(v)   { if(!SP.sel) return; SP.qty = spClampQty(v); spRenderSel(); }
+function spMax()       { if(!SP.sel) return; SP.qty = spAvail(SP.sel); spRenderSel(); }
+function spAdd() {
+  const id = SP.sel; if(!id) return;
+  const q = spClampQty(SP.qty), c = spInCart(id);
+  if(c) c.qty = q; else SP.cart.push({id, qty:q});
+  SP.sel = 0; SP.qty = 0;
+  spRenderList(); spRenderSel(); spRenderCart();
 }
-
-function updateSposDisp() {
-  const artId   = document.getElementById('sArticolo').value;
-  const magDaId = document.getElementById('sMagDa').value;
-  const el      = document.getElementById('sDisponibile');
-  if (artId && magDaId) {
-    const disp = getStock(artId, magDaId);
-    const inC = D._contMap?.[artId]?.[magDaId]?.tot || 0;
-    el.textContent = `Disponibile in "${getMag(magDaId)?.nome}": ${disp} ${getArt(artId)?.um||'pz'}` + (inC ? ` (altri ${inC} sono nei case e viaggiano con il case)` : '');
-    el.style.color = disp===0 ? 'var(--red)' : 'var(--green)';
-  } else { el.textContent=''; }
+function spCset(id, v) {
+  v = Math.max(0, Math.min(spAvail(id), parseInt(v) || 0));
+  if(v === 0) SP.cart = SP.cart.filter(x => x.id !== id);
+  else { const c = spInCart(id); if(c) c.qty = v; }
+  spRenderList(); spRenderCart();
 }
-function setSposMax() {
-  const artId   = document.getElementById('sArticolo').value;
-  const magDaId = document.getElementById('sMagDa').value;
-  if (!artId||!magDaId) { toast('Seleziona articolo e magazzino DA prima',true); return; }
-  const disp = getStock(artId, magDaId);
-  if (disp===0) { toast('Nessuna disponibilità in questo magazzino',true); return; }
-  document.getElementById('sQty').value = disp;
-}
-async function salvaSpostamento() {
-  const art_id  = +document.getElementById('sArticolo').value;
-  const qty     = +document.getElementById('sQty').value;
-  const note    = document.getElementById('sNote').value.trim();
-  const data    = nowRoma();
-  const mag_from = +document.getElementById('sMagDa').value;
-  const mag_to   = +document.getElementById('sMagA').value;
-  if (!art_id)        { toast('Seleziona un articolo',true); return; }
-  if (!mag_from)      { toast('Seleziona il magazzino DA',true); return; }
-  if (!mag_to)        { toast('Seleziona il magazzino A',true); return; }
-  if (mag_from===mag_to) { toast('I magazzini devono essere diversi',true); return; }
-  if (qty<1)          { toast('Inserisci una quantità valida',true); return; }
+function spCq(id, d) { const c = spInCart(id); if(c) spCset(id, c.qty + d); }
+function spRm(id)    { SP.cart = SP.cart.filter(x => x.id !== id); spRenderList(); spRenderCart(); }
+async function spRegistra() {
+  if(SP.busy) return;
+  const mag_from = SP.src, mag_to = SP.dst;
+  const note = document.getElementById('spNote').value.trim();
+  if(!SP.cart.length)    { toast('Seleziona almeno un articolo', true); return; }
+  if(!mag_to)            { toast('Seleziona il magazzino di destinazione', true); return; }
+  if(mag_from === mag_to){ toast('I magazzini devono essere diversi', true); return; }
+  SP.busy = true; spRenderBar();
+  const fatte = [];
+  let errore = null;
   try {
-    await apiFetch('POST','/spostamenti',{art_id,mag_from,mag_to,qty,note,data});
-    document.getElementById('sQty').value=''; document.getElementById('sNote').value='';
-    setSposBox('da',null); setSposBox('a',null);
-    await loadPartial('spostamenti'); onSposArticoloChange();
-    pushUndo({type:'spostamento',art_id,mag_from:mag_from,mag_to:mag_to,qty,note});
+    for(const c of SP.cart) {
+      try {
+        await apiFetch('POST', '/spostamenti', {art_id:c.id, mag_from, mag_to, qty:c.qty, note, data:nowRoma()});
+        fatte.push({art_id:c.id, qty:c.qty});
+      } catch(e) { errore = e; break; }
+    }
+  } finally { SP.busy = false; }
+  if(fatte.length) {
+    SP.cart = SP.cart.filter(c => !fatte.some(f => f.art_id === c.id));
+    // una sola voce di annullamento per l'intera operazione
+    pushUndo({type:'spostamentoMulti', righe:fatte, mag_from, mag_to, note});
     playSpostamentoSound();
-    toast('Spostamento registrato ✓');
-  } catch(e) { toast(e.message||'Errore imprevisto — riprova', true); }
+  }
+  await loadPartial('spostamenti');
+  if(errore) {
+    toast(`${errore.message||'Errore imprevisto — riprova'}${fatte.length?` (registrati ${fatte.length} articoli, gli altri restano nell'elenco)`:''}`, true);
+  } else {
+    document.getElementById('spNote').value = '';
+    SP.sel = 0; SP.qty = 0;
+    toast(`Spostamento registrato ✓${fatte.length>1?` (${fatte.length} articoli)`:''}`);
+  }
+  spInit();
 }
 
 // ─── CARICO / SCARICO ───
@@ -933,6 +896,7 @@ function updateUndoBtn() {
 }
 function undoLabelOf(a) {
   if(a.type==='spostamento') return `spostamento ${getArt(a.art_id)?.nome||''}`;
+  if(a.type==='spostamentoMulti') return a.righe.length===1 ? `spostamento ${getArt(a.righe[0].art_id)?.nome||''}` : `spostamento di ${a.righe.length} articoli`;
   if(a.type==='carico')      return `carico ${getArt(a.art_id)?.nome||''}`;
   if(a.type==='scarico')     return `scarico ${getArt(a.art_id)?.nome||''}`;
   if(a.type==='svuotaMag')   return `svuota ${getMag(a.magId)?.nome||''}`;
@@ -947,6 +911,12 @@ async function undoLast() {
     if(a.type==='spostamento') {
       // inverti: sposta qty da mag_to a mag_from
       await apiFetch('POST','/spostamenti',{art_id:a.art_id,mag_from:a.mag_to,mag_to:a.mag_from,qty:a.qty,note:`[ANNULLATO] ${h(a.note)||''}`,data:nowRoma()});
+    } else if(a.type==='spostamentoMulti') {
+      // un solo annullamento inverte tutti gli articoli dell'operazione
+      const data = nowRoma();
+      for(const r of a.righe) {
+        await apiFetch('POST','/spostamenti',{art_id:r.art_id,mag_from:a.mag_to,mag_to:a.mag_from,qty:r.qty,note:`[ANNULLATO] ${a.note||''}`.trim(),data});
+      }
     } else if(a.type==='carico') {
       await apiFetch('POST','/stock/scarica',{art_id:a.art_id,mag_id:a.mag_id,qty:a.qty,note:`[ANNULLATO] carico`,data:nowRoma()});
     } else if(a.type==='svuotaMag'||a.type==='trasferimentoTour') {
@@ -3475,7 +3445,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 38;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 39;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
