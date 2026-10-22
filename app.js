@@ -436,6 +436,7 @@ function spInit() {
 function spRenderAll() { spRenderDst(); spRenderList(); spRenderSel(); spRenderCart(); }
 function spRenderDst() {
   const dstMags = spMags().filter(m => m.id !== SP.src);
+  document.getElementById('spDst').classList.toggle('sel', !!SP.dst);
   document.getElementById('spDst').innerHTML = dstMags.length ? dstMags.map(m =>
     `<div class="sp-dc${m.id===SP.dst?' on':''}" style="--mc:${m.colore||'var(--border2)'}" onclick="spSetDst(${m.id})">
        <b>${h(m.nome)}</b><small>${h(spMagLbl(m))||'&nbsp;'}</small></div>`).join('')
@@ -2347,7 +2348,6 @@ function setModo(m) {
   _applyDarkClass();
   aspettoRefresh();
 }
-function resetAspetto() { setStile(''); setStruttura(''); setTheme(''); setModo('a'); }
 
 function aspettoRefresh() {
   const b = document.body, theme = b.getAttribute('data-theme') || '';
@@ -3482,7 +3482,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 42;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 43;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
