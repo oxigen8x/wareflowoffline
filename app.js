@@ -562,193 +562,158 @@ async function spRegistra() {
   spInit();
 }
 
-// ─── CARICO / SCARICO ───
-function renderCaricoNoStock() {
-  const senzaStock = D.articoli.filter(a => totalArtAny(a.id) === 0);
-  const modSenza = modelliSenzaPezzi();
-  const wrap = document.getElementById('caricoNoStockWrap');
-  if (wrap) wrap.style.display = (senzaStock.length || modSenza.length) ? '' : 'none';
-  // filtro categoria: solo le categorie che hanno articoli senza stock
-  const catSel = document.getElementById('cNoStockCat');
-  if (catSel) {
-    const prev = catSel.value;
-    const ids = new Set([...senzaStock.map(a => a.cat_id), ...modSenza.map(m => m.cat_id)]);
-    catSel.innerHTML = '<option value="">Tutte le categorie</option>' +
-      D.categorie.filter(c => ids.has(c.id)).map(c => `<option value="${c.id}"${c.id == prev ? ' selected' : ''}>${h(c.nome)}</option>`).join('');
+// ─── CARICA — stessa struttura di Spostamento: destinazione in alto, elenco articoli + scheda a destra, barra di conferma ───
+const CA = { cat: '', q: '', solo: false, pending: null, noteFor: null, busy: false };
+const ccSenzaStock = a => totalArtAny(a.id) === 0;
+const ccPezziModello = m => D.articoli.filter(x => x.modello_id == m.id);
+// voci dell'elenco: gli articoli con varianti (si caricano creando i pezzi) + gli articoli normali (e i pezzi rimasti senza stock)
+function ccItems() {
+  const q = CA.q.trim().toLowerCase(), out = [];
+  const okCat = c => !CA.cat || c == CA.cat;
+  const okQ = s => !q || s.toLowerCase().includes(q);
+  for (const m of (D.modelli || [])) {
+    if (!okCat(m.cat_id) || !okQ(`${m.codice || ''} ${m.nome}`)) continue;
+    const pz = ccPezziModello(m), tot = pz.reduce((n, x) => n + totalArtAny(x.id), 0);
+    if (CA.solo && pz.length) continue;
+    out.push({ key: 'm' + m.id, mod: m, cat_id: m.cat_id, codice: m.codice || '—', nome: m.nome, tot, vuoto: !pz.length });
   }
-  const cf = catSel?.value || '';
-  const listNoStock = cf ? senzaStock.filter(a => a.cat_id == cf) : senzaStock;
-  const mv = cf ? modSenza.filter(m => m.cat_id == cf) : modSenza;
-  const tbody = document.getElementById('tbCaricoNoStock');
-  if (!tbody) return;
-  tbody.innerHTML = (listNoStock.length || mv.length)
-    ? mv.map(m => { const cat = getCat(m.cat_id);
-        return `<tr onclick="caricaModello(${m.id})" title="Clicca per caricare">
-          <td>${codiceBadge(m.codice || '—', cat?.colore)}</td>
-          <td><strong>${h(m.nome)}</strong> <span class="var-chip">${m.varianti.length} varianti</span></td>
-          <td>${catPill(cat)}</td>
-          <td style="font-family:'DM Mono',monospace;font-size:12px">pz</td>
-          <td class="wrap" style="font-size:12px;color:var(--ink3)">${h(m.note)||'—'}</td>
-        </tr>`; }).join('') + listNoStock.map(a => {
-        const cat = getCat(a.cat_id);
-        return `<tr onclick="selArtDaNoStock(${a.id})" title="Clicca per selezionare">
-          <td>${codiceBadge(a.codice, cat?.colore)}</td>
-          <td><strong>${h(a.nome)}</strong>${varChip(a)}</td>
-          <td>${catPill(cat)}</td>
-          <td style="font-family:'DM Mono',monospace;font-size:12px">${h(a.um)}</td>
-          <td class="wrap" style="font-size:12px;color:var(--ink3)">${h(a.note)||'—'}</td>
-        </tr>`;
-      }).join('')
-    : '<tr><td colspan="5" class="empty">✓ Tutti gli articoli hanno stock</td></tr>';
+  for (const a of D.articoli) {
+    if (isSpecialArt(a.id) || !okCat(a.cat_id) || !okQ(`${a.codice} ${a.nome} ${a.variante || ''}`)) continue;
+    const tot = totalArtAny(a.id);
+    if (a.modello_id && tot > 0) continue;            // un pezzo con stock non si ricarica: si creano nuovi pezzi dal suo articolo
+    if (CA.solo && tot > 0) continue;
+    out.push({ key: String(a.id), art: a, cat_id: a.cat_id, codice: a.codice, nome: a.nome, variante: a.variante, tot, vuoto: tot === 0 });
+  }
+  return out;
 }
-
-function selArtDaNoStock(artId) {
-  const sel = document.getElementById('cArticolo');
-  if (!sel) return;
-  sel.value = artId; cvRender();
-  document.querySelectorAll('#tbCaricoNoStock tr').forEach(tr => {
-    tr.classList.toggle('selected', tr.getAttribute('onclick') === `selArtDaNoStock(${artId})`);
-  });
-  sel.dispatchEvent(new Event('change'));
-  document.getElementById('cQty')?.focus();
+function ccRenderList() {
+  const L = ccItems(), sel = document.getElementById('cArticolo').value;
+  document.getElementById('cList').innerHTML = L.length ? L.map(it => {
+    const cat = getCat(it.cat_id);
+    return `<div class="sp-ar${it.key === sel ? ' on' : ''}" data-key="${it.key}" onclick="ccPick('${it.key}')">
+      ${codiceBadge(it.codice, cat?.colore)}
+      <span class="sp-nm"><strong>${h(it.nome)}</strong>${it.mod ? ` <span class="var-chip">${it.mod.varianti.length} varianti</span>` : (it.variante ? ' · ' + h(it.variante) : '')}</span><span class="sp-cp">${catPill(cat)}</span>
+      ${it.vuoto ? '<span class="cc-nos">senza stock</span>' : `<span class="sp-av">${it.tot}<small>${it.mod ? 'pezzi' : 'tot.'}</small></span>`}</div>`;
+  }).join('') : `<div class="sp-empty">${CA.solo ? '✓ Nessun articolo senza stock con questi filtri' : 'Nessun articolo con questi filtri'}</div>`;
+  const nSolo = (D.modelli || []).filter(m => !ccPezziModello(m).length).length + D.articoli.filter(a => !isSpecialArt(a.id) && !a.modello_id && ccSenzaStock(a)).length;
+  document.getElementById('cSoloN').textContent = nSolo ? `(${nSolo})` : '';
 }
-// ─── CREA ───
-function renderCrea() {
-  document.getElementById('naArtCat').innerHTML =
-    '<option value="">— Seleziona categoria —</option>' +
-    getCatNormali().map(c=>`<option value="${c.id}">[${h(c.prefisso)}] ${h(c.nome)}</option>`).join('');
-  document.getElementById('naArtCodice').value = '';
-  document.getElementById('naArtNome').value   = '';
-  document.getElementById('naArtNote').value   = '';
-  document.getElementById('naArtCodiceHint').textContent = 'Seleziona prima la categoria';
-  // Tabella articoli senza stock
-  const noMag = D.articoli.filter(a=>totalArtAny(a.id)===0);
-  const noMagMod = modelliSenzaPezzi();
-  const badge = document.getElementById('stockNoMagBadge');
-  if(badge){ { const nt=noMag.length+modelliSenzaPezzi().length; badge.textContent=nt; badge.style.display=nt?'':'none'; } }
-  const tbNoMag = document.getElementById('tbStockNoMag');
-  if(tbNoMag) tbNoMag.innerHTML = (noMag.length||noMagMod.length) ? noMagMod.map(m=>{ const cat=getCat(m.cat_id);
-    return `<tr>
-      <td>${codiceBadge(m.codice||'—', cat?.colore)}</td>
-      <td><strong>${h(m.nome)}</strong> <span class="var-chip">${m.varianti.map(h).join(' · ')}</span></td>
-      <td>${catPill(cat)}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:12px">pz</td>
-      <td style="font-size:12px;color:var(--ink3)">${h(m.note)||'—'}</td>
-      <td style="white-space:nowrap">${modelloVuotoBtns(m)}</td>
-    </tr>`; }).join('') + noMag.map(a=>{
-    const cat = getCat(a.cat_id);
-    return `<tr>
-      <td>${codiceBadge(a.codice, cat?.colore)}</td>
-      <td><strong>${h(a.nome)}</strong>${varChip(a)}</td>
-      <td>${catPill(cat)}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:12px">${h(a.um)}</td>
-      <td style="font-size:12px;color:var(--ink3)">${h(a.note)||'—'}</td>
-      <td style="white-space:nowrap">
-        <button class="btn btn-ghost btn-xs" onclick="editArt(${a.id})">Modifica</button>
-        <button class="btn btn-danger btn-xs" onclick="delArtNoStock(${a.id})" style="margin-left:4px">Elimina</button>
-      </td>
-    </tr>`;
-  }).join('') : '<tr><td colspan="6" class="empty">✓ Tutti gli articoli hanno uno stock assegnato</td></tr>';
+function ccRenderDst() {
+  const sel = +document.getElementById('cMag').value || 0;
+  const box = document.getElementById('cMagList');
+  box.classList.toggle('sel', !!sel);
+  box.innerHTML = D.magazzini.map(m =>
+    `<div class="sp-dc${m.id === sel ? ' on' : ''}" style="--mc:${m.colore || 'var(--border2)'}" onclick="selCaricoMag(${m.id})">
+       <b>${m.virtuale ? '🗑 ' : ''}${h(m.nome)}</b><small>${h(spMagLbl(m)) || '&nbsp;'}</small></div>`).join('');
+  const d = getMag(sel);
+  document.getElementById('cMagSel').textContent = d ? d.nome : 'scegli';
 }
-// ─── CARICO/SCARICO ───
-function renderCaricaScarica() {
-  renderCaricoNoStock();
-  const catSel = document.getElementById('cCategoria');
-  const prevCat = catSel.value;
-  catSel.innerHTML = '<option value="">Tutte</option>' +
-    getCatNormali().map(c=>`<option value="${c.id}"${c.id==prevCat?' selected':''}>[${h(c.prefisso)}] ${h(c.nome)}</option>`).join('');
-  filterCaricoArticoli();
-  document.getElementById('cMag').value  = '';
-  renderCaricoMagList();
-  // Popola categorie per "Nuovo articolo"
-  document.getElementById('naArtCat').innerHTML =
-    '<option value="">— Seleziona categoria —</option>' +
-    getCatNormali().map(c=>`<option value="${c.id}">[${h(c.prefisso)}] ${h(c.nome)}</option>`).join('');
-  document.getElementById('naArtCodice').value = '';
-  document.getElementById('naArtNome').value   = '';
-  document.getElementById('naArtNote').value   = '';
-  document.getElementById('naArtCodiceHint').textContent = 'Seleziona prima la categoria';
-  resetVar('naArt');
-}
-
-// ── Carico ──
-function onCaricoCategoriaChange() {
-  filterCaricoArticoli();
-  onCaricoChange();
-}
-function filterCaricoArticoli() {
-  const catId = document.getElementById('cCategoria').value;
-  const prevArt = document.getElementById('cArticolo').value;
-  const lista = (catId ? D.articoli.filter(a=>a.cat_id==catId) : D.articoli).filter(a => !isSpecialArt(a.id));
-  const mods = (D.modelli || []).filter(m => !catId || m.cat_id == catId);
-  document.getElementById('cArticolo').innerHTML =
-    mods.map(m=>`<option value="m${m.id}"${'m'+m.id===prevArt?' selected':''}>${m.codice?'['+h(m.codice)+'] ':''}${h(m.nome)} (con varianti)</option>`).join('') +
-    lista.map(a=>`<option value="${a.id}"${a.id==prevArt?' selected':''}>[${h(a.codice)}] ${h(a.nome)}${a.variante?' · '+h(a.variante):''}</option>`).join('');
-}
-function onCaricoChange() {
-  renderCaricoMagList();
-  const artId = document.getElementById('cArticolo').value;
-  const a = getArt(+artId);
-  document.getElementById('cNote').value = a?.note || '';
-  if (a?.modello_id) document.getElementById('cQty').value = 1;
-  if (cvModello()?.id !== _cv.mid) { _cv = { tot: 1, q: {}, mid: cvModello()?.id }; }
+function ccRenderSel() {
+  const v = document.getElementById('cArticolo').value;
+  const mod = cvModello(), a = mod ? null : (v ? getArt(+v) : null), it = mod || a;
+  const head = document.getElementById('cSelHead'), body = document.getElementById('cSelBody');
+  const dst = +document.getElementById('cMag').value || 0;
+  if (!it) {
+    head.innerHTML = `<div class="sp-code">—</div><div class="sp-name ph">Nessun articolo selezionato</div><div class="sp-chips"><span class="sp-hint">Scegli un articolo dall'elenco</span></div>`;
+    body.style.display = 'none'; ccBar(); return;
+  }
+  body.style.display = '';
+  const cat = getCat(it.cat_id);
+  const pz = mod ? ccPezziModello(mod) : null;
+  const chips = D.magazzini.map(m => {
+    const n = mod ? pz.reduce((t, x) => t + getTot(x.id, m.id), 0) : getTot(a.id, m.id);
+    return n > 0 ? `<span class="stock-pill${m.id === dst ? ' sp-me' : ''}"><strong>${n}</strong> ${m.virtuale ? '🗑 ' : ''}${h(m.nome)}</span>` : '';
+  }).join('');
+  head.innerHTML = `<div class="sp-code">${codiceBadge(mod ? (mod.codice || '—') : a.codice, cat?.colore)} ${catPill(cat)} <span>· ${mod ? 'pz' : h(a.um)}</span></div>
+    <div class="sp-name">${h(it.nome)}${a?.variante ? ' · ' + h(a.variante) : ''}</div>
+    <div class="sp-chips">${chips || '<span class="sp-chip">nessuno stock · primo carico</span>'}</div>`;
+  document.getElementById('cUm').textContent = mod ? 'pezzi' : (a.um || '');
+  if (CA.noteFor !== v) { document.getElementById('cNote').value = a?.note || ''; CA.noteFor = v; }
   cvRender();
 }
-function renderCaricoMagList() {
-  // Per il carico mostra tutti i magazzini reali con il totale pezzi già presenti
-  const artIdRaw = document.getElementById('cArticolo').value;
-  const mod = cvModello();
-  const artId = mod ? '' : artIdRaw;
-  const selMagId = +document.getElementById('cMag').value;
-  const list = document.getElementById('cMagList');
-  list.innerHTML = D.magazzini.map(m=>{
-    const tot    = totalMag(m.id);
-    const artQty = mod ? D.articoli.filter(x => x.modello_id == mod.id).reduce((n, x) => n + getStock(x.id, m.id), 0) : (artId ? getStock(artId, m.id) : null);
-    const isSel  = selMagId && m.id==selMagId;
-    const isVirt = !!m.virtuale;
-    const colDot = m.colore&&!isVirt ? `<span style="width:8px;height:8px;border-radius:50%;background:${m.colore};display:inline-block;margin-right:5px"></span>` : '';
-    const virtBadge = isVirt ? `<span class="stock-map-badge badge-virt">📦</span>` : '';
-    let cls = 'stock-map-row clickable' + (isSel?' sel-a':'');
-    return `<div class="${cls}" onclick="selCaricoMag(${m.id})">
-      <div>
-        <div style="font-weight:600;display:flex;align-items:center">${colDot}${h(m.nome)} ${virtBadge}</div>
-        <div style="font-size:11px;color:var(--ink3);margin-top:1px">${h(m.citta)||''} · ${tot} pz totali${(artId||mod)&&artQty!==null?` · <strong style="color:var(--ink)">${artQty} di questo art.</strong>`:''}</div>
-      </div>
-      ${isSel?`<span class="stock-map-badge" class="stock-badge-a" style="font-size:11px">✓ selezionato</span>`:''}
-    </div>`;
-  }).join('');
+function ccBar() {
+  const reg = document.getElementById('cReg'); if (!reg) return;
+  const v = document.getElementById('cArticolo').value, mod = cvModello(), a = mod ? null : (v ? getArt(+v) : null);
+  const d = getMag(+document.getElementById('cMag').value);
+  const q = mod ? cvSum() : (parseInt(document.getElementById('cQty').value) || 0);
+  const okQ = mod ? (cvSum() === _cv.tot && cvSum() > 0) : q >= 1;
+  document.getElementById('cSum').innerHTML =
+    (mod || a ? `<b>${q}</b> ${mod ? (q === 1 ? 'pezzo' : 'pezzi') : h(a.um)} di <b>${h((mod || a).nome)}</b>` : 'Nessun articolo selezionato') +
+    (d ? ` → <b>${h(d.nome)}</b>` : ' · scegli la destinazione');
+  reg.disabled = !((mod || a) && d && okQ) || CA.busy;
 }
+function ccRenderAll() { ccRenderDst(); ccRenderList(); ccRenderSel(); }
+function renderCaricaScarica() {
+  const catSel = document.getElementById('cCategoria');
+  if (CA.cat && !getCatNormali().some(c => c.id == CA.cat)) CA.cat = '';
+  catSel.innerHTML = '<option value="">Tutte</option>' +
+    getCatNormali().map(c => `<option value="${c.id}"${c.id == CA.cat ? ' selected' : ''}>[${h(c.prefisso)}] ${h(c.nome)}</option>`).join('');
+  document.getElementById('cQ').value = CA.q;
+  document.getElementById('cSolo').checked = CA.solo;
+  document.getElementById('cSoloLbl').classList.toggle('on', CA.solo);
+  const art = document.getElementById('cArticolo');
+  if (CA.pending) { art.value = CA.pending; CA.pending = null; CA.noteFor = null; document.getElementById('cQty').value = 1; _cv = { tot: 1, q: {}, mid: cvModello()?.id }; CA.scroll = true; }
+  else if (art.value && !(cvModello() || getArt(+art.value))) { art.value = ''; CA.noteFor = null; }
+  if (!getMag(+document.getElementById('cMag').value)) document.getElementById('cMag').value = '';
+  ccRenderAll();
+  if (CA.scroll) { CA.scroll = false; document.querySelector('#cList .sp-ar.on')?.scrollIntoView({ block: 'nearest' }); }
+}
+function onCaricoCategoriaChange() { CA.cat = document.getElementById('cCategoria').value; ccRenderList(); }
+function ccSetQ(v) { CA.q = v; ccRenderList(); }
+function ccSetSolo(on) { CA.solo = !!on; document.getElementById('cSoloLbl').classList.toggle('on', CA.solo); ccRenderList(); }
+function ccPick(key) {
+  document.getElementById('cArticolo').value = key;
+  onCaricoChange();
+  const card = document.getElementById('cSelHead')?.closest('.card'), w = document.getElementById('ccCarica');
+  if (card && w && w.clientWidth < 900) card.scrollIntoView({ block: 'nearest', behavior: 'smooth' });   // schermi stretti: la scheda sta sotto l'elenco
+}
+function onCaricoChange() {     // cambia l'articolo selezionato
+  CA.noteFor = null;
+  document.getElementById('cQty').value = 1;
+  if (cvModello()?.id !== _cv.mid) { _cv = { tot: 1, q: {}, mid: cvModello()?.id }; }
+  ccRenderList(); ccRenderDst(); ccRenderSel();
+}
+const ccClampQty = v => Math.max(1, Math.min(QTY_MAX_UI, parseInt(v) || 1));
+const QTY_MAX_UI = 1000000;
+function ccAdj(d) { const el = document.getElementById('cQty'); el.value = ccClampQty((parseInt(el.value) || 1) + d); ccBar(); }
+function ccSetQty(v) { document.getElementById('cQty').value = ccClampQty(v); ccBar(); }
 function selCaricoMag(magId) {
   document.getElementById('cMag').value = magId;
-  const m = getMag(magId);
-  document.getElementById('cMagSel').textContent = `Destinazione: ${h(m.nome)}`;
-  renderCaricoMagList();
+  ccRenderDst(); ccRenderSel();
+}
+// Apre Carica con l'articolo (o l'articolo con varianti 'm<id>') già selezionato
+async function ccGoTo(key) {
+  CA.cat = ''; CA.q = ''; CA.solo = false; CA.pending = key;
+  await goTo('caricoscarico');
 }
 async function salvaCaricoModello(m) {
   const mag_id = +document.getElementById('cMag').value;
   if (!mag_id) { toast('Seleziona il magazzino destinazione', true); return; }
   const righe = m.varianti.filter(v => _cv.q[v] > 0).map(v => ({ variante: v, qty: _cv.q[v] }));
   if (cvSum() !== _cv.tot || !righe.length) { toast('Assegna tutti i pezzi a una variante', true); return; }
+  CA.busy = true; ccBar();
   try {
     const r = await apiFetch('POST', `/modelli/${m.id}/carica`, { mag_id, righe, note: '' });
-    document.getElementById('cMag').value = ''; document.getElementById('cMagSel').textContent = '';
+    document.getElementById('cMag').value = '';
     _cv = { tot: 1, q: {}, mid: m.id };
     await loadPartial('articoli');
-    filterCaricoArticoli(); document.getElementById('cArticolo').value = 'm' + m.id;
-    onCaricoChange(); renderCaricoNoStock();
+    CA.busy = false; ccRenderAll();
     toast(`${r.pezzi.length} ${r.pezzi.length === 1 ? 'pezzo caricato' : 'pezzi caricati'} ✓`);
   } catch (e) { toast(e.message || 'Errore imprevisto — riprova', true); }
+  finally { CA.busy = false; ccBar(); }
 }
 async function salvaCarico() {
+  if (CA.busy) return;
   const mCar = cvModello();
   if (mCar) return salvaCaricoModello(mCar);
   const art_id = +document.getElementById('cArticolo').value;
   const mag_id = +document.getElementById('cMag').value;
-  const qty    = +document.getElementById('cQty').value;
+  const qty    = Number(document.getElementById('cQty').value);
   const note   = document.getElementById('cNote').value.trim();
   if (!art_id)  { toast('Seleziona un articolo',true); return; }
   if (!mag_id)  { toast('Seleziona il magazzino destinazione',true); return; }
-  if (qty<1)    { toast('Inserisci una quantità valida',true); return; }
+  if (!Number.isInteger(qty) || qty<1) { toast('Inserisci una quantità valida',true); return; }
+  CA.busy = true; ccBar();
   try {
     // Aggiorna nota sull'articolo se modificata
     const a = getArt(art_id);
@@ -756,55 +721,136 @@ async function salvaCarico() {
       await apiFetch('PUT',`/articoli/${art_id}`,{...a, note});
     }
     await apiFetch('POST','/stock/carica',{art_id, mag_id, qty, note:''});
-    document.getElementById('cQty').value=''; document.getElementById('cNote').value='';
+    document.getElementById('cQty').value = 1;
     document.getElementById('cMag').value='';
-    await loadPartial('stock'); renderCaricoMagList(); renderCaricoNoStock();
+    await loadPartial('stock');
+    if (a && note !== (a.note||'').trim()) await loadPartial('articoli');
+    CA.busy = false; CA.noteFor = null; ccRenderAll();
     pushUndo({type:'carico',art_id,mag_id,qty});
     toast('Carico registrato ✓');
   } catch(e) { toast(e.message||'Errore imprevisto — riprova', true); }
+  finally { CA.busy = false; ccBar(); }
 }
+// compatibilità con i vecchi punti d'ingresso
+function caricaModello(mid) { return ccGoTo('m' + mid); }
+function selArtDaNoStock(artId) { return ccGoTo(String(artId)); }
 
-// ── Nuovo articolo dalla scheda Carico ──
+// ─── CREA — stessa struttura di Spostamento: categoria in alto, dati a sinistra, anteprima a destra, barra di conferma ───
+const CR = { edited: false, tok: 0, busy: false, hl: 0 };
+const crVarianti = () => document.getElementById('naArtVarList').value.split(/[,;\n]/).map(x => x.trim()).filter(Boolean);
+function crRenderCats() {
+  const cur = document.getElementById('naArtCat').value;
+  document.getElementById('naArtCats').innerHTML = getCatNormali().map(c =>
+    `<div class="cc-cat${c.id == cur ? ' on' : ''}" style="--mc:${c.colore || 'var(--border2)'}" onclick="crSetCat(${c.id})"><b>${h(c.nome)}</b><small>${h(c.prefisso)}</small></div>`).join('')
+    || '<div class="sp-empty">Nessuna categoria: creane una dalla sezione Categorie</div>';
+}
+async function crSetCat(id) {
+  document.getElementById('naArtCat').value = id;
+  CR.edited = false;
+  crRenderCats();
+  await onNaArtCatChange();
+}
 async function onNaArtCatChange() {
   const catId = document.getElementById('naArtCat').value;
-  if (!catId) { document.getElementById('naArtCodice').value=''; document.getElementById('naArtCodiceHint').textContent='Seleziona prima la categoria'; return; }
+  const cod = document.getElementById('naArtCodice'), hint = document.getElementById('naArtCodiceHint'), top = document.getElementById('crCatHint');
+  if (!catId) { cod.value = ''; hint.textContent = 'Seleziona prima la categoria'; top.textContent = 'scegli la categoria'; crPrev(); return; }
+  const tok = ++CR.tok;
   try {
     const res = await apiFetch('GET',`/articoli/prossimo-codice/${catId}`);
-    document.getElementById('naArtCodice').value = res.codice;
-    document.getElementById('naArtCodiceHint').textContent = `Suggerito: ${res.codice} (modificabile)`;
+    if (tok !== CR.tok) return;
+    top.textContent = `codice automatico ${res.codice}`;
+    if (!CR.edited || !cod.value.trim()) { cod.value = res.codice; CR.edited = false; hint.textContent = 'automatico (modificabile)'; }
   } catch(e) {}
+  crPrev();
 }
-async function salvaArticoloDaCarico() {
-  if (document.getElementById('naArtVarOn')?.checked) {
-    try {
-      if (!(await creaModelloDa('naArt'))) return;
-      document.getElementById('naArtNome').value=''; document.getElementById('naArtNote').value='';
-      document.getElementById('naArtCat').value=''; document.getElementById('naArtCodice').value='';
-      document.getElementById('naArtCodiceHint').textContent='Seleziona prima la categoria';
-      resetVar('naArt');
-      await loadPartial('articoli'); renderCaricaScarica();
-      if(curPage==='crea') renderCrea();
-      toast('Articolo con varianti creato ✓ — i pezzi si creano al carico');
-    } catch(e) {}
-    return;
+function crCodeEdit(el) {
+  el.value = el.value.toUpperCase();
+  CR.edited = true;
+  document.getElementById('naArtCodiceHint').textContent = 'personalizzato';
+  crPrev();
+}
+function crCodiceEsiste(cod) { return !!cod && (D.articoli.some(a => a.codice === cod) || (D.modelli || []).some(m => m.codice === cod)); }
+function crPrev() {
+  const g = id => document.getElementById(id);
+  if (!g('crPrev')) return;
+  const cat = getCat(+g('naArtCat').value) || null, nome = g('naArtNome').value.trim(), code = g('naArtCodice').value.trim().toUpperCase();
+  const um = g('naArtUm').value, varOn = g('naArtVarOn').checked, vs = varOn ? crVarianti() : [];
+  const dup = !varOn && crCodiceEsiste(code);
+  const badge = code ? codiceBadge(code, cat?.colore) : '<span class="badge-codice">—</span>';
+  g('crPrev').innerHTML = `<div class="cc-pre">${badge}<div style="min-width:0"><div class="sp-name${nome ? '' : ' ph'}" style="margin:0 0 6px">${nome ? h(nome) : "Nome dell'articolo"}</div>
+      <div class="cc-pills">${cat ? catPill(cat) : '<span class="cc-pill">categoria?</span>'}<span class="cc-pill">${varOn ? 'pz' : h(um)}</span>${varOn ? '<span class="cc-pill">pezzi univoci</span>' : ''}</div></div></div>
+    ${vs.length ? `<div class="sp-chips" style="margin:12px 0 0">${vs.map(v => `<span class="sp-chip">${h(v)}</span>`).join('')}</div>
+      <div class="sp-hint" style="margin-top:8px;line-height:1.5">I pezzi nascono al carico, con codici ${h(code || 'COD')}-1, ${h(code || 'COD')}-2…</div>` : ''}
+    <div class="sp-hint" style="margin-top:12px;line-height:1.5">${dup ? '<span style="color:var(--red)">Codice già esistente</span>' : 'Appena creato resta senza stock finché non lo carichi in un magazzino.'}</div>`;
+  const ok = !!cat && !!nome && (varOn ? vs.length > 0 : (!!code && !dup));
+  g('crSum').innerHTML = nome ? `<b>${h(varOn ? (code || '—') : code || '—')}</b> · ${h(nome)} <span class="sp-hint">— ${cat ? h(cat.nome) : 'categoria?'} · ${varOn ? 'pz, con varianti' : h(um)}</span>` : 'Compila categoria, codice e nome';
+  g('crBtn').disabled = !ok || CR.busy; g('crBtnCarica').disabled = !ok || CR.busy;
+}
+function crReset() {
+  ['naArtNome', 'naArtNote', 'naArtVarList'].forEach(id => document.getElementById(id).value = '');
+  const c = document.getElementById('naArtVarOn'); c.checked = false; onVarToggle('naArt');
+  CR.edited = false;
+}
+function renderCrea() {
+  const catEl = document.getElementById('naArtCat');
+  if (catEl.value && !getCatNormali().some(c => c.id == catEl.value)) { catEl.value = ''; document.getElementById('naArtCodice').value = ''; }
+  crRenderCats();
+  onVarToggle('naArt');
+  renderCreaNoStock();
+  if (catEl.value) onNaArtCatChange(); else { document.getElementById('crCatHint').textContent = 'scegli la categoria'; crPrev(); }
+}
+function renderCreaNoStock() {
+  const box = document.getElementById('tbStockNoMag'); if (!box) return;
+  const noMag = D.articoli.filter(a => totalArtAny(a.id) === 0);
+  const noMod = modelliSenzaPezzi();
+  const n = noMag.length + noMod.length;
+  const badge = document.getElementById('stockNoMagBadge');
+  if (badge) badge.textContent = n ? `${n} da caricare` : '';
+  const rowBtns = (key, mid, aid) => `<span class="cc-acts">${isSpecialArt(aid) ? '' : `<button class="btn btn-ghost btn-xs cc-go" onclick="ccGoTo('${key}')">Carica →</button>`}${
+    mid ? `<button class="btn btn-ghost btn-xs" onclick="modificaVarianti(${mid})">Varianti</button><button class="btn btn-danger btn-xs" onclick="eliminaModello(${mid})">Elimina</button>`
+        : `<button class="btn btn-ghost btn-xs" onclick="editArt(${aid})">Modifica</button><button class="btn btn-danger btn-xs" onclick="delArtNoStock(${aid})">Elimina</button>`}</span>`;
+  box.innerHTML = n ? noMod.map(m => { const cat = getCat(m.cat_id);
+      return `<div class="sp-ar cc-nr${CR.hl === 'm' + m.id ? ' hl' : ''}">${codiceBadge(m.codice || '—', cat?.colore)}
+        <span class="sp-nm"><strong>${h(m.nome)}</strong> <span class="var-chip">${m.varianti.map(h).join(' · ')}</span>${m.note ? `<span class="sp-ct">${h(m.note)}</span>` : ''}</span><span class="sp-cp">${catPill(cat)}</span>${rowBtns('m' + m.id, m.id)}</div>`; }).join('')
+    + noMag.map(a => { const cat = getCat(a.cat_id);
+      return `<div class="sp-ar cc-nr${CR.hl === a.id ? ' hl' : ''}">${codiceBadge(a.codice, cat?.colore)}
+        <span class="sp-nm"><strong>${h(a.nome)}</strong>${varChip(a)}<span class="sp-ct">${h(a.um)}${a.note ? ' · ' + h(a.note) : ''}</span></span><span class="sp-cp">${catPill(cat)}</span>${rowBtns(String(a.id), 0, a.id)}</div>`; }).join('')
+    : '<div class="sp-empty">✓ Tutti gli articoli hanno uno stock assegnato</div>';
+}
+async function salvaArticoloDaCarico(andLoad) {
+  if (CR.busy) return;
+  const g = id => document.getElementById(id);
+  const varOn = g('naArtVarOn').checked;
+  const cat_id = +g('naArtCat').value || null;
+  const codice = g('naArtCodice').value.trim().toUpperCase();
+  const nome   = g('naArtNome').value.trim();
+  const um     = g('naArtUm').value;
+  const note   = g('naArtNote').value.trim();
+  if (!varOn) {
+    if (!cat_id) { toast('Categoria obbligatoria',true); return; }
+    if (!codice) { toast('Codice obbligatorio',true); return; }
+    if (!nome)   { toast('Nome obbligatorio',true); return; }
   }
-  const cat_id = +document.getElementById('naArtCat').value||null;
-  const codice = document.getElementById('naArtCodice').value.trim().toUpperCase();
-  const nome   = document.getElementById('naArtNome').value.trim();
-  const um     = document.getElementById('naArtUm').value;
-  const note   = document.getElementById('naArtNote').value.trim();
-  if (!cat_id) { toast('Categoria obbligatoria',true); return; }
-  if (!codice) { toast('Codice obbligatorio',true); return; }
-  if (!nome)   { toast('Nome obbligatorio',true); return; }
+  CR.busy = true; crPrev();
   try {
-    await apiFetch('POST','/articoli',{codice,nome,cat_id,um,note});
-    document.getElementById('naArtNome').value=''; document.getElementById('naArtNote').value='';
-    document.getElementById('naArtCodice').value=''; document.getElementById('naArtCat').value='';
-    document.getElementById('naArtCodiceHint').textContent='Seleziona prima la categoria';
-    await loadPartial('articoli'); renderCaricaScarica();
-    if(curPage==='crea') renderCrea();
-    toast(`Articolo "${nome}" creato ✓`);
+    let key, hl;
+    if (varOn) {
+      const r = await creaModelloDa('naArt');
+      if (!r) return;
+      key = 'm' + r.id; hl = key;
+    } else {
+      const r = await apiFetch('POST','/articoli',{codice,nome,cat_id,um,note});
+      key = String(r.id); hl = Number(r.id);
+    }
+    crReset();
+    await loadPartial('articoli');
+    CR.hl = hl;
+    toast(varOn ? 'Articolo con varianti creato ✓ — i pezzi si creano al carico' : `Articolo "${nome}" creato ✓`);
+    if (andLoad) { CR.busy = false; await ccGoTo(key); return; }
+    renderCrea();
+    document.querySelector('#tbStockNoMag .hl')?.scrollIntoView({ block: 'nearest' });
   } catch(e) {}
+  finally { CR.busy = false; crPrev(); }
 }
 
 // Elimina articolo direttamente dalla lista (solo se stock totale = 0 in magazzini reali)
@@ -1135,13 +1181,6 @@ async function cambiaVariante(id, sel) {
     toast('Variante aggiornata ✓');
   } catch (e) { sel.value = old; }
 }
-function caricaModello(mid) {
-  goTo('caricoscarico');
-  document.getElementById('cCategoria').value = '';
-  filterCaricoArticoli();
-  document.getElementById('cArticolo').value = 'm' + mid;
-  onCaricoChange();
-}
 async function eliminaModello(mid) {
   const m = getModello(mid); if (!m) return;
   if (!await askConfirm(`Eliminare l'articolo "${m.nome}"?\nNon ha ancora pezzi creati.`, { ok: 'Elimina', danger: true })) return;
@@ -1192,7 +1231,7 @@ function cvRender() {
   box.style.display = m ? '' : 'none';
   const qw = document.getElementById('cQtyWrap'), nw = document.getElementById('cNoteWrap');
   if (qw) qw.style.display = m ? 'none' : ''; if (nw) nw.style.display = m ? 'none' : '';
-  if (!m) return;
+  if (!m) { ccBar(); return; }
   const rest = _cv.tot - cvSum();
   document.getElementById('cVarTot').value = _cv.tot;
   document.getElementById('cVarTiles').innerHTML = m.varianti.map((v, i) => {
@@ -1201,6 +1240,7 @@ function cvRender() {
   }).join('');
   document.getElementById('cVarInfo').innerHTML = rest > 0 ? `Da assegnare: <strong>${rest}</strong> — tocca una variante` : `✓ ${_cv.tot} ${_cv.tot === 1 ? 'pezzo' : 'pezzi'} assegnati`;
   document.getElementById('cVarInfo').style.color = rest > 0 ? 'var(--orange,#c2410c)' : 'var(--green)';
+  ccBar();
 }
 async function modificaVarianti(mid) {
   const m = getModello(mid); if (!m) return;
@@ -1229,8 +1269,7 @@ async function creaModelloDa(p) {      // true se creato; false se mancano dati 
   if (!cat_id) { toast('Categoria obbligatoria', true); return false; }
   if (!nome) { toast('Nome obbligatorio', true); return false; }
   if (!varianti.length) { toast('Indica almeno una variante', true); return false; }
-  await apiFetch('POST', '/modelli', { nome, cat_id, note, varianti });
-  return true;
+  return await apiFetch('POST', '/modelli', { nome, cat_id, note, varianti });
 }
 
 const _magCompact = () => window.matchMedia('(max-width:600px)').matches;   // telefono: niente colonne U.M. e Categoria
@@ -2165,33 +2204,7 @@ function renderStock() {
   }).join(''):'<tr><td colspan="4" class="empty">Nessuno stock trovato</td></tr>';
   { const c=document.getElementById('cntStock'); if(c) c.textContent=`${rows.length} articoli · ${rows.reduce((t,r)=>t+r.qty,0)} pz`; }
 
-  const noMag=D.articoli.filter(a=>totalArtAny(a.id)===0);
-  const badge=document.getElementById('stockNoMagBadge');
-  if(badge){ { const nt=noMag.length+modelliSenzaPezzi().length; badge.textContent=nt; badge.style.display=nt?'':'none'; } }
-  const tbNoMag=document.getElementById('tbStockNoMag');
-  const noMagMod2=modelliSenzaPezzi();
-  if(tbNoMag) tbNoMag.innerHTML=(noMag.length||noMagMod2.length)?noMagMod2.map(m=>{ const cat=getCat(m.cat_id);
-    return `<tr>
-      <td>${codiceBadge(m.codice||'—', cat?.colore)}</td>
-      <td><strong>${h(m.nome)}</strong> <span class="var-chip">${m.varianti.map(h).join(' · ')}</span></td>
-      <td>${catPill(cat)}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:12px">pz</td>
-      <td style="font-size:12px;color:var(--ink3)">${h(m.note)||'—'}</td>
-      <td style="white-space:nowrap">${modelloVuotoBtns(m)}</td>
-    </tr>`; }).join('')+noMag.map(a=>{
-    const cat=getCat(a.cat_id);
-    return `<tr>
-      <td>${codiceBadge(a.codice, cat?.colore)}</td>
-      <td><strong>${h(a.nome)}</strong>${varChip(a)}</td>
-      <td>${catPill(cat)}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:12px">${h(a.um)}</td>
-      <td style="font-size:12px;color:var(--ink3)">${h(a.note)||'—'}</td>
-      <td style="white-space:nowrap">
-        <button class="btn btn-ghost btn-xs" onclick="editArt(${a.id})">Modifica</button>
-        <button class="btn btn-danger btn-xs" onclick="delArtNoStock(${a.id})" style="margin-left:4px">Elimina</button>
-      </td>
-    </tr>`;
-  }).join(''):'<tr><td colspan="6" class="empty">✓ Tutti gli articoli hanno uno stock assegnato</td></tr>';
+  renderCreaNoStock();
 }
 
 // ─── MODALS ───
@@ -3482,7 +3495,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 43;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 45;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);

@@ -249,132 +249,133 @@
 
     <!-- CARICA -->
     <div class="page" id="page-caricoscarico">
-      <div class="page-head" style="max-width:760px;margin:0 auto">
+      <div class="page-head">
         <div><div class="page-title">Carica</div><div class="page-sub">Registra entrata merce nei magazzini</div></div>
       </div>
-      <div style="max-width:760px;margin:0 auto">
-        <div class="card" style="border-top:5px solid var(--green)">
-          <div class="card-head"><span class="card-title" style="color:var(--green)">↓ Carico — entrata merce</span></div>
-          <div class="card-body">
-            <div style="display:grid;grid-template-columns:1fr 2fr;gap:10px;margin-bottom:14px">
-              <div class="fgroup" style="margin-bottom:0">
-                <label>Categoria</label>
-                <select class="finput" id="cCategoria" onchange="onCaricoCategoriaChange()" autocomplete="off">
-                  <option value="">Tutte</option>
-                </select>
+      <div class="cc-wrap" id="ccCarica">
+        <div class="lk-col-h sp-sec"><i style="background:var(--teal)"></i>Carico merce<span>un articolo alla volta</span></div>
+        <!-- Destinazione -->
+        <div class="card" style="margin-bottom:10px">
+          <div class="card-head sp-bh"><span class="card-title">Magazzino di destinazione</span><small class="sp-hint" id="cMagSel"></small></div>
+          <div class="sp-dst" id="cMagList"></div>
+          <input type="hidden" id="cMag">
+        </div>
+        <!-- Elenco + articolo selezionato -->
+        <div class="sp-mid">
+          <div class="card">
+            <div class="sp-fl cc-fl">
+              <div class="fgroup"><label>Categoria</label>
+                <select class="finput" id="cCategoria" onchange="onCaricoCategoriaChange()" autocomplete="off"><option value="">Tutte</option></select>
               </div>
-              <div class="fgroup" style="margin-bottom:0">
-                <label>Articolo *</label>
-                <select class="finput" id="cArticolo" onchange="onCaricoChange()" autocomplete="off"></select>
+              <div class="fgroup"><label>Articolo</label>
+                <input class="finput" id="cQ" placeholder="Cerca per codice o nome…" oninput="ccSetQ(this.value)" autocomplete="off">
+              </div>
+              <label class="cc-tg" id="cSoloLbl"><input type="checkbox" id="cSolo" onchange="ccSetSolo(this.checked)"><span>Solo senza stock</span><b id="cSoloN"></b></label>
+            </div>
+            <div class="sp-list" id="cList"></div>
+            <input type="hidden" id="cArticolo">
+          </div>
+          <div class="card">
+            <div class="card-head sp-bh"><span class="card-title">Articolo selezionato</span></div>
+            <div class="sp-sel">
+              <div id="cSelHead"></div>
+              <div id="cSelBody">
+                <div id="cQtyWrap">
+                  <label class="sp-lab">Quantità da caricare</label>
+                  <div class="sp-qrow">
+                    <div class="sp-step"><button type="button" aria-label="Meno" onclick="ccAdj(-1)"><svg viewBox="0 0 12 12"><path d="M2 6h8"/></svg></button><input id="cQty" type="text" inputmode="numeric" value="1" onchange="ccSetQty(this.value)" oninput="ccBar()" autocomplete="off"><button type="button" aria-label="Più" onclick="ccAdj(1)"><svg viewBox="0 0 12 12"><path d="M2 6h8M6 2v8"/></svg></button></div>
+                    <span class="sp-hint" id="cUm"></span>
+                  </div>
+                </div>
+                <div id="cVarPanel" style="display:none">
+                  <label class="sp-lab">Quanti pezzi per variante</label>
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><label style="margin:0;font-weight:600;font-size:13px">Totale pezzi *</label><input class="finput" id="cVarTot" type="number" min="1" max="200" value="1" style="width:90px" oninput="cvSetTot(this.value)" autocomplete="off"></div>
+                  <div id="cVarTiles" class="cv-tiles"></div>
+                  <div id="cVarInfo" style="font-size:12px;margin-top:8px;min-height:18px"></div>
+                </div>
+                <div id="cNoteWrap" style="margin-top:12px">
+                  <label class="sp-lab">Note articolo</label>
+                  <input class="finput" id="cNote" placeholder="Caratteristiche, modello, specifiche tecniche…" autocomplete="off">
+                </div>
               </div>
             </div>
-            <div style="font-size:11px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);margin-bottom:8px">Seleziona magazzino destinazione</div>
-            <div id="cMagList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px"></div>
-            <input type="hidden" id="cMag">
-            <div id="cMagSel" style="font-size:12px;font-family:'DM Mono',monospace;color:var(--green);min-height:18px;margin-bottom:12px"></div>
-            <div id="cVarPanel" style="display:none;margin-bottom:14px">
-              <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><label style="margin:0;font-weight:600">Quanti pezzi *</label><input class="finput" id="cVarTot" type="number" min="1" max="200" value="1" style="width:90px" oninput="cvSetTot(this.value)" autocomplete="off"></div>
-              <div id="cVarTiles" class="cv-tiles"></div>
-              <div id="cVarInfo" style="font-size:12px;margin-top:8px;min-height:18px"></div>
-            </div>
-            <div class="form-grid form-row-2" style="margin-bottom:14px">
-              <div class="fgroup" id="cQtyWrap">
-                <label>Quantità *</label>
-                <input class="finput" id="cQty" type="number" min="1" step="1" placeholder="0" autocomplete="off">
-              </div>
-            </div>
-            <div class="fgroup" id="cNoteWrap" style="margin-bottom:16px">
-              <label>Note articolo</label>
-              <input class="finput" id="cNote" placeholder="Caratteristiche, modello, specifiche tecniche..." autocomplete="off">
-            </div>
-            <button class="btn btn-dark" style="width:100%;background:var(--green);border-color:var(--green)" onclick="salvaCarico()">↓ Registra carico</button>
           </div>
         </div>
-      </div>
-
-      <!-- Articoli senza stock da caricare -->
-      <div style="max-width:760px;margin:16px auto 0" id="caricoNoStockWrap">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;padding-left:2px">
-          <span style="font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.8px;color:var(--ink3);text-transform:uppercase">Articoli senza stock — clicca per selezionare</span>
-          <select class="finput" id="cNoStockCat" onchange="renderCaricoNoStock()" style="width:auto;min-width:150px" autocomplete="off"></select>
-        </div>
-        <div class="card tbl-compact">
-          <div class="tbl-wrap">
-            <table class="tbl-selectable">
-              <colgroup><col class="cw-code"><col class="cw-xl"><col class="cw-lg"><col class="cw-um"><col class="cw-note"></colgroup>
-              <thead><tr><th>Codice</th><th>Nome</th><th>Categoria</th><th>U.M.</th><th class="wrap">Note art.</th></tr></thead>
-              <tbody id="tbCaricoNoStock"></tbody>
-            </table>
-          </div>
+        <!-- Conferma -->
+        <div class="card sp-bar">
+          <div class="sp-sum" id="cSum"></div>
+          <button class="btn btn-primary" id="cReg" onclick="salvaCarico()">↓ Registra carico</button>
         </div>
       </div>
     </div>
 
     <!-- CREA -->
     <div class="page" id="page-crea">
-      <div class="page-head" style="max-width:760px;margin:0 auto">
+      <div class="page-head">
         <div><div class="page-title">Crea</div><div class="page-sub">Inserisci nuovi articoli nel catalogo</div></div>
       </div>
-      <div style="max-width:760px;margin:0 auto">
-        <div class="card" style="border-top:5px solid var(--ink)">
-          <div class="card-head"><span class="card-title">+ Nuovo articolo</span><span style="font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.8px;color:var(--ink3);opacity:.7">CATALOGO</span></div>
-          <div class="card-body">
-            <div class="form-grid">
-              <div class="fgroup">
-                <label>Categoria *</label>
-                <select class="finput" id="naArtCat" onchange="onNaArtCatChange()" autocomplete="off"></select>
-              </div>
-              <div class="fgroup">
-                <label>Codice *</label>
-                <div style="display:flex;align-items:center;gap:10px">
-                  <input class="finput" id="naArtCodice" placeholder="es. A1" style="font-family:'DM Mono',monospace;font-weight:700;font-size:15px;width:100px;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()" autocomplete="off">
-                  <span id="naArtCodiceHint" style="font-size:12px;color:var(--ink3)">Seleziona prima la categoria</span>
+      <div class="cc-wrap" id="ccCrea">
+        <div class="lk-col-h sp-sec"><i style="background:var(--teal)"></i>Nuovo articolo</div>
+        <!-- Categoria -->
+        <div class="card" style="margin-bottom:10px">
+          <div class="card-head sp-bh"><span class="card-title">Categoria</span><small class="sp-hint" id="crCatHint">scegli la categoria</small></div>
+          <div class="cc-cats" id="naArtCats"></div>
+          <input type="hidden" id="naArtCat">
+        </div>
+        <!-- Dati + anteprima -->
+        <div class="sp-mid">
+          <div class="card">
+            <div class="card-head sp-bh"><span class="card-title">Dati articolo</span></div>
+            <div class="cc-pad">
+              <div class="cc-g2">
+                <div class="fgroup">
+                  <label>Codice *</label>
+                  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                    <input class="finput" id="naArtCodice" placeholder="es. A1" style="font-family:'DM Mono',monospace;font-weight:700;font-size:14px;width:110px;text-transform:uppercase" oninput="crCodeEdit(this)" autocomplete="off">
+                    <span id="naArtCodiceHint" class="sp-hint">Seleziona prima la categoria</span>
+                  </div>
+                </div>
+                <div class="fgroup">
+                  <label>Unità di misura</label>
+                  <select class="finput" id="naArtUm" onchange="crPrev()" autocomplete="off" style="max-width:160px">
+                    <option>pz</option><option>mt</option><option>kg</option><option>colli</option><option>pallet</option>
+                  </select>
                 </div>
               </div>
-              <div class="fgroup"><label>Nome *</label><input class="finput" id="naArtNome" placeholder="es. Cassa Audio 15&quot;" autocomplete="off"></div>
-              <div class="fgroup">
-                <label>Unità misura</label>
-                <select class="finput" id="naArtUm" autocomplete="off">
-                  <option>pz</option><option>mt</option><option>kg</option><option>colli</option><option>pallet</option>
-                </select>
+              <div class="fgroup"><label>Nome *</label><input class="finput" id="naArtNome" placeholder="es. Cassa Audio 15&quot;" oninput="crPrev()" autocomplete="off"></div>
+              <div class="fgroup" id="naArtVarWrap">
+                <label class="cc-sw"><input type="checkbox" id="naArtVarOn" onchange="onVarToggle('naArt');crPrev()"> Articolo con varianti <small>(pezzi univoci)</small></label>
+                <div id="naArtVarBox" style="display:none;margin-top:10px">
+                  <label class="sp-lab">Varianti * (separate da virgola)</label>
+                  <input class="finput" id="naArtVarList" placeholder="es. cp60, cp61, cp62" oninput="crPrev()" autocomplete="off">
+                  <div class="sp-hint" style="margin-top:6px;line-height:1.5">Si crea l'articolo generico. I pezzi nascono al carico: scegli quanti e di quale variante, con codici COD-1, COD-2… (i numeri non si riusano).</div>
+                </div>
               </div>
-<div class="fgroup" id="naArtVarWrap"><div class="var-block">
-<label class="var-toggle"><input type="checkbox" id="naArtVarOn" onchange="onVarToggle('naArt')"> Articolo con varianti <span style="font-weight:400;font-size:11px;color:var(--ink3)">(pezzi univoci)</span></label>
-<div id="naArtVarBox" style="display:none;margin-top:10px">
-<div class="fgroup"><label>Varianti * <span style="font-weight:400;font-size:11px;color:var(--ink3)">(separate da virgola)</span></label><input class="finput" id="naArtVarList" placeholder="es. cp60, cp61, cp62" autocomplete="off"></div>
-<div style="font-size:11px;color:var(--ink3);line-height:1.5">Si crea l'articolo generico. I pezzi nascono al carico: scegli quanti e di quale variante, con codici LU3-1, LU3-2… (i numeri non si riusano).</div>
-</div></div></div>
-              <div class="fgroup">
+              <div class="fgroup" style="margin-bottom:0">
                 <label>Descrizione / Note <span style="font-weight:400;font-size:11px;color:var(--ink3)">(rimane sull'articolo)</span></label>
-                <textarea class="finput" id="naArtNote" rows="2" placeholder="Caratteristiche, modello, specifiche tecniche..." autocomplete="off"></textarea>
+                <textarea class="finput" id="naArtNote" rows="2" placeholder="Caratteristiche, modello, specifiche tecniche…" oninput="crPrev()" autocomplete="off"></textarea>
               </div>
             </div>
-            <div style="margin-top:18px">
-              <button class="btn btn-dark" style="width:100%" onclick="salvaArticoloDaCarico()">Crea articolo</button>
-            </div>
+          </div>
+          <div class="card">
+            <div class="card-head sp-bh"><span class="card-title">Anteprima</span></div>
+            <div class="sp-sel" id="crPrev"></div>
           </div>
         </div>
-      </div>
-
-      <!-- Articoli senza magazzino -->
-      <div style="margin-top:28px;max-width:760px;margin-left:auto;margin-right:auto">
-        <div style="font-size:13px;font-weight:700;color:var(--ink2);margin-bottom:10px;display:flex;align-items:center;gap:8px">
-          ⚠ Articoli creati senza stock
-          <span class="art-tab-badge warn" id="stockNoMagBadge" style="display:none">0</span>
+        <!-- Conferma -->
+        <div class="card sp-bar">
+          <div class="sp-sum" id="crSum"></div>
+          <button class="btn btn-ghost" id="crBtnCarica" onclick="salvaArticoloDaCarico(true)">Crea e carica →</button>
+          <button class="btn btn-primary" id="crBtn" onclick="salvaArticoloDaCarico(false)">＋ Crea articolo</button>
         </div>
-        <div class="card">
-          <div class="tbl-wrap">
-            <table>
-              <colgroup><col class="cw-code"><col class="cw-xl"><col class="cw-lg"><col class="cw-um"><col class="cw-note"><col class="cw-act"></colgroup>
-              <thead><tr><th>Codice</th><th>Articolo</th><th>Categoria</th><th>U.M.</th><th class="wrap">Note</th><th></th></tr></thead>
-              <tbody id="tbStockNoMag"></tbody>
-            </table>
-          </div>
-        </div>
+        <!-- Senza stock -->
+        <div class="lk-col-h sp-sec cc-sec2"><i style="background:var(--amber)"></i>Articoli creati senza stock<span id="stockNoMagBadge"></span></div>
+        <div class="card"><div class="sp-list cc-nolist" id="tbStockNoMag"></div></div>
       </div>
     </div>
 
-    <!-- MAGAZZINI -->
+    
+<!-- MAGAZZINI -->
     <div class="page" id="page-magazzini">
       <div class="page-head">
         <div><div class="page-title">Magazzini</div><div class="page-sub">Gestisci i tuoi depositi</div></div>

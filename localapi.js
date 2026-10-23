@@ -75,7 +75,7 @@ async function localFetch(method, url, body) {
   return out;
 }
 window.localFetch = localFetch;
-window.LOCALAPI_BUILD = 43;   // deve coincidere con APP_BUILD in index.html
+window.LOCALAPI_BUILD = 45;   // deve coincidere con APP_BUILD in index.html
 
 function isValidColore(c) {
   return !c || /^#[0-9a-fA-F]{3,6}$/.test(c);
@@ -88,6 +88,19 @@ function safeErr(e, context) {
   if (e.message.includes('Stock insufficiente')) return e.message; // already safe
   return 'Errore durante l\'operazione';
 }
+
+// ── Validazione rigorosa di id e quantità (solo interi decimali positivi, niente 1.5 / "1e2" / true / array / oggetti)
+const QTY_MAX = 1000000;
+function strictInt(v) {
+  if (typeof v === 'number') return Number.isSafeInteger(v) ? v : null;
+  if (typeof v === 'string' && /^\d{1,15}$/.test(v.trim())) return Number(v.trim());
+  return null;
+}
+function parseId(v)  { const n = strictInt(v); return n !== null && n > 0 ? n : null; }
+function parseQty(v) { const n = strictInt(v); return n !== null && n > 0 && n <= QTY_MAX ? n : null; }
+const ERR_QTY = 'Quantità non valida (intero da 1 a ' + QTY_MAX + ')';
+const esisteArt = id => !!db.prepare('SELECT 1 FROM articoli WHERE id=?').get(id);
+const esisteMag = id => !!db.prepare('SELECT 1 FROM magazzini WHERE id=?').get(id);
 
 function prossimoNumero(prefisso) {
   const mx = t => db.prepare(`SELECT MAX(CAST(SUBSTR(codice, ?) AS INTEGER)) as max FROM ${t} WHERE codice LIKE ?`)
@@ -519,9 +532,13 @@ app.get('/api/stock', (_, res) =>
     WHERE s.qty>0 ORDER BY m.virtuale ASC, a.codice, m.nome`).all()));
 app.post('/api/stock/carica', (req, res) => {
   touch();
-  const { art_id, mag_id, qty, note='' } = req.body;
-  if (!art_id||!mag_id) return res.status(400).json({ error: 'Campi obbligatori mancanti' });
-  const q = parseInt(qty); if (isNaN(q)||q<=0) return res.status(400).json({ error: 'Quantità non valida' });
+  const { qty, note='' } = req.body;
+  if (!req.body.art_id||!req.body.mag_id) return res.status(400).json({ error: 'Campi obbligatori mancanti' });
+  const art_id = parseId(req.body.art_id), mag_id = parseId(req.body.mag_id);
+  if (!art_id || !mag_id) return res.status(400).json({ error: 'Articolo o magazzino non valido' });
+  const q = parseQty(qty); if (q === null) return res.status(400).json({ error: ERR_QTY });
+  if (!esisteArt(art_id)) return res.status(404).json({ error: 'Articolo non trovato' });
+  if (!esisteMag(mag_id)) return res.status(404).json({ error: 'Magazzino non trovato' });
   const artCat = db.prepare("SELECT c.prefisso FROM articoli a JOIN categorie c ON c.id=a.cat_id WHERE a.id=?").get(art_id);
   if (['BAU','FLC','FLCK'].includes(artCat?.prefisso))
     return res.status(400).json({ error: 'Il carico di bauli e flight case avviene dalla sezione dedicata' });
@@ -540,9 +557,11 @@ app.post('/api/stock/carica', (req, res) => {
 });
 app.post('/api/stock/scarica', (req, res) => {
   touch();
-  const { art_id, mag_id, qty, note='' } = req.body;
-  if (!art_id||!mag_id||!qty) return res.status(400).json({ error: 'Campi obbligatori mancanti' });
-  const q = parseInt(qty); if (isNaN(q)||q<=0) return res.status(400).json({ error: 'Quantità non valida' });
+  const { qty, note='' } = req.body;
+  if (!req.body.art_id||!req.body.mag_id||!qty) return res.status(400).json({ error: 'Campi obbligatori mancanti' });
+  const art_id = parseId(req.body.art_id), mag_id = parseId(req.body.mag_id);
+  if (!art_id || !mag_id) return res.status(400).json({ error: 'Articolo o magazzino non valido' });
+  const q = parseQty(qty); if (q === null) return res.status(400).json({ error: ERR_QTY });
   const uid = req.session.user.id;
   try {
     db.transaction(() => {
@@ -575,10 +594,12 @@ app.get('/api/spostamenti', (req, res) => {
 });
 app.post('/api/spostamenti', (req, res) => {
   touch();
-  const { art_id, mag_from, mag_to, qty, data, note='' } = req.body;
-  if (!art_id||!mag_from||!mag_to||!qty) return res.status(400).json({ error: 'Campi obbligatori mancanti' });
+  const { qty, data, note='' } = req.body;
+  if (!req.body.art_id||!req.body.mag_from||!req.body.mag_to||!qty) return res.status(400).json({ error: 'Campi obbligatori mancanti' });
+  const art_id = parseId(req.body.art_id), mag_from = parseId(req.body.mag_from), mag_to = parseId(req.body.mag_to);
+  if (!art_id || !mag_from || !mag_to) return res.status(400).json({ error: 'Articolo o magazzino non valido' });
   if (mag_from===mag_to) return res.status(400).json({ error: 'Origine e destinazione devono essere diversi' });
-  const q = parseInt(qty); if (isNaN(q)||q<=0) return res.status(400).json({ error: 'Quantità non valida' });
+  const q = parseQty(qty); if (q === null) return res.status(400).json({ error: ERR_QTY });
   const uid = req.session.user.id;
   const ts = data||new Date().toISOString();
   const fc = db.prepare('SELECT * FROM flightcase_def WHERE art_id=?').get(art_id);
@@ -621,10 +642,12 @@ app.post('/api/spostamenti/batch', (req, res) => {
     return res.status(400).json({ error: 'Nessuno spostamento' });
   // Validate each item
   for (const s of spostamenti) {
-    const q = parseInt(s.qty);
-    if (!s.art_id || !s.mag_from || !s.mag_to || isNaN(q) || q <= 0)
+    if (!s || typeof s !== 'object' || Array.isArray(s)) return res.status(400).json({ error: 'Dati spostamento non validi' });
+    const q = parseQty(s.qty), a = parseId(s.art_id), mf = parseId(s.mag_from), mt = parseId(s.mag_to);
+    if (!a || !mf || !mt || q === null)
       return res.status(400).json({ error: 'Dati spostamento non validi' });
-    s.qty = q; // normalise to integer
+    if (mf === mt) return res.status(400).json({ error: 'Origine e destinazione devono essere diversi' });
+    s.art_id = a; s.mag_from = mf; s.mag_to = mt; s.qty = q; // normalise to integers
   }
   const batchId = randomUUID();
   const uid = req.session.user.id;
