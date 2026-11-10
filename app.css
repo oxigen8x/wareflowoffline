@@ -1341,15 +1341,6 @@ body.dark .stock-badge-a{background:#052e16;color:#4ade80;border-color:#166534;}
   .aside-toggle{display:flex;position:absolute;top:8px;right:8px;z-index:5;width:26px;height:26px;padding:0;align-items:center;justify-content:center;border-radius:7px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);color:rgba(255,255,255,.85);cursor:pointer;font-family:'DM Sans',sans-serif;}
   .aside-toggle:hover{background:rgba(255,255,255,.13);}
   .aside-toggle .ni{width:auto;font-size:15px;line-height:1;opacity:1;}
-  body.aside-min:not([data-style="cr"]):not([data-struct="top"]) aside{width:68px;}
-  body.aside-min:not([data-style="cr"]):not([data-struct="top"]) aside > *:not(.aside-nav):not(.aside-toggle){display:none!important;}
-  body.aside-min:not([data-style="cr"]):not([data-struct="top"]) .aside-toggle{right:auto;left:19px;top:10px;}
-  body.aside-min:not([data-style="cr"]):not([data-struct="top"]) .aside-nav{padding:56px 8px 8px;}
-  body.aside-min:not([data-style="cr"]):not([data-struct="top"]) .nav-group-label{font-size:0;line-height:0;height:0;padding:0;margin:8px 6px 4px;border-top:1px solid rgba(255,255,255,.12)!important;}
-  body.aside-min:not([data-style="cr"]):not([data-struct="top"]) .nav-btn{justify-content:center;padding:11px 0;position:relative;}
-  body.aside-min:not([data-style="cr"]):not([data-struct="top"]) .nav-btn > span:not(.ni):not(.nav-badge){display:none;}
-  body.aside-min:not([data-style="cr"]):not([data-struct="top"]) .nav-btn .ni{font-size:18px;width:auto;}
-  body.aside-min:not([data-style="cr"]):not([data-struct="top"]) .nav-badge{position:absolute;top:2px;right:3px;margin:0;}
 }
 /* ═══════════════════════════════════════════════════════════
    ASPETTO — stili (data-style), struttura (data-struct), pannello
@@ -1490,28 +1481,28 @@ body[data-style="cr"] .page-title:before{content:"●";color:#34d399;font-size:1
 body[data-style="cr"].dark th{color:var(--ink3);}
 /* sidebar a icone (solo da 769px, solo se non è topbar) */
 @media(min-width:769px){
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) aside{width:88px;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) .aside-logo{padding:12px 6px;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) .aside-logo .zb-full{display:none;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) .aside-logo .zb-mark{display:block;width:44px;height:44px;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) .beta-badge{display:none;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) .aside-nav{padding:10px 6px;gap:3px;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) .nav-btn{flex-direction:column;gap:3px;padding:9px 3px;font-size:10px;text-align:center;line-height:1.15;justify-content:center;position:relative;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) .nav-btn .ni{font-size:18px;width:auto;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) .nav-btn .nav-badge{position:absolute;top:2px;right:6px;margin:0;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) .nav-group-label{font-size:0;line-height:0;height:0;padding:0;margin:6px 10px;border-top:1px solid var(--border)!important;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) .online-pill{padding:6px;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) .online-pill-inner{justify-content:center;padding:4px;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) .online-avatars,body.aside-min[data-style="cr"]:not([data-struct="top"]) .online-count{display:none;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) .aspetto-wrap{padding:8px 10px;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) .aspetto-btn{justify-content:center;padding:8px 0;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) .aspetto-lbl,body.aside-min[data-style="cr"]:not([data-struct="top"]) .aspetto-arr{display:none;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) #userInfo{padding:6px!important;align-items:center;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) #userInfo>div{justify-content:center!important;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) #userLabel{display:none;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) #userInfo button{width:auto!important;padding:6px 10px!important;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) #userInfo .ui-t{display:none;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) .aside-foot{padding:8px 4px;text-align:center;}
+  body.aside-min:not([data-struct="top"]) aside{width:88px;}
+  body.aside-min:not([data-struct="top"]) .aside-logo{padding:12px 6px;}
+  body.aside-min:not([data-struct="top"]) .aside-logo .zb-full{display:none;}
+  body.aside-min:not([data-struct="top"]) .aside-logo .zb-mark{display:block;width:44px;height:44px;}
+  body.aside-min:not([data-struct="top"]) .beta-badge{display:none;}
+  body.aside-min:not([data-struct="top"]) .aside-nav{padding:10px 6px;gap:3px;}
+  body.aside-min:not([data-struct="top"]) .nav-btn{flex-direction:column;gap:3px;padding:9px 3px;font-size:10px;text-align:center;line-height:1.15;justify-content:center;position:relative;}
+  body.aside-min:not([data-struct="top"]) .nav-btn .ni{font-size:18px;width:auto;}
+  body.aside-min:not([data-struct="top"]) .nav-btn .nav-badge{position:absolute;top:2px;right:6px;margin:0;}
+  body.aside-min:not([data-struct="top"]) .nav-group-label{font-size:0;line-height:0;height:0;padding:0;margin:6px 10px;border-top:1px solid var(--border)!important;}
+  body.aside-min:not([data-struct="top"]) .online-pill{padding:6px;}
+  body.aside-min:not([data-struct="top"]) .online-pill-inner{justify-content:center;padding:4px;}
+  body.aside-min:not([data-struct="top"]) .online-avatars,body.aside-min:not([data-struct="top"]) .online-count{display:none;}
+  body.aside-min:not([data-struct="top"]) .aspetto-wrap{padding:8px 10px;}
+  body.aside-min:not([data-struct="top"]) .aspetto-btn{justify-content:center;padding:8px 0;}
+  body.aside-min:not([data-struct="top"]) .aspetto-lbl,body.aside-min:not([data-struct="top"]) .aspetto-arr{display:none;}
+  body.aside-min:not([data-struct="top"]) #userInfo{padding:6px!important;align-items:center;}
+  body.aside-min:not([data-struct="top"]) #userInfo>div{justify-content:center!important;}
+  body.aside-min:not([data-struct="top"]) #userLabel{display:none;}
+  body.aside-min:not([data-struct="top"]) #userInfo button{width:auto!important;padding:6px 10px!important;}
+  body.aside-min:not([data-struct="top"]) #userInfo .ui-t{display:none;}
+  body.aside-min:not([data-struct="top"]) .aside-foot{padding:8px 4px;text-align:center;}
 }
 
 /* ═══════════ STILE: NEUMORFICO ═══════════ */
@@ -1638,11 +1629,11 @@ body[data-style] .aside-tools{border-top-color:var(--border);}
 
 /* Control Room: barra stretta, strumenti in colonna */
 @media(min-width:769px){
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) .aside-tools{flex-direction:column;gap:6px;padding:8px 6px;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) .aside-tools .aspetto-btn{width:34px!important;height:34px!important;padding:0!important;justify-content:center;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) .aspetto-lbl{display:none!important;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) .aspetto-ic{width:17px;height:17px;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) .aside-tools .online-pill{width:100%;}
+  body.aside-min:not([data-struct="top"]) .aside-tools{flex-direction:column;gap:6px;padding:8px 6px;}
+  body.aside-min:not([data-struct="top"]) .aside-tools .aspetto-btn{width:34px!important;height:34px!important;padding:0!important;justify-content:center;}
+  body.aside-min:not([data-struct="top"]) .aspetto-lbl{display:none!important;}
+  body.aside-min:not([data-struct="top"]) .aspetto-ic{width:17px;height:17px;}
+  body.aside-min:not([data-struct="top"]) .aside-tools .online-pill{width:100%;}
 }
 
 /* "a posto" = verde fisso, indipendente da stile e colore del tema */
@@ -1733,35 +1724,35 @@ body[data-style="cr"] .ph-step.on,body[data-style="cr"] .spos-sel-box.filled{bac
 
 /* ANNI 90 v2: più chiaro e meno pesante */
 /* menu: voci piatte, selezione blu come nelle liste di Windows */
-body[data-style="w95"][data-style] .nav-btn{background:transparent;border:1px solid transparent;color:#000;padding:6px 10px;font-weight:400;}
-body[data-style="w95"][data-style] .nav-btn:hover{background:transparent;border-color:#fff #404040 #404040 #fff;}
-body[data-style="w95"][data-style] .nav-btn.active{background:var(--w95)!important;color:#fff!important;border-color:var(--w95);font-weight:700;}
-body[data-style="w95"][data-style] .nav-btn.active .ni,body[data-style="w95"][data-style] .nav-btn.active span{color:#fff!important;}
-body[data-style="w95"][data-style] .nav-group-label{color:#000;font-weight:700;font-size:11px;letter-spacing:0;text-transform:none;border-bottom:1px solid #808080;box-shadow:0 1px 0 #fff;margin:10px 4px 4px;padding:4px 6px 3px;}
-body[data-style="w95"][data-style] .aside-nav .nav-group-label:not(:first-child){border-top:0;}
+body[data-style="w95"] .nav-btn{background:transparent;border:1px solid transparent;color:#000;padding:6px 10px;font-weight:400;}
+body[data-style="w95"] .nav-btn:hover{background:transparent;border-color:#fff #404040 #404040 #fff;}
+body[data-style="w95"] .nav-btn.active{background:var(--w95)!important;color:#fff!important;border-color:var(--w95);font-weight:700;}
+body[data-style="w95"] .nav-btn.active .ni,body[data-style="w95"] .nav-btn.active span{color:#fff!important;}
+body[data-style="w95"] .nav-group-label{color:#000;font-weight:700;font-size:11px;letter-spacing:0;text-transform:none;border-bottom:1px solid #808080;box-shadow:0 1px 0 #fff;margin:10px 4px 4px;padding:4px 6px 3px;}
+body[data-style="w95"] .aside-nav .nav-group-label:not(:first-child){border-top:0;}
 /* contenitori: un solo bordo, incassati ma completi */
-body[data-style="w95"][data-style] :is(.card,.stat,.tbl-wrap,.lk-card,.bt-card,.mag-card,.mag-stat,.spos-sel-box,.stock-map-row,.gr-panel,.gr-row,.gr-stop,.ph-row,.ph-step,.ph-stop,.cv-tile,.var-chip,.ds-tile,.lk-empty){border:1px solid #808080;box-shadow:inset 1px 1px 0 #404040,1px 1px 0 #fff;}
+body[data-style="w95"] :is(.card,.stat,.tbl-wrap,.lk-card,.bt-card,.mag-card,.mag-stat,.spos-sel-box,.stock-map-row,.gr-panel,.gr-row,.gr-stop,.ph-row,.ph-step,.ph-stop,.cv-tile,.var-chip,.ds-tile,.lk-empty){border:1px solid #808080;box-shadow:inset 1px 1px 0 #404040,1px 1px 0 #fff;}
 /* colonne e gruppi: riquadro grigio con filetto, così si distinguono dalle schede bianche */
-body[data-style="w95"][data-style] :is(.lk-col,.bt-list,.lk-count){background:#c0c0c0;border:1px solid #808080;box-shadow:inset 1px 1px 0 #fff,1px 1px 0 #fff;}
-body[data-style="w95"][data-style] :is(.lk-col,.bt-list) .lk-card,body[data-style="w95"][data-style] :is(.lk-col,.bt-list) .card{background:#ebebeb;}
+body[data-style="w95"] :is(.lk-col,.bt-list,.lk-count){background:#c0c0c0;border:1px solid #808080;box-shadow:inset 1px 1px 0 #fff,1px 1px 0 #fff;}
+body[data-style="w95"] :is(.lk-col,.bt-list) .lk-card,body[data-style="w95"] :is(.lk-col,.bt-list) .card{background:#ebebeb;}
 /* pulsanti: rilievo sottile, niente doppio bordo nero */
-body[data-style="w95"][data-style] :is(.btn,.aspetto-btn,.aside-toggle,.op-btn,.lk-btn,.vl-btn,.mg-open,.asp-seg button){border:1px solid #404040;box-shadow:inset 1px 1px 0 #fff,inset -1px -1px 0 #808080;}
-body[data-style="w95"][data-style] :is(.btn,.aspetto-btn,.aside-toggle,.op-btn):active{box-shadow:inset 1px 1px 0 #808080;}
-body[data-style="w95"][data-style] :is(.btn-primary,.btn-teal,.btn-primary:hover,.btn-teal:hover){outline:0;border-color:#000;}
-body[data-style="w95"][data-style] .btn-primary,body[data-style="w95"][data-style] .btn-teal{box-shadow:inset 1px 1px 0 #fff,inset -1px -1px 0 #808080,0 0 0 1px #000;}
-body[data-style="w95"][data-style] :is(.bt-tab,.lk-tab){border:1px solid #404040;box-shadow:inset 1px 1px 0 #fff;}
-body[data-style="w95"][data-style] :is(.bt-tab.active,.lk-tab.active){box-shadow:inset 1px 1px 0 #808080;background:#ebebeb!important;}
+body[data-style="w95"] :is(.btn,.aspetto-btn,.aside-toggle,.op-btn,.lk-btn,.vl-btn,.mg-open,.asp-seg button){border:1px solid #404040;box-shadow:inset 1px 1px 0 #fff,inset -1px -1px 0 #808080;}
+body[data-style="w95"] :is(.btn,.aspetto-btn,.aside-toggle,.op-btn):active{box-shadow:inset 1px 1px 0 #808080;}
+body[data-style="w95"] :is(.btn-primary,.btn-teal,.btn-primary:hover,.btn-teal:hover){outline:0;border-color:#000;}
+body[data-style="w95"] .btn-primary,body[data-style="w95"] .btn-teal{box-shadow:inset 1px 1px 0 #fff,inset -1px -1px 0 #808080,0 0 0 1px #000;}
+body[data-style="w95"] :is(.bt-tab,.lk-tab){border:1px solid #404040;box-shadow:inset 1px 1px 0 #fff;}
+body[data-style="w95"] :is(.bt-tab.active,.lk-tab.active){box-shadow:inset 1px 1px 0 #808080;background:#ebebeb!important;}
 /* campi: incassati con filetto interno */
-body[data-style="w95"][data-style] :is(.finput,.search,input,select,textarea){border:1px solid #808080;box-shadow:inset 1px 1px 0 #404040,1px 1px 0 #fff;}
+body[data-style="w95"] :is(.finput,.search,input,select,textarea){border:1px solid #808080;box-shadow:inset 1px 1px 0 #404040,1px 1px 0 #fff;}
 /* tabelle: righe alternate e selezione blu */
-body[data-style="w95"][data-style] tbody tr:nth-child(even) td{background:#f3f3f3;}
-body[data-style="w95"][data-style] tbody tr:hover td{background:#dfe6f7;}
-body[data-style="w95"][data-style] td{border-color:#d4d0c8;}
+body[data-style="w95"] tbody tr:nth-child(even) td{background:#f3f3f3;}
+body[data-style="w95"] tbody tr:hover td{background:#dfe6f7;}
+body[data-style="w95"] td{border-color:#d4d0c8;}
 /* fasce colorate dei contenitori: grigio neutro, il colore resta solo nell'icona e nel filetto */
-body[data-style="w95"][data-style] .bt-band{background:#d4d0c8!important;border-bottom:1px solid #808080!important;}
+body[data-style="w95"] .bt-band{background:#d4d0c8!important;border-bottom:1px solid #808080!important;}
 /* titoli di sezione dentro le schede: barra blu come una finestra */
-body[data-style="w95"][data-style] :is(.dash-card-head,.dash-head,.lk-col-h,.card-head){background:linear-gradient(90deg,var(--w95),color-mix(in srgb,var(--w95) 55%,#1084d0));color:#fff;padding:3px 8px;font-weight:700;border:0;}
-body[data-style="w95"][data-style] :is(.dash-card-head,.dash-head,.lk-col-h,.card-head) *{color:#fff!important;}
+body[data-style="w95"] :is(.dash-card-head,.dash-head,.lk-col-h,.card-head){background:linear-gradient(90deg,var(--w95),color-mix(in srgb,var(--w95) 55%,#1084d0));color:#fff;padding:3px 8px;font-weight:700;border:0;}
+body[data-style="w95"] :is(.dash-card-head,.dash-head,.lk-col-h,.card-head) *{color:#fff!important;}
 
 /* TEMA NEUTRO: chiaro = prevalenza bianco, scuro = grigio scuro (senza dominante calda) */
 [data-theme="neutro"]{
@@ -1904,8 +1895,8 @@ body.dark #sposAdmin{--sp-ac:var(--teal-light);}
 
 /* BUILD 41 — Control Room: toggle nella barra ridotta */
 @media(min-width:769px){
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) .aside-toggle{right:auto;left:50%;margin-left:-13px;top:8px;}
-  body.aside-min[data-style="cr"]:not([data-struct="top"]) .aside-logo{padding:40px 6px 10px;}
+  body.aside-min:not([data-struct="top"]) .aside-toggle{right:auto;left:50%;margin-left:-13px;top:8px;}
+  body.aside-min:not([data-struct="top"]) .aside-logo{padding:40px 6px 10px;}
 }
 /* BUILD 41 — Spostamento / Trasferisci tutto: due sezioni distinte */
 /* Spostamento / Trasferisci tutto: intestazione di sezione = stessa del resto dell'app (.lk-col-h) */
@@ -1916,7 +1907,7 @@ body.dark #sposAdmin{--sp-ac:var(--teal-light);}
 /* Contenuto centrato sullo schermo anche con sidebar ridotta (PC) */
 body{--aw:250px;}
 body.aside-min{--aw:68px;}
-body.aside-min[data-style="cr"]{--aw:88px;}
+body.aside-min{--aw:88px;}
 @media(min-width:769px){
   body.aside-min:not([data-struct="top"]) .page.active{margin-left:max(0px,calc(50vw - 600px - var(--aw)));}
 }
@@ -1982,3 +1973,28 @@ body.dark .cc-wrap{--sp-ac:var(--teal-light);}
   .cc-wrap .sp-bar{position:sticky;bottom:0;z-index:5;}
   .cc-wrap .sp-bar .btn{flex:1;}
 }
+
+/* ── Barra ridotta: stessa struttura di Control Room in tutti gli stili (ritocchi per Term e Anni 90) ── */
+@media(min-width:769px){
+  body.aside-min[data-style="term"]:not([data-struct="top"]) .nav-btn{font-size:9.5px;letter-spacing:0;}
+  body.aside-min[data-style="w95"]:not([data-struct="top"]) .nav-btn{font-size:10px;padding:8px 2px;}
+  body.aside-min[data-style="w95"]:not([data-struct="top"]) .nav-group-label{font-size:0;line-height:0;height:0;padding:0;margin:6px 10px;border-bottom:0;box-shadow:none;border-top:1px solid #808080!important;}
+}
+
+/* ── Niente zoom col doppio tocco (iPad/tablet) su pulsanti, link, menu e campi; il pizzico a due dita resta attivo ── */
+:where(button,a,select,summary,label,[onclick],input[type=number],input[type=checkbox],input[type=radio]){touch-action:manipulation;}
+
+/* ── Bauli: filtro magazzino + ordinamento ── */
+.bt-fbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:-4px 0 16px;}
+.bt-ordl{margin-left:auto;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);}
+.bt-seg{display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--surface);}
+.bt-seg button{min-height:36px;padding:0 12px;border:0;background:transparent;color:var(--ink3);font:600 12.5px 'DM Sans',sans-serif;cursor:pointer;}
+.bt-seg button+button{border-left:1px solid var(--border);}
+.bt-seg button.on{background:var(--surface2);color:var(--amber);}
+.bt-mgh{display:flex;align-items:center;gap:8px;margin:18px 0 8px;font-size:13px;color:var(--ink);}
+.bt-groups>.bt-mgh:first-child{margin-top:2px;}
+.bt-mgh i{width:10px;height:10px;border-radius:3px;background:var(--mc);flex-shrink:0;}
+.bt-mgh span{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3);border:1px solid var(--border);border-radius:10px;padding:1px 7px;}
+.bt-mgh::after{content:"";flex:1;height:1px;background:var(--border);}
+body:has(#bauliTabContent:not([style*="none"]) #bauleDettaglio:not([style*="none"]),#flcTabContent:not([style*="none"]) #flcDettaglio:not([style*="none"]),#flckTabContent:not([style*="none"]) #flckDettaglio:not([style*="none"])) .bt-fbar{display:none;}
+@media(max-width:560px){.bt-ordl{display:none}.bt-fbar .finput{flex:1 1 100%;width:100%!important}.bt-seg{width:100%}.bt-seg button{flex:1}}

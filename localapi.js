@@ -75,7 +75,7 @@ async function localFetch(method, url, body) {
   return out;
 }
 window.localFetch = localFetch;
-window.LOCALAPI_BUILD = 45;   // deve coincidere con APP_BUILD in index.html
+window.LOCALAPI_BUILD = 46;   // deve coincidere con APP_BUILD in index.html
 
 function isValidColore(c) {
   return !c || /^#[0-9a-fA-F]{3,6}$/.test(c);
@@ -181,7 +181,7 @@ app.delete('/api/categorie/:id', (req, res) => {
   touch();
   const catPfx = db.prepare("SELECT prefisso FROM categorie WHERE id=?").get(req.params.id);
   if (catPfx?.prefisso === 'BAU')
-    return res.status(400).json({ error: 'La categoria "Bauli speciali" non può essere eliminata' });
+    return res.status(400).json({ error: 'La categoria "Bauli misti" non può essere eliminata' });
   if (catPfx?.prefisso === 'FLC')
     return res.status(400).json({ error: 'La categoria "Flight Case" non può essere eliminata' });
   if (catPfx?.prefisso === 'FLCK')
@@ -1174,7 +1174,8 @@ try {
   if (!db.prepare('SELECT id FROM magazzini WHERE virtuale=1').get())
     db.prepare("INSERT INTO magazzini (nome,citta,virtuale) VALUES ('Cestino','',1)").run();
   if (!db.prepare("SELECT id FROM categorie WHERE prefisso='BAU'").get())
-    db.prepare('INSERT OR IGNORE INTO categorie (nome,colore,prefisso) VALUES (?,?,?)').run('Bauli speciali', '#92400e', 'BAU');
+    db.prepare('INSERT OR IGNORE INTO categorie (nome,colore,prefisso) VALUES (?,?,?)').run('Bauli misti', '#92400e', 'BAU');
+  db.prepare("UPDATE categorie SET nome='Bauli misti' WHERE prefisso='BAU' AND nome='Bauli speciali'").run();   // migrazione nome
   if (!db.prepare("SELECT id FROM categorie WHERE prefisso='FLC'").get())
     db.prepare('INSERT OR IGNORE INTO categorie (nome,colore,prefisso) VALUES (?,?,?)').run('Flight Case', '#6b4c6e', 'FLC');
   if (!db.prepare("SELECT id FROM categorie WHERE prefisso='FLCK'").get())

@@ -396,13 +396,21 @@
       </div>
       <div class="bt-bar">
         <div class="bt-tabs">
-          <button class="bt-tab active" id="tabBauli" onclick="switchBauliTab('bauli')">Bauli <span id="tabBauliN">0</span></button>
+          <button class="bt-tab active" id="tabBauli" onclick="switchBauliTab('bauli')">Bauli misti <span id="tabBauliN">0</span></button>
           <button class="bt-tab" id="tabFlc" onclick="switchBauliTab('flc')">Flight Case <span id="tabFlcN">0</span></button>
           <button class="bt-tab" id="tabFlck" onclick="switchBauliTab('flck')">Flightcase K <span id="tabFlckN">0</span></button>
         </div>
         <div class="bt-view" id="btView">
           <button id="btvTile" title="Riquadri" aria-label="Vista a riquadri" onclick="setBauliView('tile')">▦</button>
           <button id="btvList" title="Lista compatta" aria-label="Vista a lista compatta" onclick="setBauliView('list')">☰</button>
+        </div>
+      </div>
+      <div class="bt-fbar" id="btFbar">
+        <select class="finput" id="btMagSel" onchange="setBtMag(this.value)" aria-label="Filtra per magazzino" style="width:auto;min-width:200px" autocomplete="off"></select>
+        <span class="bt-ordl">Ordina</span>
+        <div class="bt-seg" id="btOrd">
+          <button id="btoAz" onclick="setBtOrd('az')">A–Z</button>
+          <button id="btoMag" onclick="setBtOrd('mag')">Per magazzini</button>
         </div>
       </div>
       <div id="bauliTabContent">

@@ -3495,7 +3495,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 45;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 46;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
@@ -3685,7 +3685,7 @@ async function salvaCambiaPwd() {
 // ─── STAMPA ───
 // ─── STAMPE ───
 // Helper condivisi dalle stampe della lista di carico e del contenuto di un magazzino.
-const _PRINT_CSS = 'body{font-family:"Helvetica Neue",Arial,sans-serif;padding:32px;color:#1a1814;}h1{font-size:22px;margin-bottom:4px;}.sub{font-size:13px;color:#9a9287;margin-bottom:24px;}table{width:100%;border-collapse:collapse;font-size:12px;}th{background:#f4f1eb;padding:4px 8px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:#5a5449;border-bottom:1px solid #ddd9cf;}td{padding:4px 8px;border-bottom:0.5px solid #ede9e0;vertical-align:middle;}.foot{margin-top:32px;font-size:11px;color:#9a9287;border-top:1px solid #ede9e0;padding-top:12px;}tr.catrow td{background:#e9e4d8;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;padding:6px 8px;border-bottom:1px solid #ccc6b6;}tr.catrow span{float:right;font-family:monospace;}tr.catrow{break-after:avoid;}tr{break-inside:avoid;}.bx{display:inline-block;width:11px;height:11px;border:1px solid #9a9287;border-radius:2px;vertical-align:middle}.q{text-align:right;white-space:nowrap;font-weight:700;width:60px}.q .um{font-weight:400;color:#9a9287;font-size:11px}.nm{font-size:14px}.cod{font-family:monospace;font-size:10px;font-weight:400;color:#8a8275;white-space:nowrap}table.fx{table-layout:fixed}@media print{body{padding:16px;}}';
+const _PRINT_CSS = 'body{font-family:"Helvetica Neue",Arial,sans-serif;padding:32px;color:#1a1814;}h1{font-size:22px;margin-bottom:4px;}.sub{font-size:13px;color:#9a9287;margin-bottom:24px;}table{width:100%;border-collapse:collapse;font-size:12px;}th{background:#f4f1eb;padding:4px 8px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:#5a5449;border-bottom:1px solid #ddd9cf;}td{padding:4px 8px;border-bottom:0.5px solid #ede9e0;vertical-align:middle;}.foot{margin-top:32px;font-size:11px;color:#9a9287;border-top:1px solid #ede9e0;padding-top:12px;}tr.catrow td{background:#e9e4d8;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;padding:6px 8px;border-bottom:1px solid #ccc6b6;}tr.catrow span{float:right;font-family:monospace;}tr.catrow{break-after:avoid;}tr{break-inside:avoid;}.bx{display:inline-block;width:11px;height:11px;border:1px solid #9a9287;border-radius:2px;vertical-align:middle}.q{text-align:right;white-space:nowrap;font-weight:700;width:60px}.q .um{font-weight:400;color:#9a9287;font-size:11px}.nm{font-size:14px}.cod{font-family:monospace;font-size:10px;font-weight:400;color:#8a8275;white-space:nowrap}table.fx{table-layout:fixed}@page{margin:0}tr.catrow.k-BAU td{background:#f1dfc0;color:#7a3e0c;border-bottom:1px solid #d9bd8c;border-left:5px solid #92400e}tr.catrow.k-FLC td{background:#e8dcec;color:#4f3552;border-bottom:1px solid #c9b3cf;border-left:5px solid #6b4c6e}tr.catrow.k-FLCK td{background:#d3ebf1;color:#0b5568;border-bottom:1px solid #9fcad6;border-left:5px solid #0e7490}tr.divrow td{padding:18px 0 6px;border-bottom:0;background:#fff}.divbox{border-top:2px solid #1a1814;padding-top:8px}.divbox b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.8px}.divbox i{display:block;font-size:10.5px;color:#6b6358;margin-top:2px}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}@media screen{tr.sp{display:none}}@media print{body{padding:10mm 10mm 0;}.sub{margin-bottom:0}tr.sp td{height:8mm;padding:0;border:0;background:none}tfoot tr.sp td{height:10mm}}';
 const _cmpCodice = (x, y) => String(x || '').localeCompare(String(y || ''), 'it', { numeric: true });
 
 // Raggruppa i pezzi con varianti che hanno stesso modello e stessa variante (extra = chiave aggiuntiva, es. il case)
@@ -3724,7 +3724,7 @@ function _catGroups(items, artIdFn) {
 }
 // larghezze fisse (px) delle colonne: tutte tranne 'Articolo', che prende lo spazio rimasto
 const _printCols = w => '<colgroup>' + w.map(x => x ? `<col style="width:${x}px">` : '<col>').join('') + '</colgroup>';
-const _printCatRow = (cat, n, cols) => `<tr class="catrow"><td colspan="${cols}">${h(cat?.nome || 'Senza categoria')}<span>${n} pz</span></td></tr>`;
+const _printCatRow = (cat, n, cols, colori) => `<tr class="catrow${colori && ['BAU', 'FLC', 'FLCK'].includes(cat?.prefisso) ? ' k-' + cat.prefisso : ''}"><td colspan="${cols}">${h(cat?.nome || 'Senza categoria')}<span>${n} pz</span></td></tr>`;
 // Badge del FLC/FLCK che contiene l'articolo: cs = [{nome, codice, qty, tipo}]
 function _printCaseBadge(cs, conQty) {
   return (cs || []).map(e => ` <span style="font-size:9px;background:#6b4c6e22;color:#6b4c6e;border:1px solid #6b4c6e44;padding:1px 5px;border-radius:3px;font-family:monospace;white-space:nowrap">${e.tipo === 'FLCK' ? 'FLCK' : 'FLC'} · ${h(e.nome)}${e.codice ? ' ' + h(e.codice) : ''}${conQty ? ' ×' + e.qty : ''}</span>`).join('');
@@ -3808,7 +3808,7 @@ async function stampaTesto() {
   righeGrp.forEach(g => { if (g._grp) g.qty_richiesta = g._qty; });
   const rows = _catGroups(righeGrp, r => r.art_id).map(g => _printCatRow(g.cat, g.items.reduce((n, r) => n + (+r.qty_richiesta || 0), 0), 5) + g.items.map(rigaLista).join('')).join('');
   const now = new Date();
-  _printInFrame('<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><title>Lista — ' + h(lista.nome) + '</title><style>' + _PRINT_CSS + '</style></head><body><h1>' + h(lista.nome) + '</h1><div class="sub">' + righe.length + ' articoli' + dest + (lista.note ? ' · ' + h(lista.note) : '') + '</div><table class="fx">' + _printCols([22, 64, 0, 270, 84]) + '<thead><tr><th></th><th style="text-align:right">Qtà</th><th>Articolo</th><th>Prelevato da</th><th style="text-align:right">Codice</th></tr></thead><tbody>' + rows + '</tbody></table><div class="foot">Stampato il ' + now.toLocaleDateString('it-IT') + ' alle ' + now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) + ' · WareFlow</div></body></html>');
+  _printInFrame('<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><title>Lista — ' + h(lista.nome) + '</title><style>' + _PRINT_CSS + '</style></head><body><h1>' + h(lista.nome) + '</h1><div class="sub">' + righe.length + ' articoli' + dest + (lista.note ? ' · ' + h(lista.note) : '') + '</div><table class="fx">' + _printCols([22, 64, 0, 270, 84]) + '<thead><tr class="sp"><td colspan="5"></td></tr><tr><th></th><th style="text-align:right">Qtà</th><th>Articolo</th><th>Prelevato da</th><th style="text-align:right">Codice</th></tr></thead><tfoot><tr class="sp"><td colspan="5"></td></tr></tfoot><tbody>' + rows + '</tbody></table><div class="foot">Stampato il ' + now.toLocaleDateString('it-IT') + ' alle ' + now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) + ' · WareFlow</div></body></html>');
 }
 
 // Modalità di stampa del magazzino (cursore nel modale): tutto | articoli | contenitori
@@ -3850,7 +3850,12 @@ async function stampaMagDetail() {
   // pezzi con varianti: una riga per modello+variante, separati tra liberi e dentro ciascun FLC/FLCK
   const righeGrp = _groupVar(righe, s => s.qty, s => (s._case || []).map(e => e.tipo + e.id).sort().join(','));
   righeGrp.forEach(g => { if (g._grp) g.qty = g._qty; });
-  const rows = _catGroups(righeGrp, s => s.art_id).map(g => _printCatRow(g.cat, g.items.reduce((n, s) => n + s.qty, 0), 4) + g.items.map(rigaMag).join('')).join('');
+  // categorie con sfondo dedicato per Bauli/FLC/FLCK; in modalità completa un divisorio prima degli articoli singoli
+  const gruppi = _catGroups(righeGrp, s => s.art_id);
+  const isCont = g => ['BAU', 'FLC', 'FLCK'].includes(g.cat?.prefisso);
+  const iDiv = (modo === 'tutto' && gruppi.some(isCont)) ? gruppi.findIndex(g => !isCont(g)) : -1;
+  const divisorio = `<tr class="divrow"><td colspan="4"><div class="divbox"><b>Articoli singoli</b><i>L'elenco sottostante comprende tutti gli articoli, ad eccezione di quelli contenuti nei bauli misti.</i></div></td></tr>`;
+  const rows = gruppi.map((g, i) => (i === iDiv ? divisorio : '') + _printCatRow(g.cat, g.items.reduce((n, s) => n + s.qty, 0), 4, true) + g.items.map(rigaMag).join('')).join('');
   _printInFrame(`<!DOCTYPE html><html lang="it"><head>
     <meta charset="UTF-8">
     <title>Contenuto — ${h(m.nome)}</title>
@@ -3860,7 +3865,8 @@ async function stampaMagDetail() {
     <div class="sub">${m.citta ? h(m.citta) + ' · ' : ''}${soloCont ? righe.length + ' contenitori' : totale + ' pezzi totali'}${soloArt ? ' · solo articoli' : ''}${soloCont ? ' · solo contenitori' : ''}${cf ? ' · filtro categoria attivo' : ''}</div>
     <table class="fx">
       ${_printCols([22, 64, 0, 84])}
-      <thead><tr><th></th><th style="text-align:right">Qtà</th><th>Articolo</th><th style="text-align:right">Codice</th></tr></thead>
+      <thead><tr class="sp"><td colspan="4"></td></tr><tr><th></th><th style="text-align:right">Qtà</th><th>Articolo</th><th style="text-align:right">Codice</th></tr></thead>
+      <tfoot><tr class="sp"><td colspan="4"></td></tr></tfoot>
       <tbody>${rows}</tbody>
     </table>
     <div class="totale">Totale: ${soloCont ? `<strong>${righe.length} contenitori</strong>` : `<strong>${totale} pezzi</strong> in ${righe.length} articoli`}</div>
@@ -4187,6 +4193,7 @@ let _bauliTab = 'bauli';
 
 function switchBauliTab(tab) {
   _bauliTab = tab;
+  _btMag = '';
   document.getElementById('tabBauli').classList.toggle('active', tab === 'bauli');
   document.getElementById('tabFlc').classList.toggle('active', tab === 'flc');
   document.getElementById('tabFlck').classList.toggle('active', tab === 'flck');
@@ -4224,7 +4231,42 @@ function setBauliView(v) {
   if (open) return;
   ({ bauli: renderBauli, flc: renderFlc, flck: renderFlck })[_bauliTab]();
 }
+// ── Filtro per magazzino (tendina) e ordinamento (A–Z / per magazzini) di Bauli, Flight Case, Flightcase K ──
+let _btMag = '';   // '' = tutti · '-' = senza magazzino · id magazzino (si azzera cambiando scheda)
+let _btOrd = (() => { try { return localStorage.getItem('bauliOrd') === 'mag' ? 'mag' : 'az'; } catch (e) { return 'az'; } })();
+const _btMagOf = artId => D.stock.find(s => s.art_id == artId && s.qty > 0)?.mag_id ?? null;
+function _btRerender() { ({ bauli: renderBauli, flc: renderFlc, flck: renderFlck })[_bauliTab](); }
+function setBtMag(v) { _btMag = v; _btRerender(); }
+function setBtOrd(o) { _btOrd = o === 'mag' ? 'mag' : 'az'; try { localStorage.setItem('bauliOrd', _btOrd); } catch (e) {} _btRerender(); }
+function _btFbar(items) {
+  const sel = document.getElementById('btMagSel'); if (!sel) return;
+  const cnt = new Map(); let senza = 0;
+  items.forEach(i => { const m = _btMagOf(i.id); if (m == null) senza++; else cnt.set(String(m), (cnt.get(String(m)) || 0) + 1); });
+  if (_btMag && _btMag !== '-' && !cnt.has(String(_btMag))) _btMag = '';          // il magazzino scelto non ha più elementi
+  if (_btMag === '-' && !senza) _btMag = '';
+  const mags = [...cnt.keys()].map(id => getMag(id)).filter(Boolean).sort((a, b) => String(a.nome).localeCompare(String(b.nome), 'it', { numeric: true }));
+  sel.innerHTML = `<option value="">Tutti i magazzini (${items.length})</option>` + mags.map(m => `<option value="${m.id}">${h(m.nome)} (${cnt.get(String(m.id))})</option>`).join('') + (senza ? `<option value="-">Senza magazzino (${senza})</option>` : '');
+  sel.value = _btMag;
+  document.getElementById('btoAz')?.classList.toggle('on', _btOrd !== 'mag');
+  document.getElementById('btoMag')?.classList.toggle('on', _btOrd === 'mag');
+}
 function _btRender(grid, items, vuoto) {
+  _btFbar(items);
+  const tot = items.length;
+  if (_btMag) items = items.filter(i => _btMag === '-' ? _btMagOf(i.id) == null : _btMagOf(i.id) == _btMag);
+  const vu = tot && !items.length ? 'Nessun elemento in questo magazzino' : vuoto;
+  const cmp = (a, b) => String(a.nome || '').localeCompare(String(b.nome || ''), 'it', { numeric: true });
+  items = [...items].sort(cmp);
+  if (_btOrd !== 'mag' || !items.length) { _btRenderItems(grid, items, vu); return; }
+  const by = new Map();
+  items.forEach(i => { const m = _btMagOf(i.id); const k = m == null ? '-' : String(m); if (!by.has(k)) by.set(k, []); by.get(k).push(i); });
+  const gruppi = [...by].map(([k, arr]) => ({ k, m: k === '-' ? null : getMag(k), arr }))
+    .sort((a, b) => (a.m ? 0 : 1) - (b.m ? 0 : 1) || String(a.m?.nome || '').localeCompare(String(b.m?.nome || ''), 'it', { numeric: true }));
+  grid.className = 'bt-groups';
+  grid.innerHTML = gruppi.map((g, n) => `<div class="bt-mgh" style="--mc:${g.m?.colore || 'var(--ink3)'}"><i></i><b>${g.m ? h(g.m.icona || '📍') + ' ' + h(g.m.nome) : 'Senza magazzino'}</b><span>${g.arr.length}</span></div><div id="btG${n}"></div>`).join('');
+  gruppi.forEach((g, n) => _btRenderItems(document.getElementById('btG' + n), g.arr, ''));
+}
+function _btRenderItems(grid, items, vuoto) {
   _btSyncToggle();
   if (!items.length) { grid.className = 'bt-grid'; grid.innerHTML = `<div class="lk-empty" style="grid-column:1/-1">${vuoto}</div>`; return; }
   const admin = currentUser?.ruolo === 'admin';
