@@ -3495,7 +3495,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 46;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 47;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
@@ -4205,6 +4205,8 @@ function switchBauliTab(tab) {
   _bauliTabCounts();
   if (tab === 'flc') renderFlc();
   if (tab === 'flck') renderFlck();
+  // l'elenco dei Bauli si ridisegna al ritorno (vista/ordine/filtro potrebbero essere cambiati altrove), senza chiudere un baule aperto
+  if (tab === 'bauli' && document.getElementById('bauleDettaglio').style.display === 'none') renderBauli();
 }
 function nuovoBauliCorrente() {
   ({ bauli: openModalBauleNew, flc: openModalFlcNew, flck: openModalFlckNew })[_bauliTab]();
@@ -4263,8 +4265,14 @@ function _btRender(grid, items, vuoto) {
   const gruppi = [...by].map(([k, arr]) => ({ k, m: k === '-' ? null : getMag(k), arr }))
     .sort((a, b) => (a.m ? 0 : 1) - (b.m ? 0 : 1) || String(a.m?.nome || '').localeCompare(String(b.m?.nome || ''), 'it', { numeric: true }));
   grid.className = 'bt-groups';
-  grid.innerHTML = gruppi.map((g, n) => `<div class="bt-mgh" style="--mc:${g.m?.colore || 'var(--ink3)'}"><i></i><b>${g.m ? h(g.m.icona || '📍') + ' ' + h(g.m.nome) : 'Senza magazzino'}</b><span>${g.arr.length}</span></div><div id="btG${n}"></div>`).join('');
-  gruppi.forEach((g, n) => _btRenderItems(document.getElementById('btG' + n), g.arr, ''));
+  grid.innerHTML = '';
+  gruppi.forEach(g => {      // un'intestazione + un contenitore per magazzino, creati qui (niente id: le tre schede hanno ciascuna la propria griglia)
+    const hd = document.createElement('div'); hd.className = 'bt-mgh'; hd.style.setProperty('--mc', g.m?.colore || 'var(--ink3)');
+    hd.innerHTML = `<i></i><b>${g.m ? h(g.m.icona || '📍') + ' ' + h(g.m.nome) : 'Senza magazzino'}</b><span>${g.arr.length}</span>`;
+    const box = document.createElement('div');
+    grid.append(hd, box);
+    _btRenderItems(box, g.arr, '');
+  });
 }
 function _btRenderItems(grid, items, vuoto) {
   _btSyncToggle();
