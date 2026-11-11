@@ -75,7 +75,7 @@ async function localFetch(method, url, body) {
   return out;
 }
 window.localFetch = localFetch;
-window.LOCALAPI_BUILD = 47;   // deve coincidere con APP_BUILD in index.html
+window.LOCALAPI_BUILD = 48;   // deve coincidere con APP_BUILD in index.html
 
 function isValidColore(c) {
   return !c || /^#[0-9a-fA-F]{3,6}$/.test(c);
@@ -840,17 +840,6 @@ app.get('/api/flightcase', (req, res) => {
   res.json(flc);
 });
 
-// GET flight case che contengono un dato articolo (per suggerimento liste)
-app.get('/api/flightcase/per-articolo/:art_id', (req, res) => {
-  const flc = db.prepare(`
-    SELECT a.id, a.codice, a.nome, fc.qty_max
-    FROM flightcase_def fc
-    JOIN articoli a ON a.id=fc.art_id
-    WHERE fc.art_id_contenuto=?
-  `).all(req.params.art_id);
-  res.json(flc);
-});
-
 // POST nuovo flight case
 app.post('/api/flightcase', (req, res) => {
   touch();
@@ -884,23 +873,6 @@ app.post('/api/flightcase', (req, res) => {
     console.error('Errore creazione FLC:', e.message);
     res.status(400).json({ error: safeErr(e, 'POST flightcase') });
   }
-});
-
-// PUT modifica definizione flight case
-app.put('/api/flightcase/:id', (req, res) => {
-  touch();
-  const { art_id_contenuto, qty_max } = req.body;
-  const fc = db.prepare('SELECT * FROM flightcase_def WHERE art_id=?').get(req.params.id);
-  if (!fc) return res.status(404).json({ error: 'Flight case non trovato' });
-  const newArt = art_id_contenuto || fc.art_id_contenuto;
-  if (isUnico(newArt))
-    return res.status(400).json({ error: 'I pezzi univoci con varianti non vanno in un flight case: usa un Flightcase K' });
-  const newQty = parseInt(qty_max) || fc.qty_max;
-  if (newQty < 1) return res.status(400).json({ error: 'Capienza non valida' });
-  if (newQty < fc.qty_caricata) return res.status(400).json({ error: `Capienza non può essere inferiore alla quantità caricata (${fc.qty_caricata})` });
-  db.prepare('UPDATE flightcase_def SET art_id_contenuto=?, qty_max=? WHERE art_id=?')
-    .run(newArt, newQty, req.params.id);
-  res.json({ ok: true });
 });
 
 // PUT modifica di baule / flight case / flightcase K (nome e note; per il FLC anche capienza e, a case vuoto, articolo contenuto)

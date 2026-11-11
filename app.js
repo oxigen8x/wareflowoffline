@@ -157,7 +157,6 @@ function caseLines(artId) {                   // pagina Articoli: dove sono i pe
 // ─── UTILS ───
 // Helper getElementById shorthand
 function $id(id) { return document.getElementById(id); }
-function $set(id, html) { const el = $id(id); if(el) el.innerHTML = html; }
 function getMagReali() { return D.magazzini.filter(m => !m.virtuale); }
 function isBauleArt(artId) {
   const catBAU = D.categorie.find(c => c.prefisso === 'BAU');
@@ -172,23 +171,15 @@ function isFlckArt(artId) {
   return !!(catK && getArt(artId)?.cat_id === catK.id);
 }
 function isSpecialArt(artId) { return isBauleArt(artId) || isFlightcaseArt(artId) || isFlckArt(artId); }
-function isSpecialCat(catId) { const c = getCat(catId); return c && (c.prefisso === 'BAU' || c.prefisso === 'FLC' || c.prefisso === 'FLCK'); }
 function getCatNormali() { return D.categorie.filter(c => c.prefisso !== 'BAU' && c.prefisso !== 'FLC' && c.prefisso !== 'FLCK'); }
 function getArtNormali() { return D.articoli.filter(a => !isSpecialArt(a.id)); }
 function getFlightcaseDef(artId) { return D.flightcase.find(fc => fc.id === artId); }
-function getFlightcasePerArticolo(artId) { return D.flightcase.filter(fc => fc.art_id_contenuto === artId); }
 function sortBauliFirst(arr, artIdFn) {
   return [...arr].sort((a,b) => {
     const ba = isSpecialArt(artIdFn ? artIdFn(a) : a.id) ? 0 : 1;
     const bb = isSpecialArt(artIdFn ? artIdFn(b) : b.id) ? 0 : 1;
     return ba - bb;
   });
-}
-// Helper DELETE con conferma e toast
-async function deleteConfirm(url, msg, successMsg, reloadFn) {
-  if (!await askConfirm(msg, { ok: 'Elimina', danger: true })) return;
-  try { await apiFetch('DELETE', url); if(reloadFn) await reloadFn(); toast(successMsg); }
-  catch(e) { toast(e.message||'Errore', true); }
 }
 // Contrasto automatico: testo chiaro o scuro in base al colore della categoria
 const _HEX6 = /^#[0-9a-fA-F]{6}$/;
@@ -733,7 +724,6 @@ async function salvaCarico() {
 }
 // compatibilità con i vecchi punti d'ingresso
 function caricaModello(mid) { return ccGoTo('m' + mid); }
-function selArtDaNoStock(artId) { return ccGoTo(String(artId)); }
 
 // ─── CREA — stessa struttura di Spostamento: categoria in alto, dati a sinistra, anteprima a destra, barra di conferma ───
 const CR = { edited: false, tok: 0, busy: false, hl: 0 };
@@ -1202,7 +1192,6 @@ function modelloVuotoBtns(m, cls) {
 let _cv = { tot: 1, q: {} };
 const cvSum = () => Object.values(_cv.q).reduce((x, y) => x + y, 0);
 function cvModello() { const v = document.getElementById('cArticolo')?.value || ''; return /^m\d+$/.test(v) ? getModello(+v.slice(1)) : null; }
-function cvReset() { _cv = { tot: 1, q: {} }; cvRender(); }
 function cvSetTot(v) {
   let n = Math.max(1, Math.min(200, parseInt(v) || 1)); const was = _cv.tot, ks = Object.keys(_cv.q).filter(k => _cv.q[k] > 0);
   if (n > was && cvSum() === was && ks.length === 1) _cv.q[ks[0]] = n;       // una sola variante: segue il totale
@@ -1757,17 +1746,6 @@ async function onCatChange() {
   } catch(e) { toast(e.message||'Errore imprevisto — riprova', true); }
 }
 
-function openModalArtNew() {
-  document.getElementById('artEditId').value='';
-  document.getElementById('modalArtTitle').textContent='Nuovo Articolo';
-  ['artNome','artNote','artCodice'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('artCodiceHint').textContent='Seleziona prima la categoria';
-  document.getElementById('artCat').innerHTML='<option value="">— Seleziona categoria —</option>'+
-    getCatNormali().map(c=>`<option value="${c.id}">[${h(c.prefisso)}] ${h(c.nome)}</option>`).join('');
-  document.getElementById('artUm').value='pz';
-  resetVar('art'); document.getElementById('artVarWrap').style.display='';
-  openModal('modalArt');
-}
 function editArt(id) {
   const a=getArt(id);
   document.getElementById('artEditId').value=id;
@@ -2595,11 +2573,23 @@ function renderDettaglioRighe(lista) {
 }
 
 // ── Lista veloce: stessa grafica delle liste normali, una sola schermata ──
+// Lista veloce: disponibilità nel magazzino di partenza della riga (null se la riga non ha ancora una provenienza)
+function _velDisp(r) {
+  const f0 = (r.flags || []).find(f => f.qty_presa > 0);
+  return f0 ? { mag: f0.mag_nome, qty: (r.stock || []).find(s => s.mag_id === f0.mag_id)?.qty || 0 } : null;
+}
+// Lista veloce: la quantità richiesta non può superare quella presente nel magazzino di partenza (ridurla è sempre possibile)
+function _velOk(r, nq) {
+  const d = _velDisp(r);
+  if (d && nq > d.qty && nq > r.qty_richiesta) { toast('Disponibili in ' + d.mag + ': ' + d.qty, true); return false; }
+  return true;
+}
 async function lsQtyV(rigaId, d) {
   const r = (_listaCorrente.righe || []).find(x => x.id === rigaId);
   if (!r) return;
   const nq = Math.max(1, r.qty_richiesta + d);
   if (nq === r.qty_richiesta) return;
+  if (d > 0 && !_velOk(r, nq)) return;
   try {
     await apiFetch('PUT', `/liste/righe/${rigaId}`, { qty_richiesta: nq });
     await _giroReload();
@@ -2614,13 +2604,15 @@ function _renderVeloce(lista) {
   const srcIds = src.map(s => s.id);
   const destId = lista.mag_dest_id ? parseInt(lista.mag_dest_id) : null;
   const totPz = righe.reduce((n, r) => n + r.qty_richiesta, 0);
+  const sopra = r => { const d = _velDisp(r); return !!d && r.qty_richiesta > d.qty; };   // quantità oltre la disponibilità (lo stock è calato dopo l'inserimento)
+  const nSopra = righe.filter(sopra).length;
   const rows = sortBauliFirst(righe, r => r.art_id).map(r => {
     const f0 = (r.flags || []).find(f => f.qty_presa > 0);
     const stock = f0 ? ((r.stock || []).find(s => s.mag_id === f0.mag_id)?.qty || 0) : 0;
-    return `<div class="ph-row">
+    return `<div class="ph-row${sopra(r) ? ' ph-over' : ''}">
       <div class="ph-r-main">
         <div class="ph-r-n">${h(r.art_nome)}</div>
-        <div class="ph-r-s">${h(r.art_codice)}${f0 ? ' · da ' + h(f0.mag_nome) + ' · disp. ' + stock : ''}${r.note_riga ? ' · ' + h(r.note_riga) : ''}</div>
+        <div class="ph-r-s">${h(r.art_codice)}${f0 ? ' · da ' + h(f0.mag_nome) + ' · disp. ' + stock + (sopra(r) ? ' (richiesti ' + r.qty_richiesta + ')' : '') : ''}${r.note_riga ? ' · ' + h(r.note_riga) : ''}</div>
       </div>
       <div class="ph-q"><button onclick="lsQtyV(${r.id},-1)" aria-label="Meno">−</button><button class="ph-qn" onclick="modificaRiga(${r.id},${r.qty_richiesta},'${h(r.note_riga || '')}')" aria-label="Modifica quantità">${r.qty_richiesta}</button><button onclick="lsQtyV(${r.id},1)" aria-label="Più">+</button></div>
       <button class="gr-ico gr-del ph-del" aria-label="Rimuovi dalla lista" onclick="eliminaRiga(${r.id})">✕</button>
@@ -2631,9 +2623,10 @@ function _renderVeloce(lista) {
     return;
   }
   const conflitto = destId && srcIds.includes(destId);
-  const pronto = !!destId && !conflitto && src.length > 0;
+  const pronto = !!destId && !conflitto && src.length > 0 && !nSopra;
   let motivo = '';
-  if (!destId) motivo = 'Scegli la destinazione';
+  if (nSopra) motivo = 'Quantità oltre la disponibilità: riduci le righe in rosso';
+  else if (!destId) motivo = 'Scegli la destinazione';
   else if (conflitto) motivo = 'La destinazione coincide con la partenza';
   const destOpts = '<option value="">— Scegli la destinazione —</option>' +
     getMagReali().filter(m => !srcIds.includes(m.id)).map(m => `<option value="${m.id}"${m.id === destId ? ' selected' : ''}>${h(m.nome)}</option>`).join('');
@@ -3019,44 +3012,6 @@ function _renderGiro(lista) {
   }
 }
 
-function toggleRigaLista(head) {
-  const body = head.nextElementSibling;
-  const arrow = head.querySelector('span:first-child');
-  const open = body.style.display !== 'none';
-  body.style.display = open ? 'none' : '';
-  arrow.textContent = open ? '▶' : '▼';
-}
-
-async function stepFlag(rigaId, magId, delta, maxQty, qtyRichiesta) {
-  const numEl = document.getElementById(`flag-num-${rigaId}-${magId}`);
-  const doneEl = document.getElementById(`flag-done-${rigaId}-${magId}`);
-  if (!numEl) return;
-  const curr = parseInt(numEl.textContent) || 0;
-  // Calcola quanto è già flaggato sugli altri magazzini per questa riga
-  const riga = _listaCorrente?.righe?.find(r => r.id === rigaId);
-  const altriFlag = riga?.stock?.reduce((s, s2) => {
-    if (s2.mag_id === magId) return s;
-    const el = document.getElementById(`flag-num-${rigaId}-${s2.mag_id}`);
-    return s + (el ? (parseInt(el.textContent) || 0) : 0);
-  }, 0) || 0;
-  const maxEffettivo = qtyRichiesta !== undefined
-    ? Math.min(maxQty, Math.max(0, qtyRichiesta - altriFlag))
-    : maxQty;
-  const nuova = Math.max(0, Math.min(maxEffettivo, curr + delta));
-  if (nuova === curr) return;
-  numEl.textContent = nuova;
-  if (doneEl) { doneEl.style.opacity = nuova > 0 ? '1' : '0'; }
-  // Aggiorna in background senza ricostruire il DOM
-  await apiFetch('PUT', `/liste/flag/${rigaId}/${magId}`, { qty_presa: nuova });
-  // Aggiorna solo progress bar e contatore nella testata
-  if (_listaCorrente) {
-    const l = await apiFetch('GET', '/liste/' + _listaCorrente.id);
-    _listaCorrente = l;
-    aggiornaSoloTestata(l);
-    aggiornaStatoLista(l);
-  }
-}
-
 // Aggiorna progress bar e contatori senza ricostruire il DOM delle righe
 function calcolaStatoLista(lista) {
   const righe = lista.righe || [];
@@ -3095,15 +3050,6 @@ function aggiornaSoloTestata(lista) {
     const pb = document.getElementById(`pb-${r.id}`);
     if (pb) { pb.style.width = pct+'%'; pb.className = 'lista-progress-bar' + (completo?' completo':''); }
   }
-}
-
-async function salvaFlag(rigaId, magId, input) {
-  const qty = Math.max(0, +input.value || 0);
-  input.value = qty;
-  await apiFetch('PUT', `/liste/flag/${rigaId}/${magId}`, { qty_presa: qty });
-  const doneEl = document.getElementById(`flag-done-${rigaId}-${magId}`);
-  if (doneEl) { doneEl.style.opacity = qty > 0 ? '1' : '0'; }
-  if (_listaCorrente) { const l = await apiFetch('GET', '/liste/' + _listaCorrente.id); _listaCorrente = l; aggiornaSoloTestata(l); }
 }
 
 function openModalListaNew() {
@@ -3156,10 +3102,6 @@ async function eliminaLista(id) {
   await loadPartial('spostamenti');
   renderListe();
   toast('Lista eliminata');
-}
-
-function eliminaListaCorrente() {
-  if (_listaCorrente) eliminaLista(_listaCorrente.id).then(chiudiDettaglioLista);
 }
 
 function aggiungiArticoloLista() {
@@ -3240,6 +3182,7 @@ async function modificaRiga(rigaId, qtyAttuare, noteRiga) {
   const qty = +nuovaQty;
   if (!qty || qty < 1) { toast('Quantità non valida', true); return; }
   if (_listaCorrente && _listaCorrente.tipo !== 'veloce') { await _lsApplyQty(rigaId, qty); return; }
+  if (_listaCorrente) { const rv = (_listaCorrente.righe || []).find(x => x.id === rigaId); if (rv && !_velOk(rv, qty)) return; }   // lista veloce
   try {
     await apiFetch('PUT', `/liste/righe/${rigaId}`, { qty_richiesta: qty });
     const l = await apiFetch('GET', '/liste/' + _listaCorrente.id);
@@ -3495,7 +3438,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 47;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 48;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);

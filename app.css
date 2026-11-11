@@ -1998,3 +1998,7 @@ body.dark .cc-wrap{--sp-ac:var(--teal-light);}
 .bt-mgh::after{content:"";flex:1;height:1px;background:var(--border);}
 body:has(#bauliTabContent:not([style*="none"]) #bauleDettaglio:not([style*="none"]),#flcTabContent:not([style*="none"]) #flcDettaglio:not([style*="none"]),#flckTabContent:not([style*="none"]) #flckDettaglio:not([style*="none"])) .bt-fbar{display:none;}
 @media(max-width:560px){.bt-ordl{display:none}.bt-fbar .finput{flex:1 1 100%;width:100%!important}.bt-seg{width:100%}.bt-seg button{flex:1}}
+
+/* ── Lista veloce: riga con quantità oltre la disponibilità ── */
+.ph-row.ph-over{border-color:var(--red);}
+.ph-row.ph-over .ph-r-s{color:var(--red);font-weight:600;}
