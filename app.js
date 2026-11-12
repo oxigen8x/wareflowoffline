@@ -110,7 +110,7 @@ const getArt     = id => D._artMap?.[id] ?? D.articoli.find(a => a.id == id);
 const getMagVirt = ()  => D.magazzini.find(m => m.virtuale == 1);
 const getStock   = (artId, magId) => D._stockMap?.[artId]?.[magId] || 0;
 // Totali: contano gli articoli liberi + quelli dentro i case (FLC/FLCK) che si trovano nel magazzino.
-// Bauli, flight case e flightcase K sono contenitori e non contano come pezzi.
+// Bauli, flightcase e flightcase K sono contenitori e non contano come pezzi.
 const totalMag   = magId  => {
   let t = 0; const sp = D._spCat;
   for (const [aid, mm] of Object.entries(D._stockMap || {})) { if (sp && sp.has(D._artMap?.[aid]?.cat_id)) continue; t += mm[magId] || 0; }
@@ -1310,7 +1310,7 @@ function renderMagDetailTable() {
     const specialPill = isFLCK ? flckPillMag(kDef) : isBau
       ? `<span class="mag-bau-pill"><svg width="10" height="10" viewBox="0 0 48 48" fill="none" style="vertical-align:middle;margin-right:2px"><rect x="6" y="12" width="36" height="26" rx="2" stroke="#92400e" stroke-width="3.5" fill="none"/><path d="M6 12l3-3h30l3 3" stroke="#92400e" stroke-width="3" fill="none"/><rect x="6" y="12" width="4" height="4" rx="0.5" fill="#92400e" opacity=".5"/><rect x="38" y="12" width="4" height="4" rx="0.5" fill="#92400e" opacity=".5"/><rect x="6" y="34" width="4" height="4" rx="0.5" fill="#92400e" opacity=".5"/><rect x="38" y="34" width="4" height="4" rx="0.5" fill="#92400e" opacity=".5"/><line x1="6" y1="25" x2="42" y2="25" stroke="#92400e" stroke-width="2" opacity=".5"/><circle cx="16" cy="25" r="2" fill="#92400e" opacity=".5"/><circle cx="32" cy="25" r="2" fill="#92400e" opacity=".5"/></svg> baule</span>`
       : isFLC
-      ? `<span class="mag-bau-pill" style="background:#6b4c6e22;color:#6b4c6e;border-color:#6b4c6e44"><svg width="10" height="10" viewBox="0 0 48 48" fill="none" style="vertical-align:middle;margin-right:2px"><rect x="6" y="12" width="36" height="26" rx="2" stroke="#6b4c6e" stroke-width="3.5" fill="none"/><path d="M6 12l3-3h30l3 3" stroke="#6b4c6e" stroke-width="3" fill="none"/><rect x="6" y="12" width="4" height="4" rx="0.5" fill="#6b4c6e" opacity=".5"/><rect x="38" y="12" width="4" height="4" rx="0.5" fill="#6b4c6e" opacity=".5"/><rect x="6" y="34" width="4" height="4" rx="0.5" fill="#6b4c6e" opacity=".5"/><rect x="38" y="34" width="4" height="4" rx="0.5" fill="#6b4c6e" opacity=".5"/><line x1="6" y1="25" x2="42" y2="25" stroke="#6b4c6e" stroke-width="2" opacity=".5"/><circle cx="16" cy="25" r="2" fill="#6b4c6e" opacity=".5"/><circle cx="32" cy="25" r="2" fill="#6b4c6e" opacity=".5"/></svg> case${fcDef?` · ${h(fcDef.art_contenuto_nome)} ×${fcDef.qty_max}`:''}</span>`
+      ? `<span class="mag-bau-pill" style="background:#4d7c0f22;color:#4d7c0f;border-color:#4d7c0f44"><svg width="10" height="10" viewBox="0 0 48 48" fill="none" style="vertical-align:middle;margin-right:2px"><rect x="6" y="12" width="36" height="26" rx="2" stroke="#4d7c0f" stroke-width="3.5" fill="none"/><path d="M6 12l3-3h30l3 3" stroke="#4d7c0f" stroke-width="3" fill="none"/><rect x="6" y="12" width="4" height="4" rx="0.5" fill="#4d7c0f" opacity=".5"/><rect x="38" y="12" width="4" height="4" rx="0.5" fill="#4d7c0f" opacity=".5"/><rect x="6" y="34" width="4" height="4" rx="0.5" fill="#4d7c0f" opacity=".5"/><rect x="38" y="34" width="4" height="4" rx="0.5" fill="#4d7c0f" opacity=".5"/><line x1="6" y1="25" x2="42" y2="25" stroke="#4d7c0f" stroke-width="2" opacity=".5"/><circle cx="16" cy="25" r="2" fill="#4d7c0f" opacity=".5"/><circle cx="32" cy="25" r="2" fill="#4d7c0f" opacity=".5"/></svg> case${fcDef?` · ${h(fcDef.art_contenuto_nome)} ×${fcDef.qty_max}`:''}</span>`
       : '';
     const nomeCell = hasCase
       ? `<strong><span class="mag-bau-arrow" id="bau-arr-${s.art_id}">▶</span>${a?h(a.nome):'—'}${caseChips(s._lib, s._case)}</strong>${noteBtn(s.art_id)}`
@@ -1523,15 +1523,15 @@ function renderArticoli() {
     const specialPill = isFLCK ? flckPillSm(kDef) : isBau
       ? ' <span style="font-size:9px;background:#92400e15;color:#92400e;border:1px solid #92400e33;padding:1px 5px;border-radius:3px;font-family:\'DM Mono\',monospace;vertical-align:middle">baule</span>'
       : isFLC
-      ? ` <span style="font-size:9px;background:#6b4c6e15;color:#6b4c6e;border:1px solid #6b4c6e33;padding:1px 5px;border-radius:3px;font-family:'DM Mono',monospace;vertical-align:middle">case${fcDef?` · ${h(fcDef.art_contenuto_nome)} ${fcDef.qty_caricata}/${fcDef.qty_max}`:''}</span>`
+      ? ` <span style="font-size:9px;background:#4d7c0f15;color:#4d7c0f;border:1px solid #4d7c0f33;padding:1px 5px;border-radius:3px;font-family:'DM Mono',monospace;vertical-align:middle">case${fcDef?` · ${h(fcDef.art_contenuto_nome)} ${fcDef.qty_caricata}/${fcDef.qty_max}`:''}</span>`
       : '';
     // Extra content for BAU/FLC in expand row
     let specialExpand = '';
     if (isBau) specialExpand = `<div style="margin-top:6px;font-size:11px;color:#92400e" id="art-bau-wrap-${a.id}"><span style="color:var(--ink3)">Caricamento…</span></div>`;
     if (isFLC && fcDef) {
       const pct = fcDef.qty_max ? Math.round(fcDef.qty_caricata / fcDef.qty_max * 100) : 0;
-      const barCol = pct >= 100 ? '#22c55e' : pct > 0 ? '#6b4c6e' : 'var(--ink4)';
-      specialExpand = `<div style="margin-top:6px;font-size:11px;color:#6b4c6e">
+      const barCol = pct >= 100 ? '#22c55e' : pct > 0 ? '#4d7c0f' : 'var(--ink4)';
+      specialExpand = `<div style="margin-top:6px;font-size:11px;color:#4d7c0f">
         Contiene: <strong>${h(fcDef.art_contenuto_nome||'—')}</strong> — ${fcDef.qty_caricata}/${fcDef.qty_max} caricati
         <div style="margin-top:4px;height:5px;background:var(--ink4);border-radius:3px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${barCol};border-radius:3px"></div></div>
       </div>`;
@@ -2003,7 +2003,7 @@ function renderStorico() {
         : isBau
         ? ' <span style="font-size:8px;background:#92400e15;color:#92400e;border:1px solid #92400e33;padding:0 4px;border-radius:2px;font-family:\'DM Mono\',monospace;vertical-align:middle">BAU</span>'
         : isFLC
-        ? ' <span style="font-size:8px;background:#6b4c6e15;color:#6b4c6e;border:1px solid #6b4c6e33;padding:0 4px;border-radius:2px;font-family:\'DM Mono\',monospace;vertical-align:middle">FLC</span>'
+        ? ' <span style="font-size:8px;background:#4d7c0f15;color:#4d7c0f;border:1px solid #4d7c0f33;padding:0 4px;border-radius:2px;font-family:\'DM Mono\',monospace;vertical-align:middle">FLC</span>'
         : '';
       const stoClick = isSpec ? ` onclick="toggleStoExpand(this)" style="cursor:pointer"` : '';
       let stoExpandRow = '';
@@ -2013,7 +2013,7 @@ function renderStorico() {
       } else if (isFLC) {
         const fcDef = getFlightcaseDef(x.art_id);
         if (fcDef) {
-          stoExpandRow = `<tr class="sto-batch-detail" style="display:none"><td colspan="6" style="padding:6px 12px 8px 24px;font-size:11px;color:#6b4c6e">
+          stoExpandRow = `<tr class="sto-batch-detail" style="display:none"><td colspan="6" style="padding:6px 12px 8px 24px;font-size:11px;color:#4d7c0f">
             Contiene: <strong>${h(fcDef.art_contenuto_nome||'—')}</strong> — ${fcDef.qty_caricata}/${fcDef.qty_max} caricati
           </td></tr>`;
         }
@@ -2076,7 +2076,7 @@ async function undoBatch(batchId) {
   const gruppo = D.spostamenti.filter(x => x.batch_id === batchId);
   if (!gruppo.length) { toast('Operazione non trovata', true); return; }
   if (gruppo.some(x => isSpecialArt(x.art_id))) {
-    toast('Le operazioni su bauli e flight case non possono essere annullate dallo storico', true);
+    toast('Le operazioni su bauli e flightcase non possono essere annullate dallo storico', true);
     return;
   }
   const x = gruppo[0];
@@ -2103,7 +2103,7 @@ async function undoStorico(spostId) {
   const x = D.spostamenti.find(s=>s.id===spostId);
   if(!x) { toast('Operazione non trovata',true); return; }
   if(isSpecialArt(x.art_id)) {
-    toast('Le operazioni su bauli e flight case non possono essere annullate dallo storico', true);
+    toast('Le operazioni su bauli e flightcase non possono essere annullate dallo storico', true);
     return;
   }
   const a = getArt(x.art_id);
@@ -3438,7 +3438,7 @@ async function initAuth() {
   try {
     await window.localReady;
     currentUser = { id:1, username:'iPad', ruolo:'admin' };
-    const APP_BUILD = 48;   // deve coincidere con LOCALAPI_BUILD in localapi.js
+    const APP_BUILD = 49;   // deve coincidere con LOCALAPI_BUILD in localapi.js
     const okBuild = window.LOCALAPI_BUILD === APP_BUILD;
     document.getElementById('userLabel').textContent = okBuild ? 'Offline · v' + APP_BUILD : '⚠ file non allineati';
     if (!okBuild) setTimeout(() => toast('Aggiornamento incompleto: chiudi e riapri l\'app con la rete attiva', true), 800);
@@ -3628,7 +3628,7 @@ async function salvaCambiaPwd() {
 // ─── STAMPA ───
 // ─── STAMPE ───
 // Helper condivisi dalle stampe della lista di carico e del contenuto di un magazzino.
-const _PRINT_CSS = 'body{font-family:"Helvetica Neue",Arial,sans-serif;padding:32px;color:#1a1814;}h1{font-size:22px;margin-bottom:4px;}.sub{font-size:13px;color:#9a9287;margin-bottom:24px;}table{width:100%;border-collapse:collapse;font-size:12px;}th{background:#f4f1eb;padding:4px 8px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:#5a5449;border-bottom:1px solid #ddd9cf;}td{padding:4px 8px;border-bottom:0.5px solid #ede9e0;vertical-align:middle;}.foot{margin-top:32px;font-size:11px;color:#9a9287;border-top:1px solid #ede9e0;padding-top:12px;}tr.catrow td{background:#e9e4d8;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;padding:6px 8px;border-bottom:1px solid #ccc6b6;}tr.catrow span{float:right;font-family:monospace;}tr.catrow{break-after:avoid;}tr{break-inside:avoid;}.bx{display:inline-block;width:11px;height:11px;border:1px solid #9a9287;border-radius:2px;vertical-align:middle}.q{text-align:right;white-space:nowrap;font-weight:700;width:60px}.q .um{font-weight:400;color:#9a9287;font-size:11px}.nm{font-size:14px}.cod{font-family:monospace;font-size:10px;font-weight:400;color:#8a8275;white-space:nowrap}table.fx{table-layout:fixed}@page{margin:0}tr.catrow.k-BAU td{background:#f1dfc0;color:#7a3e0c;border-bottom:1px solid #d9bd8c;border-left:5px solid #92400e}tr.catrow.k-FLC td{background:#e8dcec;color:#4f3552;border-bottom:1px solid #c9b3cf;border-left:5px solid #6b4c6e}tr.catrow.k-FLCK td{background:#d3ebf1;color:#0b5568;border-bottom:1px solid #9fcad6;border-left:5px solid #0e7490}tr.divrow td{padding:18px 0 6px;border-bottom:0;background:#fff}.divbox{border-top:2px solid #1a1814;padding-top:8px}.divbox b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.8px}.divbox i{display:block;font-size:10.5px;color:#6b6358;margin-top:2px}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}@media screen{tr.sp{display:none}}@media print{body{padding:10mm 10mm 0;}.sub{margin-bottom:0}tr.sp td{height:8mm;padding:0;border:0;background:none}tfoot tr.sp td{height:10mm}}';
+const _PRINT_CSS = 'body{font-family:"Helvetica Neue",Arial,sans-serif;padding:32px;color:#1a1814;}h1{font-size:22px;margin-bottom:4px;}.sub{font-size:13px;color:#9a9287;margin-bottom:24px;}table{width:100%;border-collapse:collapse;font-size:12px;}th{background:#f4f1eb;padding:4px 8px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:#5a5449;border-bottom:1px solid #ddd9cf;}td{padding:4px 8px;border-bottom:0.5px solid #ede9e0;vertical-align:middle;}.foot{margin-top:32px;font-size:11px;color:#9a9287;border-top:1px solid #ede9e0;padding-top:12px;}tr.catrow td{background:#e9e4d8;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;padding:6px 8px;border-bottom:1px solid #ccc6b6;}tr.catrow span{float:right;font-family:monospace;}tr.catrow{break-after:avoid;}tr{break-inside:avoid;}.bx{display:inline-block;width:11px;height:11px;border:1px solid #9a9287;border-radius:2px;vertical-align:middle}.q{text-align:right;white-space:nowrap;font-weight:700;width:60px}.q .um{font-weight:400;color:#9a9287;font-size:11px}.nm{font-size:14px}.sub-c{padding-left:16px!important;font-size:12px;color:#5a5449}.sub-c b{color:#1a1814;font-weight:700}.sub-c .um{color:#9a9287;font-size:11px;font-weight:400}.cod{font-family:monospace;font-size:10px;font-weight:400;color:#8a8275;white-space:nowrap}table.fx{table-layout:fixed}@page{size:A4;margin:0}tr.catrow.k-BAU td{background:#f1dfc0;color:#7a3e0c;border-bottom:1px solid #d9bd8c;border-left:5px solid #92400e}tr.catrow.k-FLC td{background:#e6eddd;color:#2a4408;border-bottom:1px solid #afc493;border-left:5px solid #4d7c0f}tr.catrow.k-FLCK td{background:#d3ebf1;color:#0b5568;border-bottom:1px solid #9fcad6;border-left:5px solid #0e7490}tr.divrow td{padding:18px 0 6px;border-bottom:0;background:#fff}.divbox{border-top:2px solid #1a1814;padding-top:8px}.divbox b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.8px}.divbox i{display:block;font-size:10.5px;color:#6b6358;margin-top:2px}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}@media screen{tr.sp{display:none}}@media print{body{padding:10mm 10mm 0;}.sub{margin-bottom:0}tr.sp td{height:8mm;padding:0;border:0;background:none}tfoot tr.sp td{height:10mm}}';
 const _cmpCodice = (x, y) => String(x || '').localeCompare(String(y || ''), 'it', { numeric: true });
 
 // Raggruppa i pezzi con varianti che hanno stesso modello e stessa variante (extra = chiave aggiuntiva, es. il case)
@@ -3670,29 +3670,27 @@ const _printCols = w => '<colgroup>' + w.map(x => x ? `<col style="width:${x}px"
 const _printCatRow = (cat, n, cols, colori) => `<tr class="catrow${colori && ['BAU', 'FLC', 'FLCK'].includes(cat?.prefisso) ? ' k-' + cat.prefisso : ''}"><td colspan="${cols}">${h(cat?.nome || 'Senza categoria')}<span>${n} pz</span></td></tr>`;
 // Badge del FLC/FLCK che contiene l'articolo: cs = [{nome, codice, qty, tipo}]
 function _printCaseBadge(cs, conQty) {
-  return (cs || []).map(e => ` <span style="font-size:9px;background:#6b4c6e22;color:#6b4c6e;border:1px solid #6b4c6e44;padding:1px 5px;border-radius:3px;font-family:monospace;white-space:nowrap">${e.tipo === 'FLCK' ? 'FLCK' : 'FLC'} · ${h(e.nome)}${e.codice ? ' ' + h(e.codice) : ''}${conQty ? ' ×' + e.qty : ''}</span>`).join('');
+  return (cs || []).map(e => ` <span style="font-size:9px;background:#4d7c0f22;color:#4d7c0f;border:1px solid #4d7c0f44;padding:1px 5px;border-radius:3px;font-family:monospace;white-space:nowrap">${e.tipo === 'FLCK' ? 'FLCK' : 'FLC'} · ${h(e.nome)}${e.codice ? ' ' + h(e.codice) : ''}${conQty ? ' ×' + e.qty : ''}</span>`).join('');
 }
-// Etichetta con icona del tipo di contenitore (baule / flight case / flightcase K)
+// Etichetta con icona del tipo di contenitore (baule / flightcase / flightcase K)
 function _printTipoPill(artId) {
-  const [col, txt] = isBauleArt(artId) ? ['#92400e', 'baule'] : isFlckArt(artId) ? [FLCK_COL, 'flightcase K'] : ['#6b4c6e', 'flight case'];
+  const [col, txt] = isBauleArt(artId) ? ['#92400e', 'baule'] : isFlckArt(artId) ? [FLCK_COL, 'flightcase K'] : ['#4d7c0f', 'flightcase'];
   const svg = `<svg width="10" height="10" viewBox="0 0 48 48" fill="none"><rect x="6" y="12" width="36" height="26" rx="2" stroke="${col}" stroke-width="3.5" fill="none"/><path d="M6 12l3-3h30l3 3" stroke="${col}" stroke-width="3" fill="none"/><rect x="6" y="12" width="4" height="4" rx="0.5" fill="${col}" opacity=".5"/><rect x="38" y="12" width="4" height="4" rx="0.5" fill="${col}" opacity=".5"/><rect x="6" y="34" width="4" height="4" rx="0.5" fill="${col}" opacity=".5"/><rect x="38" y="34" width="4" height="4" rx="0.5" fill="${col}" opacity=".5"/><line x1="6" y1="25" x2="42" y2="25" stroke="${col}" stroke-width="2" opacity=".5"/><circle cx="16" cy="25" r="2" fill="${col}" opacity=".5"/><circle cx="32" cy="25" r="2" fill="${col}" opacity=".5"/></svg>`;
   return ` <span style="font-size:9px;background:${col}22;color:${col};border:1px solid ${col}44;padding:1px 5px;border-radius:3px;font-family:monospace;display:inline-flex;align-items:center;gap:2px;vertical-align:middle">${svg} ${txt}</span>`;
 }
 
 // Contenuto di baule / FLC / FLCK, in righe rientrate sotto il contenitore.
 // layout = ordine delle colonne della tabella: 'lista' (casella, qtà, nome, prelevato da, cod) | 'mag' (casella, qtà, nome, cod)
-const _SUB_COLS = { lista: ['', 'qty', 'nome', '', 'cod'], mag: ['', 'qty', 'nome', 'cod'] };
-const _SUB_STILE = {
-  qty: 'font-size:12px;font-weight:600', nome: 'padding-left:14px;font-size:12px;color:#5a5449',
-  cod: 'text-align:right;font-family:monospace;font-size:10px;color:#8a8275'
-};
+// Sotto-righe (contenuto) con quantità e nome insieme nella colonna del nome, rientrate: "8 × Par LED"
+// layout = 'lista' (casella, qtà, nome, prelevato da) | 'mag' (casella, qtà, nome)
+const _SUB_SPAN = { lista: 2, mag: 1 };
 function _printSubRow(layout, cod, nome, qty, um) {
-  const v = { qty: qty + (um ? ' <span class="um">' + h(um) + '</span>' : ''), nome: '↳ ' + nome, cod: h(cod || '') };
-  return '<tr style="background:#faf8f3">' + _SUB_COLS[layout].map(c => c ? `<td${c === 'qty' ? ' class="q"' : ''} style="${_SUB_STILE[c]}">${v[c]}</td>` : '<td></td>').join('') + '</tr>';
+  const sp = _SUB_SPAN[layout];
+  return `<tr style="background:#faf8f3"><td></td><td></td><td${sp > 1 ? ` colspan="${sp}"` : ''} class="sub-c"><b>${qty}${um ? ' <span class="um">' + h(um) + '</span>' : ''} ×</b> ${nome}</td></tr>`;
 }
 function _printSubNote(layout, testo) {
-  const cols = _SUB_COLS[layout], i = cols.indexOf('nome');
-  return `<tr style="background:#faf8f3">${'<td></td>'.repeat(i)}<td colspan="${cols.length - i}" style="font-size:11px;color:#9a9287;font-style:italic;padding-left:14px">↳ ${testo}</td></tr>`;
+  const sp = _SUB_SPAN[layout];
+  return `<tr style="background:#faf8f3"><td></td><td></td><td${sp > 1 ? ` colspan="${sp}"` : ''} class="sub-c" style="color:#9a9287;font-style:italic">${testo}</td></tr>`;
 }
 async function _printBauVoci(artIds) {     // voci dei bauli indicati: { artId: [voci] }
   const map = {};
@@ -3709,7 +3707,7 @@ function _printContenuto(artId, bauVoci, layout) {
   }
   if (isFlightcaseArt(artId)) {
     const fc = getFlightcaseDef(artId), art = getArt(fc?.art_id_contenuto);
-    return fc && fc.qty_caricata > 0 ? riga(art?.codice, h(fc.art_contenuto_nome || '—'), fc.qty_caricata, art?.um) : nota('Flight case vuoto');
+    return fc && fc.qty_caricata > 0 ? riga(art?.codice, h(fc.art_contenuto_nome || '—'), fc.qty_caricata, art?.um) : nota('Flightcase vuoto');
   }
   if (isFlckArt(artId)) {
     const voci = (getFlck(artId)?.voci || []).filter(v => v.qty_caricata > 0);
@@ -3744,14 +3742,13 @@ async function stampaTesto() {
       const perMag = D._contMap?.[it.art_id] || {};
       (magPresa.length ? magPresa : Object.keys(perMag)).forEach(mid => (perMag[mid]?.case || []).forEach(e => case_.set(e.id, e)));
     });
-    const codice = r._grp ? modelloDi(getArt(r.art_id)).codice || r.art_codice : r.art_codice;
-    return '<tr><td style="width:22px;padding-right:0"><span class="bx"></span></td><td class="q" style="font-size:16px">' + r.qty_richiesta + ' <span class="um">' + h(r.art_um || 'pz') + '</span></td><td class="nm">' + (r._grp ? _grpNome(r) : h(r.art_nome || '—')) + _printCaseBadge([...case_.values()], false) + '</td><td>' + (flags || '—') + '</td><td class="cod" style="text-align:right">' + h(codice || '—') + '</td></tr>' + _printContenuto(r.art_id, bauVoci, 'lista');
+    return '<tr><td style="width:22px;padding-right:0"><span class="bx"></span></td><td class="q" style="font-size:16px">' + r.qty_richiesta + ' <span class="um">' + h(r.art_um || 'pz') + '</span></td><td class="nm">' + (r._grp ? _grpNome(r) : h(r.art_nome || '—')) + _printCaseBadge([...case_.values()], false) + '</td><td>' + (flags || '—') + '</td></tr>' + _printContenuto(r.art_id, bauVoci, 'lista');
   };
   const righeGrp = _groupVar(righe, r => +r.qty_richiesta || 0, null);      // pezzi con varianti: una riga per modello+variante
   righeGrp.forEach(g => { if (g._grp) g.qty_richiesta = g._qty; });
-  const rows = _catGroups(righeGrp, r => r.art_id).map(g => _printCatRow(g.cat, g.items.reduce((n, r) => n + (+r.qty_richiesta || 0), 0), 5) + g.items.map(rigaLista).join('')).join('');
+  const rows = _catGroups(righeGrp, r => r.art_id).map(g => _printCatRow(g.cat, g.items.reduce((n, r) => n + (+r.qty_richiesta || 0), 0), 4) + g.items.map(rigaLista).join('')).join('');
   const now = new Date();
-  _printInFrame('<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><title>Lista — ' + h(lista.nome) + '</title><style>' + _PRINT_CSS + '</style></head><body><h1>' + h(lista.nome) + '</h1><div class="sub">' + righe.length + ' articoli' + dest + (lista.note ? ' · ' + h(lista.note) : '') + '</div><table class="fx">' + _printCols([22, 64, 0, 270, 84]) + '<thead><tr class="sp"><td colspan="5"></td></tr><tr><th></th><th style="text-align:right">Qtà</th><th>Articolo</th><th>Prelevato da</th><th style="text-align:right">Codice</th></tr></thead><tfoot><tr class="sp"><td colspan="5"></td></tr></tfoot><tbody>' + rows + '</tbody></table><div class="foot">Stampato il ' + now.toLocaleDateString('it-IT') + ' alle ' + now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) + ' · WareFlow</div></body></html>');
+  _printInFrame('<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><title>Lista — ' + h(lista.nome) + '</title><style>' + _PRINT_CSS + '</style></head><body><h1>' + h(lista.nome) + '</h1><div class="sub">' + righe.length + ' articoli' + dest + (lista.note ? ' · ' + h(lista.note) : '') + '</div><table class="fx">' + _printCols([22, 64, 0, 270]) + '<thead><tr class="sp"><td colspan="4"></td></tr><tr><th></th><th style="text-align:right">Qtà</th><th>Articolo</th><th>Prelevato da</th></tr></thead><tfoot><tr class="sp"><td colspan="4"></td></tr></tfoot><tbody>' + rows + '</tbody></table><div class="foot">Stampato il ' + now.toLocaleDateString('it-IT') + ' alle ' + now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) + ' · WareFlow</div></body></html>');
 }
 
 // Modalità di stampa del magazzino (cursore nel modale): tutto | articoli | contenitori
@@ -3782,12 +3779,10 @@ async function stampaMagDetail() {
   const bauVoci = await _printBauVoci(righe.map(s => s.art_id));
   const rigaMag = s => {
     const a = getArt(s.art_id), special = isSpecialArt(s.art_id);
-    const codice = s._grp ? modelloDi(a).codice || a?.codice : a?.codice;
     return `<tr${special ? ' style="background:#fdf8f0"' : ''}>
       <td style="width:22px;padding-right:0"><span class="bx"></span></td>
       <td class="q" style="font-size:16px">${s.qty} <span class="um">${h(a?.um) || 'pz'}</span></td>
       <td class="nm">${s._grp ? _grpNome(s) : (h(a?.nome) || '—')}${special ? _printTipoPill(s.art_id) : _printCaseBadge(_caseSum(s), true)}</td>
-      <td class="cod" style="text-align:right">${h(codice) || '—'}</td>
     </tr>` + _printContenuto(s.art_id, bauVoci, 'mag');
   };
   // pezzi con varianti: una riga per modello+variante, separati tra liberi e dentro ciascun FLC/FLCK
@@ -3797,8 +3792,8 @@ async function stampaMagDetail() {
   const gruppi = _catGroups(righeGrp, s => s.art_id);
   const isCont = g => ['BAU', 'FLC', 'FLCK'].includes(g.cat?.prefisso);
   const iDiv = (modo === 'tutto' && gruppi.some(isCont)) ? gruppi.findIndex(g => !isCont(g)) : -1;
-  const divisorio = `<tr class="divrow"><td colspan="4"><div class="divbox"><b>Articoli singoli</b><i>L'elenco sottostante comprende tutti gli articoli, ad eccezione di quelli contenuti nei bauli misti.</i></div></td></tr>`;
-  const rows = gruppi.map((g, i) => (i === iDiv ? divisorio : '') + _printCatRow(g.cat, g.items.reduce((n, s) => n + s.qty, 0), 4, true) + g.items.map(rigaMag).join('')).join('');
+  const divisorio = `<tr class="divrow"><td colspan="3"><div class="divbox"><b>Articoli singoli</b><i>L'elenco sottostante comprende tutti gli articoli, ad eccezione di quelli contenuti nei bauli misti.</i></div></td></tr>`;
+  const rows = gruppi.map((g, i) => (i === iDiv ? divisorio : '') + _printCatRow(g.cat, g.items.reduce((n, s) => n + s.qty, 0), 3, true) + g.items.map(rigaMag).join('')).join('');
   _printInFrame(`<!DOCTYPE html><html lang="it"><head>
     <meta charset="UTF-8">
     <title>Contenuto — ${h(m.nome)}</title>
@@ -3807,9 +3802,9 @@ async function stampaMagDetail() {
     <h1>${h(m.nome)}</h1>
     <div class="sub">${m.citta ? h(m.citta) + ' · ' : ''}${soloCont ? righe.length + ' contenitori' : totale + ' pezzi totali'}${soloArt ? ' · solo articoli' : ''}${soloCont ? ' · solo contenitori' : ''}${cf ? ' · filtro categoria attivo' : ''}</div>
     <table class="fx">
-      ${_printCols([22, 64, 0, 84])}
-      <thead><tr class="sp"><td colspan="4"></td></tr><tr><th></th><th style="text-align:right">Qtà</th><th>Articolo</th><th style="text-align:right">Codice</th></tr></thead>
-      <tfoot><tr class="sp"><td colspan="4"></td></tr></tfoot>
+      ${_printCols([22, 64, 0])}
+      <thead><tr class="sp"><td colspan="3"></td></tr><tr><th></th><th style="text-align:right">Qtà</th><th>Articolo</th></tr></thead>
+      <tfoot><tr class="sp"><td colspan="3"></td></tr></tfoot>
       <tbody>${rows}</tbody>
     </table>
     <div class="totale">Totale: ${soloCont ? `<strong>${righe.length} contenitori</strong>` : `<strong>${totale} pezzi</strong> in ${righe.length} articoli`}</div>
@@ -4084,7 +4079,7 @@ async function salvaBaule() {
   } catch(e) { toast(e.message || 'Errore', true); }
 }
 
-// Duplica baule / flight case / flightcase K (solo admin; le regole le controlla il server)
+// Duplica baule / flightcase / flightcase K (solo admin; le regole le controlla il server)
 async function duplicaBt(id) {
   try {
     const r = await apiFetch('POST', `/duplica/${id}`);
@@ -4097,7 +4092,7 @@ async function duplicaBt(id) {
 async function eliminaBaule(id) {
   const b = D.bauli.find(x => x.id === id) || D.flightcase.find(x => x.id === id);
   if (!b) { toast('Elemento non trovato', true); return; }
-  const isB = isBauleArt(id), tipo = isB ? 'baule' : 'flight case';
+  const isB = isBauleArt(id), tipo = isB ? 'baule' : 'flightcase';
   const dove = D.stock.filter(s => s.art_id==id && s.qty>0).map(s => getMag(s.mag_id)?.nome).filter(Boolean).join(', ');
   let extra = isB ? '\nLe voci del baule verranno cancellate.' : '';
   if (!isB) { const fc = getFlightcaseDef(id); if (fc && fc.qty_caricata > 0) extra = `\nI ${fc.qty_caricata} pz di "${fc.art_contenuto_nome||'articolo'}" contenuti tornano in stock${dove ? ` in "${dove}"` : ''}.`; }
@@ -4130,7 +4125,7 @@ async function _aggiornaBauliD() {
   aggiornaNavBadge();
 }
 
-// ─── FLIGHT CASE ───
+// ─── FLIGHTCASE ───
 
 let _bauliTab = 'bauli';
 
@@ -4144,7 +4139,7 @@ function switchBauliTab(tab) {
   document.getElementById('flcTabContent').style.display = tab === 'flc' ? '' : 'none';
   document.getElementById('flckTabContent').style.display = tab === 'flck' ? '' : 'none';
   const nb = document.getElementById('bauliNewBtn');
-  if (nb) nb.textContent = { bauli: '+ Baule', flc: '+ Flight Case', flck: '+ Flightcase K' }[tab];
+  if (nb) nb.textContent = { bauli: '+ Baule', flc: '+ Flightcase', flck: '+ Flightcase K' }[tab];
   _bauliTabCounts();
   if (tab === 'flc') renderFlc();
   if (tab === 'flck') renderFlck();
@@ -4159,7 +4154,7 @@ function _bauliTabCounts() {
   set('tabBauliN', (D.bauli || []).length); set('tabFlcN', (D.flightcase || []).length); set('tabFlckN', (D.flck || []).length);
 }
 
-// ── Riquadri / lista compatta per Bauli, Flight Case, Flightcase K ──
+// ── Riquadri / lista compatta per Bauli, Flightcase, Flightcase K ──
 let _bauliView = (() => { try { return localStorage.getItem('bauliView') === 'list' ? 'list' : 'tile'; } catch (e) { return 'tile'; } })();
 function _btCol(pref, fb) { const c = (D.categorie || []).find(x => x.prefisso === pref); return (c && c.colore) || fb; }
 const _BT_SVG = '<svg width="52" height="52" viewBox="0 0 48 48" fill="none" stroke="currentColor"><rect x="6" y="12" width="36" height="26" rx="2" stroke-width="2.5"/><path d="M6 12l3-3h30l3 3" stroke-width="2"/><line x1="6" y1="25" x2="42" y2="25" stroke-width="1.8"/><circle cx="16" cy="25" r="2.5" fill="currentColor" stroke="none"/><circle cx="32" cy="25" r="2.5" fill="currentColor" stroke="none"/></svg>';
@@ -4176,7 +4171,7 @@ function setBauliView(v) {
   if (open) return;
   ({ bauli: renderBauli, flc: renderFlc, flck: renderFlck })[_bauliTab]();
 }
-// ── Filtro per magazzino (tendina) e ordinamento (A–Z / per magazzini) di Bauli, Flight Case, Flightcase K ──
+// ── Filtro per magazzino (tendina) e ordinamento (A–Z / per magazzini) di Bauli, Flightcase, Flightcase K ──
 let _btMag = '';   // '' = tutti · '-' = senza magazzino · id magazzino (si azzera cambiando scheda)
 let _btOrd = (() => { try { return localStorage.getItem('bauliOrd') === 'mag' ? 'mag' : 'az'; } catch (e) { return 'az'; } })();
 const _btMagOf = artId => D.stock.find(s => s.art_id == artId && s.qty > 0)?.mag_id ?? null;
@@ -4243,10 +4238,10 @@ function renderFlc() {
   const grid = document.getElementById('flcGrid');
   _bauliTabCounts();
   _btRender(grid, D.flightcase.map(fc => ({
-    nome: fc.nome, cod: fc.codice, sub: fc.art_contenuto_nome || '', col: _btCol('FLC', '#6b4c6e'),
+    nome: fc.nome, cod: fc.codice, sub: fc.art_contenuto_nome || '', col: _btCol('FLC', '#4d7c0f'),
     chip: `${fc.qty_caricata || 0}/${fc.qty_max}`, ok: fc.qty_caricata > 0,
     id: fc.id, dupOk: !(fc.qty_caricata > 0), onOpen: `apriFlc(${fc.id})`, delOk: true, onDel: `eliminaBaule(${fc.id})`
-  })), 'Nessun flight case — clicca "+ Flight Case" per crearne uno');
+  })), 'Nessun flightcase — clicca "+ Flightcase" per crearne uno');
 }
 
 let _flcCorrente = null;
@@ -4300,7 +4295,7 @@ function renderFlcDettaglio() {
     const magNome = getMag(magReale.mag_id)?.nome || '—';
     document.getElementById('flcStockInfo').innerHTML = `📍 Il case è in <strong>${h(magNome)}</strong> — ${h(fc.art_contenuto_nome||'articolo')}: <strong>${artStockInMag}</strong> disponibili nello stesso magazzino`;
   } else {
-    document.getElementById('flcStockInfo').innerHTML = `⚠️ Il flight case non è in nessun magazzino reale`;
+    document.getElementById('flcStockInfo').innerHTML = `⚠️ Il flightcase non è in nessun magazzino reale`;
   }
 }
 
@@ -4338,9 +4333,9 @@ async function scaricaFlc() {
 }
 
 function _flcForm(edit) {
-  document.getElementById('modalFlcTitle').textContent = edit ? 'Modifica Flight Case' : 'Nuovo Flight Case';
+  document.getElementById('modalFlcTitle').textContent = edit ? 'Modifica Flightcase' : 'Nuovo Flightcase';
   document.getElementById('flcMagGrp').style.display = edit ? 'none' : '';
-  document.getElementById('flcSalvaBtn').textContent = edit ? 'Salva' : 'Crea flight case';
+  document.getElementById('flcSalvaBtn').textContent = edit ? 'Salva' : 'Crea flightcase';
 }
 // menù dell'articolo contenuto (esclude bauli, FLC, FLCK e pezzi con varianti)
 function _flcPopolaArticoli() {
@@ -4389,14 +4384,14 @@ async function salvaFlc() {
     if (_btEdit) {
       await apiFetch('PUT', `/bauli/${_btEdit}`, { nome, note, art_id_contenuto: +art_id_contenuto, qty_max: +qty_max });
       closeModal('modalFlc');
-      await _btDopoModifica('Flight case modificato ✓');
+      await _btDopoModifica('Flightcase modificato ✓');
       return;
     }
     await apiFetch('POST', '/flightcase', { nome, note, mag_id: +mag_id, art_id_contenuto: +art_id_contenuto, qty_max: +qty_max });
     closeModal('modalFlc');
     await _aggiornaBauliD();
     switchBauliTab('flc');
-    toast('Flight case creato ✓');
+    toast('Flightcase creato ✓');
   } catch(e) { toast(e.message || 'Errore', true); }
 }
 

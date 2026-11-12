@@ -205,7 +205,7 @@ body.dark[data-theme="red"]{background:linear-gradient(160deg,#141414 0%,#0f0f0f
 .mg-svuota{font-size:11px;color:var(--amber);border-color:var(--amber);}
 .mg-del{color:var(--red);border-color:rgba(220,38,38,.3);font-size:12px;}
 @media (max-width:760px){.mg-board{grid-template-columns:1fr;}}
-/* ── Bauli / Flight Case / Flightcase K: riquadri e lista compatta ── */
+/* ── Bauli / Flightcase / Flightcase K: riquadri e lista compatta ── */
 .bt-bar{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
 .bt-tabs{display:flex;gap:6px;flex-wrap:wrap;}
 .bt-tab{min-height:44px;padding:0 18px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--ink2);font-family:inherit;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;cursor:pointer;}
@@ -2002,3 +2002,6 @@ body:has(#bauliTabContent:not([style*="none"]) #bauleDettaglio:not([style*="none
 /* ── Lista veloce: riga con quantità oltre la disponibilità ── */
 .ph-row.ph-over{border-color:var(--red);}
 .ph-row.ph-over .ph-r-s{color:var(--red);font-weight:600;}
+
+/* Stampa: niente intestazione/piè di pagina del browser (indirizzo del sito) */
+@page{margin:0}

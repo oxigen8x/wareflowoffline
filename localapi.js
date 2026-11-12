@@ -75,7 +75,7 @@ async function localFetch(method, url, body) {
   return out;
 }
 window.localFetch = localFetch;
-window.LOCALAPI_BUILD = 48;   // deve coincidere con APP_BUILD in index.html
+window.LOCALAPI_BUILD = 49;   // deve coincidere con APP_BUILD in index.html
 
 function isValidColore(c) {
   return !c || /^#[0-9a-fA-F]{3,6}$/.test(c);
@@ -183,7 +183,7 @@ app.delete('/api/categorie/:id', (req, res) => {
   if (catPfx?.prefisso === 'BAU')
     return res.status(400).json({ error: 'La categoria "Bauli misti" non può essere eliminata' });
   if (catPfx?.prefisso === 'FLC')
-    return res.status(400).json({ error: 'La categoria "Flight Case" non può essere eliminata' });
+    return res.status(400).json({ error: 'La categoria "Flightcase" non può essere eliminata' });
   if (catPfx?.prefisso === 'FLCK')
     return res.status(400).json({ error: 'La categoria "Flightcase K" non può essere eliminata' });
   if (db.prepare('SELECT COUNT(*) as n FROM articoli WHERE cat_id=?').get(req.params.id).n > 0)
@@ -208,7 +208,7 @@ app.post('/api/articoli', (req, res) => {
   if (!cat_id) return res.status(400).json({ error: 'Categoria obbligatoria' });
   const catPfx = db.prepare("SELECT prefisso FROM categorie WHERE id=?").get(cat_id);
   if (['BAU','FLC','FLCK'].includes(catPfx?.prefisso))
-    return res.status(400).json({ error: 'Usa la sezione Bauli per creare bauli e flight case' });
+    return res.status(400).json({ error: 'Usa la sezione Bauli per creare bauli e flightcase' });
   if (!codice?.trim()) return res.status(400).json({ error: 'Codice obbligatorio' });
   if (db.prepare('SELECT id FROM articoli WHERE codice=?').get(codice.trim().toUpperCase())) return res.status(400).json({ error: `Codice "${codice}" già esistente` });
   try { const r = db.prepare('INSERT INTO articoli (codice,nome,cat_id,um,note) VALUES (?,?,?,?,?)').run(codice.trim().toUpperCase(),nome.trim(),cat_id,um,note); res.json({ id:r.lastInsertRowid, codice:codice.trim().toUpperCase(), nome:nome.trim(), cat_id, um, note }); }
@@ -221,7 +221,7 @@ app.put('/api/articoli/:id', (req, res) => {
   if (!cat_id) return res.status(400).json({ error: 'Categoria obbligatoria' });
   const catPfx = db.prepare("SELECT prefisso FROM categorie WHERE id=?").get(cat_id);
   if (['BAU','FLC','FLCK'].includes(catPfx?.prefisso))
-    return res.status(400).json({ error: 'Non puoi spostare un articolo nelle categorie Bauli o Flight Case' });
+    return res.status(400).json({ error: 'Non puoi spostare un articolo nelle categorie Bauli o Flightcase' });
   if (!codice?.trim()) return res.status(400).json({ error: 'Codice obbligatorio' });
   if (db.prepare('SELECT id FROM articoli WHERE codice=? AND id!=?').get(codice.trim().toUpperCase(),req.params.id)) return res.status(400).json({ error: `Codice "${codice}" già esistente` });
   try { db.prepare('UPDATE articoli SET codice=?,nome=?,cat_id=?,um=?,note=? WHERE id=?').run(codice.trim().toUpperCase(),nome.trim(),cat_id,um,note,req.params.id); res.json({ ok:true }); }
@@ -230,11 +230,11 @@ app.put('/api/articoli/:id', (req, res) => {
 app.delete('/api/articoli/:id', (req, res) => {
   touch();
   if (db.prepare("SELECT 1 FROM articoli a JOIN categorie c ON c.id=a.cat_id WHERE a.id=? AND c.prefisso='FLCK'").get(req.params.id))
-    return res.status(400).json({ error: 'Elimina il Flightcase K dalla sezione Bauli e Flight Case' });
+    return res.status(400).json({ error: 'Elimina il Flightcase K dalla sezione Bauli e Flightcase' });
   const inK = db.prepare('SELECT k.nome FROM flck_voci v JOIN articoli k ON k.id=v.flck_art_id WHERE v.art_id=? AND v.qty_caricata>0').get(req.params.id);
   if (inK) return res.status(400).json({ error: `È dentro il Flightcase K "${inK.nome}": scaricalo prima` });
   const inFlc = db.prepare('SELECT a.nome FROM flightcase_def f JOIN articoli a ON a.id=f.art_id WHERE f.art_id_contenuto=?').get(req.params.id);
-  if (inFlc) return res.status(400).json({ error: 'È il contenuto del flight case "' + inFlc.nome + '": elimina prima il flight case' });
+  if (inFlc) return res.status(400).json({ error: 'È il contenuto del flightcase "' + inFlc.nome + '": elimina prima il flightcase' });
   try {
     db.transaction(() => {
       const righeIds = db.prepare('SELECT id FROM lista_righe WHERE art_id=?').all(req.params.id).map(r => r.id);
@@ -304,7 +304,7 @@ app.post('/api/flck/:id/voci', (req, res) => {
       for (const id of ids) {
         const a = db.prepare('SELECT id, nome, modello_id FROM articoli WHERE id=?').get(id);
         if (!a) throw safeThrow('Articolo non trovato');
-        if (isCatSpeciale(id)) throw safeThrow('Non si possono inserire bauli o flight case in un Flightcase K');
+        if (isCatSpeciale(id)) throw safeThrow('Non si possono inserire bauli o flightcase in un Flightcase K');
         const unico = !!a.modello_id;
         if (!unico && (isNaN(qm) || qm < 1)) throw safeThrow('Quantità massima non valida');
         const gia = db.prepare('SELECT k.nome FROM flck_voci v JOIN articoli k ON k.id=v.flck_art_id WHERE v.art_id=? AND (?=1 OR v.flck_art_id=?)').get(id, unico ? 1 : 0, k.id);
@@ -541,7 +541,7 @@ app.post('/api/stock/carica', (req, res) => {
   if (!esisteMag(mag_id)) return res.status(404).json({ error: 'Magazzino non trovato' });
   const artCat = db.prepare("SELECT c.prefisso FROM articoli a JOIN categorie c ON c.id=a.cat_id WHERE a.id=?").get(art_id);
   if (['BAU','FLC','FLCK'].includes(artCat?.prefisso))
-    return res.status(400).json({ error: 'Il carico di bauli e flight case avviene dalla sezione dedicata' });
+    return res.status(400).json({ error: 'Il carico di bauli e flightcase avviene dalla sezione dedicata' });
   if (isUnico(art_id)) {
     if (q !== 1) return res.status(400).json({ error: 'Pezzo univoco: si carica un pezzo alla volta (quantità 1)' });
     const dove = db.prepare('SELECT m.nome FROM stock s JOIN magazzini m ON m.id=s.mag_id WHERE s.art_id=? AND s.qty>0').get(art_id);
@@ -750,7 +750,7 @@ app.delete('/api/bauli/voci/:id', (req, res) => {
   res.json({ ok: true });
 });
 
-// DELETE baule o flight case (solo admin)
+// DELETE baule o flightcase (solo admin)
 app.delete('/api/bauli/:id', (req, res) => {
   touch();
   const fcDel = db.prepare('SELECT * FROM flightcase_def WHERE art_id=?').get(req.params.id);
@@ -782,7 +782,7 @@ app.delete('/api/bauli/:id', (req, res) => {
   }
 });
 
-// ─── DUPLICA baule / flight case / flightcase K (solo admin) ───
+// ─── DUPLICA baule / flightcase / flightcase K (solo admin) ───
 // Il duplicato prende il codice successivo della categoria e il nome con numero progressivo ("Regia" → "Regia 2").
 // Baule: copiato senza voci (anche se pieno). FLC e FLCK: solo se vuoti; del FLCK si copiano le voci come struttura vuota (esclusi i pezzi univoci).
 app.post('/api/duplica/:id', (req, res) => {
@@ -820,9 +820,9 @@ app.post('/api/duplica/:id', (req, res) => {
   } catch (e) { res.status(400).json({ error: safeErr(e, 'POST duplica') }); }
 });
 
-// ─── FLIGHT CASE ───
+// ─── FLIGHTCASE ───
 
-// GET tutti i flight case con definizione e info articolo contenuto
+// GET tutti i flightcase con definizione e info articolo contenuto
 app.get('/api/flightcase', (req, res) => {
   const cat = db.prepare("SELECT id FROM categorie WHERE prefisso='FLC'").get();
   if (!cat) return res.json([]);
@@ -840,17 +840,17 @@ app.get('/api/flightcase', (req, res) => {
   res.json(flc);
 });
 
-// POST nuovo flight case
+// POST nuovo flightcase
 app.post('/api/flightcase', (req, res) => {
   touch();
   const cat = db.prepare("SELECT id, prefisso FROM categorie WHERE prefisso='FLC'").get();
-  if (!cat) return res.status(400).json({ error: 'Categoria Flight Case non trovata. Riavvia il server.' });
+  if (!cat) return res.status(400).json({ error: 'Categoria Flightcase non trovata. Riavvia il server.' });
   const { nome, note='', mag_id, art_id_contenuto, qty_max } = req.body;
   if (!nome?.trim()) return res.status(400).json({ error: 'Nome obbligatorio' });
   if (!mag_id) return res.status(400).json({ error: 'Magazzino obbligatorio' });
   if (!art_id_contenuto) return res.status(400).json({ error: 'Articolo contenuto obbligatorio' });
   if (isUnico(art_id_contenuto))
-    return res.status(400).json({ error: 'I pezzi univoci con varianti non vanno in un flight case: usa un Flightcase K' });
+    return res.status(400).json({ error: 'I pezzi univoci con varianti non vanno in un flightcase: usa un Flightcase K' });
   const qm = parseInt(qty_max); if (isNaN(qm) || qm < 1) return res.status(400).json({ error: 'Capienza non valida' });
   const row = db.prepare(`SELECT MAX(CAST(SUBSTR(codice,?) AS INTEGER)) as max FROM articoli WHERE codice LIKE ?`)
     .get(cat.prefisso.length+1, cat.prefisso+'%');
@@ -866,7 +866,7 @@ app.post('/api/flightcase', (req, res) => {
       db.prepare(`INSERT INTO stock (art_id,mag_id,qty) VALUES (?,?,1)
         ON CONFLICT(art_id,mag_id) DO UPDATE SET qty=qty+1`).run(artId, mag_id);
       db.prepare('INSERT INTO spostamenti (art_id,mag_from,mag_to,qty,tipo,note,data,user_id) VALUES (?,NULL,?,?,?,?,?,?)')
-        .run(artId, mag_id, 1, 'carico', `Creazione flight case: ${nome.trim()}`, data, uid);
+        .run(artId, mag_id, 1, 'carico', `Creazione flightcase: ${nome.trim()}`, data, uid);
     })();
     res.json({ ok: true, codice });
   } catch(e) {
@@ -875,7 +875,7 @@ app.post('/api/flightcase', (req, res) => {
   }
 });
 
-// PUT modifica di baule / flight case / flightcase K (nome e note; per il FLC anche capienza e, a case vuoto, articolo contenuto)
+// PUT modifica di baule / flightcase / flightcase K (nome e note; per il FLC anche capienza e, a case vuoto, articolo contenuto)
 app.put('/api/bauli/:id', (req, res) => {
   touch();
   const el = db.prepare("SELECT a.id, c.prefisso FROM articoli a JOIN categorie c ON c.id=a.cat_id WHERE a.id=? AND c.prefisso IN ('BAU','FLC','FLCK')").get(req.params.id);
@@ -890,9 +890,9 @@ app.put('/api/bauli/:id', (req, res) => {
     if (!(qm >= 1)) return res.status(400).json({ error: 'Capienza non valida' });
     if (qm < fc.qty_caricata) return res.status(400).json({ error: `Capienza non può essere inferiore alla quantità caricata (${fc.qty_caricata})` });
     if (art !== fc.art_id_contenuto) {
-      if (fc.qty_caricata > 0) return res.status(400).json({ error: 'Il flight case non è vuoto: svuotalo prima di cambiare articolo' });
+      if (fc.qty_caricata > 0) return res.status(400).json({ error: 'Il flightcase non è vuoto: svuotalo prima di cambiare articolo' });
       if (!db.prepare('SELECT 1 FROM articoli WHERE id=?').get(art)) return res.status(400).json({ error: 'Articolo contenuto non trovato' });
-      if (isUnico(art)) return res.status(400).json({ error: 'I pezzi univoci con varianti non vanno in un flight case: usa un Flightcase K' });
+      if (isUnico(art)) return res.status(400).json({ error: 'I pezzi univoci con varianti non vanno in un flightcase: usa un Flightcase K' });
     }
     fcNuovo = { art, qm };
   }
@@ -905,16 +905,16 @@ app.put('/api/bauli/:id', (req, res) => {
   } catch (e) { res.status(400).json({ error: 'Esiste già un elemento con questo nome' }); }
 });
 
-// POST carica articoli dentro un flight case
+// POST carica articoli dentro un flightcase
 app.post('/api/flightcase/:id/carica', (req, res) => {
   touch();
   const { qty } = req.body;
   const q = parseInt(qty); if (isNaN(q) || q <= 0) return res.status(400).json({ error: 'Quantità non valida' });
   const fc = db.prepare('SELECT * FROM flightcase_def WHERE art_id=?').get(req.params.id);
-  if (!fc) return res.status(404).json({ error: 'Flight case non trovato' });
+  if (!fc) return res.status(404).json({ error: 'Flightcase non trovato' });
   if (fc.qty_caricata + q > fc.qty_max) return res.status(400).json({ error: `Capienza massima superata (max ${fc.qty_max}, già caricati ${fc.qty_caricata})` });
   const fcStock = db.prepare(`SELECT s.mag_id, s.qty FROM stock s JOIN magazzini m ON m.id=s.mag_id WHERE s.art_id=? AND s.qty>0 AND m.virtuale=0`).all(req.params.id);
-  if (!fcStock.length) return res.status(400).json({ error: 'Il flight case non è in nessun magazzino reale' });
+  if (!fcStock.length) return res.status(400).json({ error: 'Il flightcase non è in nessun magazzino reale' });
   const magId = fcStock[0].mag_id;
   const uid = req.session.user.id;
   const data = new Date().toISOString();
@@ -938,17 +938,17 @@ app.post('/api/flightcase/:id/carica', (req, res) => {
   } catch(e) { res.status(400).json({ error: safeErr(e, 'flightcase-carica') }); }
 });
 
-// POST scarica articoli da un flight case
+// POST scarica articoli da un flightcase
 app.post('/api/flightcase/:id/scarica', (req, res) => {
   touch();
   const { qty } = req.body;
   const q = parseInt(qty); if (isNaN(q) || q <= 0) return res.status(400).json({ error: 'Quantità non valida' });
   const fc = db.prepare('SELECT * FROM flightcase_def WHERE art_id=?').get(req.params.id);
-  if (!fc) return res.status(404).json({ error: 'Flight case non trovato' });
+  if (!fc) return res.status(404).json({ error: 'Flightcase non trovato' });
   if (q > fc.qty_caricata) return res.status(400).json({ error: `Nel case ci sono solo ${fc.qty_caricata} pezzi` });
   // Il FLC deve essere in un magazzino reale
   const fcStock = db.prepare(`SELECT s.mag_id FROM stock s JOIN magazzini m ON m.id=s.mag_id WHERE s.art_id=? AND s.qty>0 AND m.virtuale=0`).all(req.params.id);
-  if (!fcStock.length) return res.status(400).json({ error: 'Il flight case non è in nessun magazzino reale' });
+  if (!fcStock.length) return res.status(400).json({ error: 'Il flightcase non è in nessun magazzino reale' });
   const magId = fcStock[0].mag_id;
   const uid = req.session.user.id;
   const data = new Date().toISOString();
@@ -1149,7 +1149,9 @@ try {
     db.prepare('INSERT OR IGNORE INTO categorie (nome,colore,prefisso) VALUES (?,?,?)').run('Bauli misti', '#92400e', 'BAU');
   db.prepare("UPDATE categorie SET nome='Bauli misti' WHERE prefisso='BAU' AND nome='Bauli speciali'").run();   // migrazione nome
   if (!db.prepare("SELECT id FROM categorie WHERE prefisso='FLC'").get())
-    db.prepare('INSERT OR IGNORE INTO categorie (nome,colore,prefisso) VALUES (?,?,?)').run('Flight Case', '#6b4c6e', 'FLC');
+    db.prepare('INSERT OR IGNORE INTO categorie (nome,colore,prefisso) VALUES (?,?,?)').run('Flightcase', '#4d7c0f', 'FLC');
+  db.prepare("UPDATE categorie SET nome='Flightcase' WHERE prefisso='FLC' AND nome='Flight Case'").run();   // migrazione nome
+  db.prepare("UPDATE categorie SET colore='#4d7c0f' WHERE prefisso='FLC' AND colore='#6b4c6e'").run();   // migrazione colore
   if (!db.prepare("SELECT id FROM categorie WHERE prefisso='FLCK'").get())
     db.prepare('INSERT OR IGNORE INTO categorie (nome,colore,prefisso) VALUES (?,?,?)').run('Flightcase K', '#0e7490', 'FLCK');
   try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (_) {}
@@ -1158,7 +1160,7 @@ try {
 
 // ── Elimina il database corrente (ripartenza da zero) ──
 window.eliminaDb = async () => {
-  if (!await askConfirm('Eliminare TUTTO il database di questo iPad?\n\nArticoli, magazzini, bauli e flight case verranno cancellati per sempre.\nSe non hai ancora esportato un backup, premi Annulla ed esporta prima.', { ok: 'Continua', danger: true })) return;
+  if (!await askConfirm('Eliminare TUTTO il database di questo iPad?\n\nArticoli, magazzini, bauli e flightcase verranno cancellati per sempre.\nSe non hai ancora esportato un backup, premi Annulla ed esporta prima.', { ok: 'Continua', danger: true })) return;
   const t = await askPrompt('Per confermare scrivi ELIMINA', '', { ok: 'Elimina tutto' });
   if (t === null || t.trim().toUpperCase() !== 'ELIMINA') { toast('Annullato: il database non è stato toccato'); return; }
   resetting = true; clearTimeout(timer); timer = null;

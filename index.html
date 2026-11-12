@@ -378,18 +378,18 @@
 <!-- MAGAZZINI -->
     <div class="page" id="page-magazzini">
       <div class="page-head">
-        <div><div class="page-title">Magazzini</div><div class="page-sub">Gestisci i tuoi depositi</div></div>
+        <div><div class="page-title">Magazzini</div></div>
         <button class="btn btn-dark admin-only" style="display:none" onclick="openModalMagNew()">+ Nuovo magazzino</button>
       </div>
       <div class="lk-counters ds-counters" id="magCounters"></div>
       <div class="mg-board" id="magGrid"></div>
     </div>
 
-    <!-- BAULI & FLIGHT CASE -->
+    <!-- BAULI & FLIGHTCASE -->
     <div class="page" id="page-bauli">
       <div class="page-head">
         <div>
-          <div class="page-title">Bauli & Flight Case</div>
+          <div class="page-title">Bauli & Flightcase</div>
           <div class="page-sub">Contenitori per il trasporto</div>
         </div>
         <button class="btn btn-dark" id="bauliNewBtn" onclick="nuovoBauliCorrente()">+ Baule</button>
@@ -397,7 +397,7 @@
       <div class="bt-bar">
         <div class="bt-tabs">
           <button class="bt-tab active" id="tabBauli" onclick="switchBauliTab('bauli')">Bauli misti <span id="tabBauliN">0</span></button>
-          <button class="bt-tab" id="tabFlc" onclick="switchBauliTab('flc')">Flight Case <span id="tabFlcN">0</span></button>
+          <button class="bt-tab" id="tabFlc" onclick="switchBauliTab('flc')">Flightcase <span id="tabFlcN">0</span></button>
           <button class="bt-tab" id="tabFlck" onclick="switchBauliTab('flck')">Flightcase K <span id="tabFlckN">0</span></button>
         </div>
         <div class="bt-view" id="btView">
@@ -439,7 +439,7 @@
         <div id="flcGrid" class="mag-grid"></div>
         <div id="flcDettaglio" style="display:none">
           <div class="baule-det-head">
-            <button class="btn lista-back-btn" onclick="chiudiFlcDettaglio()">← Flight Case</button>
+            <button class="btn lista-back-btn" onclick="chiudiFlcDettaglio()">← Flightcase</button>
             <span id="flcDetNome" style="font-size:18px;font-weight:700;color:var(--ink)"></span>
             <span id="flcDetCodice"></span>
             <span id="flcDetBadge" class="baule-badge" style="margin-left:auto"></span>
@@ -653,7 +653,7 @@
               <li>Premi <strong>📦 Trasferisci tutto</strong>: l'intero contenuto viene spostato in una sola operazione. Subito dopo, per pochi secondi, compare il tasto di annullamento.</li>
             </ol>
             <p style="margin:0;background:var(--teal-bg);border:1px solid var(--teal-border);border-radius:6px;padding:9px 13px;font-size:13px">
-              Per spostare singoli articoli (bauli, flight case e flightcase K compresi) usa le <strong>liste di carico</strong> oppure le <strong>liste veloci ⚡</strong> dal contenuto di un magazzino.
+              Per spostare singoli articoli (bauli, flightcase e flightcase K compresi) usa le <strong>liste di carico</strong> oppure le <strong>liste veloci ⚡</strong> dal contenuto di un magazzino.
             </p>
           </div>
         </div>
@@ -721,37 +721,37 @@
           <div class="card-head"><span class="card-title">📦 Bauli</span></div>
           <div class="card-body" style="font-size:14px;line-height:1.7;color:var(--ink2);display:flex;flex-direction:column;gap:8px">
             <p style="margin:0">I bauli sono contenitori fisici per materiale non catalogato come articolo (attrezzi, minuteria, consumabili). Ogni baule è un articolo speciale della categoria <strong>BAU</strong> e viene gestito nella sezione <strong>Bauli e FLC</strong>.</p>
-            <p style="margin:0">Nella sezione <strong>Bauli e FLC</strong> ogni elemento è un <strong>riquadro</strong> con una fascia del <strong>colore della sua categoria</strong>: clicca sul riquadro per aprirlo, usa la <strong>✕</strong> in alto a destra per eliminarlo (solo admin), la <strong>⧉</strong> accanto per <strong>duplicarlo</strong> e il tasto vista per passare a una <strong>lista compatta</strong> (utile quando sono molti). Le tre schede sono Bauli, Flight Case e Flightcase K.</p>
-            <p style="margin:8px 0 0"><strong>Duplica</strong> (solo admin): crea una copia nello stesso magazzino con il <strong>codice successivo</strong> e il nome con un numero progressivo (es. «Regia» → «Regia 2»). Il baule si duplica anche se pieno, ma <strong>senza il contenuto</strong>; Flight Case e Flightcase K solo se <strong>vuoti</strong> (del Flightcase K si copiano le voci previste, tranne i pezzi univoci con varianti).</p>
+            <p style="margin:0">Nella sezione <strong>Bauli e FLC</strong> ogni elemento è un <strong>riquadro</strong> con una fascia del <strong>colore della sua categoria</strong>: clicca sul riquadro per aprirlo, usa la <strong>✕</strong> in alto a destra per eliminarlo (solo admin), la <strong>⧉</strong> accanto per <strong>duplicarlo</strong> e il tasto vista per passare a una <strong>lista compatta</strong> (utile quando sono molti). Le tre schede sono Bauli, Flightcase e Flightcase K.</p>
+            <p style="margin:8px 0 0"><strong>Duplica</strong> (solo admin): crea una copia nello stesso magazzino con il <strong>codice successivo</strong> e il nome con un numero progressivo (es. «Regia» → «Regia 2»). Il baule si duplica anche se pieno, ma <strong>senza il contenuto</strong>; Flightcase e Flightcase K solo se <strong>vuoti</strong> (del Flightcase K si copiano le voci previste, tranne i pezzi univoci con varianti).</p>
             <p style="margin:0">All'interno di ogni baule puoi definire una <strong>lista di voci</strong> libere (nome + quantità) che descrivono il contenuto reale. Le voci non sono articoli del catalogo — sono semplici righe di testo.</p>
             <p style="margin:0">I bauli si spostano come qualsiasi articolo, tramite le liste di carico. Nella sezione Articoli sono visibili con un badge <span style="background:#92400e22;color:#92400e;border:1px solid #92400e44;padding:0 4px;border-radius:3px;font-size:11px">baule</span> accanto al nome.</p>
           </div>
         </div>
 
-        <div class="card" style="border-top:5px solid #6b4c6e">
-          <div class="card-head"><span class="card-title">🔒 Flight Case</span></div>
+        <div class="card" style="border-top:5px solid #4d7c0f">
+          <div class="card-head"><span class="card-title">🔒 Flightcase</span></div>
           <div class="card-body" style="font-size:14px;line-height:1.7;color:var(--ink2);display:flex;flex-direction:column;gap:10px">
-            <p style="margin:0">I Flight Case (FLC) sono contenitori rigidi dedicati a un <strong>tipo specifico di articolo</strong> del catalogo. A differenza dei bauli, un FLC ha una capienza massima e traccia quanti pezzi dell'articolo associato sono stati fisicamente caricati al suo interno.</p>
+            <p style="margin:0">I Flightcase (FLC) sono contenitori rigidi dedicati a un <strong>tipo specifico di articolo</strong> del catalogo. A differenza dei bauli, un FLC ha una capienza massima e traccia quanti pezzi dell'articolo associato sono stati fisicamente caricati al suo interno.</p>
             <ol style="padding-left:18px;margin:0;display:flex;flex-direction:column;gap:4px">
-              <li><strong>Crea</strong> un FLC nella sezione Bauli e FLC → tab Flight Case → <strong>+ Flight Case</strong>.</li>
+              <li><strong>Crea</strong> un FLC nella sezione Bauli e FLC → tab Flightcase → <strong>+ Flightcase</strong>.</li>
               <li>Scegli il <strong>magazzino</strong> di appartenenza, l'<strong>articolo contenuto</strong> e la <strong>capienza massima</strong>. Per trovare l'articolo usa il filtro <strong>categoria</strong> e il campo di <strong>ricerca</strong> sopra il menu.</li>
               <li>Apri il dettaglio del FLC per <strong>caricare</strong> o <strong>scaricare</strong> pezzi — il caricamento scala lo stock dell'articolo nel magazzino, lo scaricamento lo ripristina.</li>
               <li>Quando sposti un FLC caricato in un altro magazzino, il sistema registra automaticamente anche lo spostamento degli articoli contenuti.</li>
             </ol>
-            <p style="margin:0;background:#6b4c6e12;border:1px solid #6b4c6e33;border-radius:6px;padding:9px 13px;font-size:13px">
-              📋 Nella sezione Articoli i FLC sono visibili con un badge <span style="background:#6b4c6e22;color:#6b4c6e;border:1px solid #6b4c6e44;padding:0 4px;border-radius:3px;font-size:11px">case</span> che mostra l'articolo contenuto e il rapporto caricati/capienza. I bauli e i FLC non possono essere creati o caricati dalla sezione Articoli — si gestiscono esclusivamente dalla loro sezione dedicata.
+            <p style="margin:0;background:#4d7c0f12;border:1px solid #4d7c0f33;border-radius:6px;padding:9px 13px;font-size:13px">
+              📋 Nella sezione Articoli i FLC sono visibili con un badge <span style="background:#4d7c0f22;color:#4d7c0f;border:1px solid #4d7c0f44;padding:0 4px;border-radius:3px;font-size:11px">case</span> che mostra l'articolo contenuto e il rapporto caricati/capienza. I bauli e i FLC non possono essere creati o caricati dalla sezione Articoli — si gestiscono esclusivamente dalla loro sezione dedicata.
             </p>
           </div>
         </div>
 
-        <div class="card" style="border-top:5px solid #6b4c6e">
+        <div class="card" style="border-top:5px solid #4d7c0f">
           <div class="card-head"><span class="card-title">🧰 Flightcase K</span></div>
           <div class="card-body" style="font-size:14px;line-height:1.7;color:var(--ink2);display:flex;flex-direction:column;gap:10px">
             <p style="margin:0">Il Flightcase K (FLCK) è un contenitore che può ospitare <strong>più voci diverse</strong>, non un solo articolo. Si gestisce dalla scheda <strong>Flightcase K</strong> della sezione Bauli e FLC.</p>
             <ol style="padding-left:18px;margin:0;display:flex;flex-direction:column;gap:4px">
               <li>Crea il flightcase con <strong>+ Flightcase K</strong> e aprilo cliccando sul riquadro.</li>
               <li>Con <strong>Aggiungi contenuto</strong> scegli il tipo: <strong>articolo a quantità</strong> (con capienza massima) oppure <strong>pezzi con varianti</strong> di un modello. In entrambi i casi puoi restringere la scelta con il filtro <strong>categoria</strong> e il campo di <strong>ricerca</strong>.</li>
-              <li>Carica e scarica i pezzi di ogni voce come per i Flight Case: lo stock del magazzino si aggiorna di conseguenza.</li>
+              <li>Carica e scarica i pezzi di ogni voce come per i Flightcase: lo stock del magazzino si aggiorna di conseguenza.</li>
             </ol>
           </div>
         </div>
@@ -974,16 +974,16 @@
   </div>
 </div>
 
-<!-- Modal nuovo flight case -->
+<!-- Modal nuovo flightcase -->
 <div class="overlay" id="modalFlc">
   <div class="modal modal-sm">
     <input type="text" style="display:none" aria-hidden="true" tabindex="-1" autocomplete="username">
     <input type="password" style="display:none" aria-hidden="true" tabindex="-1" autocomplete="current-password">
     <button class="modal-close" onclick="closeModal('modalFlc')">✕</button>
-    <div class="modal-title" id="modalFlcTitle">Nuovo Flight Case</div>
+    <div class="modal-title" id="modalFlcTitle">Nuovo Flightcase</div>
     <div class="modal-body">
       <div class="fgroup">
-        <label>Nome flight case <span style="color:var(--red)">*</span></label>
+        <label>Nome flightcase <span style="color:var(--red)">*</span></label>
         <input type="text" class="finput" id="flcNome" placeholder="es. Case PAR LED 6" autocomplete="off">
       </div>
       <div class="fgroup" id="flcMagGrp">
@@ -1010,7 +1010,7 @@
     </div>
     <div class="modal-foot">
       <button class="btn btn-ghost" onclick="closeModal('modalFlc')">Annulla</button>
-      <button class="btn btn-dark" id="flcSalvaBtn" onclick="salvaFlc()">Crea flight case</button>
+      <button class="btn btn-dark" id="flcSalvaBtn" onclick="salvaFlc()">Crea flightcase</button>
     </div>
   </div>
 </div>
